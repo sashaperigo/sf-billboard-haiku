@@ -108,6 +108,7 @@ a {
 
 .stage>img {
     display: block;
+    filter: url(#lift-shadows);
     width: 100%;
     height: auto;
 }

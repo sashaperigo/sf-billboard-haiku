@@ -357,6 +357,15 @@ export default function App() {
             <section id="app" className="app">
                 <div className="frame">
                     <div className="stage">
+                    <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true" focusable="false">
+                        <filter id="lift-shadows" colorInterpolationFilters="sRGB">
+                            <feComponentTransfer>
+                                <feFuncR type="gamma" amplitude="1" exponent="0.65" offset="0" />
+                                <feFuncG type="gamma" amplitude="1" exponent="0.65" offset="0" />
+                                <feFuncB type="gamma" amplitude="1" exponent="0.65" offset="0" />
+                            </feComponentTransfer>
+                        </filter>
+                    </svg>
                     <img src={billboard} alt="A South of Market billboard" />
 
                     <div ref={boxRef} data-testid="haiku" className="haiku" aria-live="polite">
