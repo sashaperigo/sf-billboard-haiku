@@ -366,3 +366,78 @@ a {
     right: 0;
     bottom: calc(100% + 8px);
 }
+
+@media (max-width: 700px) {
+    .app {
+        padding: 0 16px 40px;
+    }
+
+    .frame {
+        overflow: visible;
+        background: transparent;
+    }
+
+    .frame>img {
+        border-radius: 6px;
+    }
+
+    .controls {
+        position: static;
+        align-items: stretch;
+        gap: 12px;
+        margin-top: 14px;
+    }
+
+    .lines-card {
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 14px;
+    }
+
+    .row {
+        gap: 10px;
+    }
+
+    .syl {
+        flex: 1;
+        font-size: 14px;
+        width: auto;
+        text-align: left;
+        margin-right: 0;
+    }
+
+    .circle {
+        width: 44px;
+        height: 44px;
+    }
+
+    .lock {
+        font-size: 18px;
+    }
+
+    .font-btn {
+        font-size: 15px;
+    }
+
+    .actions {
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .action {
+        flex: 1;
+        width: auto;
+        border-radius: 14px;
+        font-size: 22px;
+    }
+
+    .status {
+        font-size: 11px;
+        text-align: center;
+        color: rgba(20, 19, 14, 0.5);
+    }
+
+    .circle[data-tip]::after {
+        display: none;
+    }
+}
