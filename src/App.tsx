@@ -422,16 +422,6 @@ export default function App() {
                         <div className="actions">
                             <button
                                 type="button"
-                                className="circle action undo"
-                                aria-label="Undo"
-                                data-tip="Undo"
-                                disabled={!prev}
-                                onClick={undo}
-                            >
-                                <UndoIcon />
-                            </button>
-                            <button
-                                type="button"
                                 className="circle action reroll-all"
                                 aria-label="Reroll all"
                                 data-tip="Reroll all"
@@ -439,6 +429,16 @@ export default function App() {
                                 onClick={rerollEverything}
                             >
                                 🎲
+                            </button>
+                            <button
+                                type="button"
+                                className="circle action undo"
+                                aria-label="Undo"
+                                data-tip="Undo"
+                                disabled={!prev}
+                                onClick={undo}
+                            >
+                                <UndoIcon />
                             </button>
                             <button
                                 type="button"
