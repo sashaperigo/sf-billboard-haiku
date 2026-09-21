@@ -248,7 +248,6 @@ export default function App() {
                     A generator that assembles a 5-7-5 haiku from real startup-billboard one-liners, then hangs it on a SoMa
                     billboard. Every line picks its own typeface, weight, and ink on each roll, so no two postings look alike.
                 </p>
-                <a className="cta" href="#app">↓ Try it</a>
             </section>
 
             <section id="app" className="app">
