@@ -312,3 +312,41 @@ a {
     color: rgba(255, 255, 255, 0.4);
     min-height: 1em;
 }
+
+.circle[data-tip] {
+    position: relative;
+}
+
+.circle[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    z-index: 10;
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: #14140f;
+    color: #fff;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s;
+}
+
+.circle[data-tip]:hover::after,
+.circle[data-tip]:focus-visible::after {
+    opacity: 1;
+}
+
+.lock[data-tip]::after {
+    right: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.action[data-tip]::after {
+    right: 0;
+    bottom: calc(100% + 8px);
+}

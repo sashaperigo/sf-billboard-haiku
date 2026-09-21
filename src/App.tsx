@@ -282,7 +282,7 @@ export default function App() {
                                         className="circle lock"
                                         aria-label={`Lock line ${i + 1}`}
                                         aria-pressed={locks[i]}
-                                        title={locks[i] ? `Unlock line ${i + 1}` : `Lock line ${i + 1}`}
+                                        data-tip={locks[i] ? `Unlock line ${i + 1}` : `Lock line ${i + 1}`}
                                         onClick={() => toggleLock(i)}
                                     >
                                         {locks[i] ? '🔒' : '🔓'}
@@ -295,7 +295,7 @@ export default function App() {
                                 type="button"
                                 className="circle action reroll-all"
                                 aria-label="Reroll all"
-                                title="Reroll the whole haiku"
+                                data-tip="Reroll all"
                                 disabled={locks.every(Boolean)}
                                 onClick={rerollEverything}
                             >
@@ -305,7 +305,7 @@ export default function App() {
                                 type="button"
                                 className="circle action"
                                 aria-label="Copy haiku"
-                                title="Copy the haiku"
+                                data-tip="Copy haiku"
                                 onClick={() => copy(haiku.map((p) => p.text).join('\n'), 'haiku copied')}
                             >
                                 ⧉
@@ -314,7 +314,7 @@ export default function App() {
                                 type="button"
                                 className="circle action"
                                 aria-label="Copy link"
-                                title="Copy a share link"
+                                data-tip="Copy share link"
                                 onClick={() => copy(shareUrl(), 'link copied')}
                             >
                                 🔗
