@@ -261,6 +261,10 @@ a {
     text-align: right;
 }
 
+.syl-long {
+    display: none;
+}
+
 .circle {
     width: 3.8cqw;
     height: 3.8cqw;
@@ -402,9 +406,14 @@ a {
         gap: 10px;
     }
 
+    .syl-long {
+        display: inline;
+    }
+
     .syl {
         flex: 1;
-        font-size: 14px;
+        font-size: 15px;
+        color: #14140f;
         width: auto;
         text-align: left;
         margin-right: 0;

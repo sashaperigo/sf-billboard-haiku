@@ -339,7 +339,11 @@ export default function App() {
                         <div className="lines-card">
                             {LINES.map((i) => (
                                 <div className="row" key={i}>
-                                    <span className="syl">{SYLLABLES[i]}</span>
+                                    <span className="syl">
+                                        <span className="syl-long">Line {i + 1} · </span>
+                                        {SYLLABLES[i]}
+                                        <span className="syl-long"> syllables</span>
+                                    </span>
                                     <button
                                         type="button"
                                         className="circle lock font-btn"
