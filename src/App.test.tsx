@@ -49,6 +49,18 @@ describe('App', () => {
     expect(after[2]).not.toBe(before[2])
   })
 
+  it('undo restores the haiku from before the last Reroll all, once', async () => {
+    render(<App />)
+    const undo = screen.getByRole('button', { name: 'Undo' })
+    expect(undo).toBeDisabled()
+    const before = lines()
+    await userEvent.click(screen.getByRole('button', { name: 'Reroll all' }))
+    expect(undo).toBeEnabled()
+    await userEvent.click(undo)
+    expect(lines()).toEqual(before)
+    expect(undo).toBeDisabled()
+  })
+
   it('disables Reroll all when every line is locked', async () => {
     render(<App />)
     for (const n of [1, 2, 3]) await userEvent.click(screen.getByRole('button', { name: `Lock line ${n}` }))

@@ -129,6 +129,7 @@ export default function App() {
     const [style, setStyle] = useState(() => restyle([0, 0, 0], [0, 0, 0], [0, 1, 2]))
     const [rolls, setRolls] = useState < { n: number;delay: number } [] > ([0, 1, 2].map(() => ({ n: 0, delay: 0 })))
     const [status, setStatus] = useState('')
+    const [prev, setPrev] = useState<{ haiku: Haiku; style: typeof style } | null>(null)
 
     const boxRef = useRef < HTMLDivElement > (null)
     const lineRefs = useRef < (HTMLSpanElement | null)[] > ([])
@@ -213,7 +214,15 @@ export default function App() {
             }),
         )
 
+    const undo = () => {
+        if (!prev) return
+        bump(LINES.filter((i) => prev.haiku[i].id !== haiku[i].id))
+        setHaiku(prev.haiku)
+        setStyle(prev.style)
+        setPrev(null)
+    }
     const rerollEverything = () => {
+        setPrev({ haiku, style })
         bump(LINES.filter((i) => !locks[i]))
         setHaiku((h) => rerollAll(all, h, locks, Math.random))
         setStyle((s) =>
@@ -291,6 +300,16 @@ export default function App() {
                             ))}
                         </div>
                         <div className="actions">
+                            <button
+                                type="button"
+                                className="circle action undo"
+                                aria-label="Undo"
+                                data-tip="Undo"
+                                disabled={!prev}
+                                onClick={undo}
+                            >
+                                ↶
+                            </button>
                             <button
                                 type="button"
                                 className="circle action reroll-all"

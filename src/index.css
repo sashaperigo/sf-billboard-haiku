@@ -300,6 +300,11 @@ a {
     font-size: 2.1cqw;
 }
 
+.undo {
+    font-size: 2cqw;
+}
+
+.undo:disabled,
 .reroll-all:disabled {
     color: rgba(20, 19, 14, 0.3);
     cursor: not-allowed;
