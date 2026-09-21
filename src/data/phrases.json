@@ -1,0 +1,487 @@
+[
+  {
+    "id": "p001",
+    "text": "Listen to humans.",
+    "syllables": 5
+  },
+  {
+    "id": "p002",
+    "text": "LLMs love us.",
+    "syllables": 5
+  },
+  {
+    "id": "p003",
+    "text": "So do their builders.",
+    "syllables": 5
+  },
+  {
+    "id": "p004",
+    "text": "You're a bad parent.",
+    "syllables": 5
+  },
+  {
+    "id": "p005",
+    "text": "Prompt it. Then push it.",
+    "syllables": 5
+  },
+  {
+    "id": "p006",
+    "text": "Quality data",
+    "syllables": 5
+  },
+  {
+    "id": "p007",
+    "text": "*Agentic Finance.",
+    "syllables": 5
+  },
+  {
+    "id": "p008",
+    "text": "Reveló.com",
+    "syllables": 5
+  },
+  {
+    "id": "p009",
+    "text": "Build AI that works.",
+    "syllables": 5
+  },
+  {
+    "id": "p010",
+    "text": "Agents that don't suck.",
+    "syllables": 5
+  },
+  {
+    "id": "p011",
+    "text": "Build secure software.",
+    "syllables": 5
+  },
+  {
+    "id": "p012",
+    "text": "Maximize making.",
+    "syllables": 5
+  },
+  {
+    "id": "p013",
+    "text": "Knowledge is power.",
+    "syllables": 5
+  },
+  {
+    "id": "p014",
+    "text": "Support at Light speed.",
+    "syllables": 5
+  },
+  {
+    "id": "p015",
+    "text": "Trusted by billions.",
+    "syllables": 5
+  },
+  {
+    "id": "p016",
+    "text": "Harmless otherwise.",
+    "syllables": 5
+  },
+  {
+    "id": "p017",
+    "text": "I'm not a robot.",
+    "syllables": 5
+  },
+  {
+    "id": "p018",
+    "text": "Download invoices.",
+    "syllables": 5
+  },
+  {
+    "id": "p019",
+    "text": "Click submit. At Scale",
+    "syllables": 5
+  },
+  {
+    "id": "p020",
+    "text": "That's so agentic.",
+    "syllables": 5
+  },
+  {
+    "id": "p021",
+    "text": "Always-on agents.",
+    "syllables": 5
+  },
+  {
+    "id": "p022",
+    "text": "Voice of your business.",
+    "syllables": 5
+  },
+  {
+    "id": "p023",
+    "text": "AI attacks fast.",
+    "syllables": 5
+  },
+  {
+    "id": "p024",
+    "text": "Stop hirring humans.",
+    "syllables": 5
+  },
+  {
+    "id": "p025",
+    "text": "We respond faster.",
+    "syllables": 5
+  },
+  {
+    "id": "p026",
+    "text": "Fire Steve. Hire Ava.",
+    "syllables": 5
+  },
+  {
+    "id": "p027",
+    "text": "Payments are going.",
+    "syllables": 5
+  },
+  {
+    "id": "p028",
+    "text": "Software ate the world.",
+    "syllables": 5
+  },
+  {
+    "id": "p029",
+    "text": "Sales tax and VAT, solved.",
+    "syllables": 5
+  },
+  {
+    "id": "p030",
+    "text": "Agents trace. You draw.",
+    "syllables": 5
+  },
+  {
+    "id": "p031",
+    "text": "Zenni ID Guard.",
+    "syllables": 5
+  },
+  {
+    "id": "p032",
+    "text": "Your ID on lock.",
+    "syllables": 5
+  },
+  {
+    "id": "p033",
+    "text": "To-Do's to To-Done",
+    "syllables": 5
+  },
+  {
+    "id": "p034",
+    "text": "Usage-based billing.",
+    "syllables": 5
+  },
+  {
+    "id": "p035",
+    "text": "Meet your AI team.",
+    "syllables": 5
+  },
+  {
+    "id": "p036",
+    "text": "Stop hiring humans.",
+    "syllables": 5
+  },
+  {
+    "id": "p037",
+    "text": "They need computers.",
+    "syllables": 5
+  },
+  {
+    "id": "p038",
+    "text": "All-in cost per lead.",
+    "syllables": 5
+  },
+  {
+    "id": "p039",
+    "text": "Who's the real good boy?",
+    "syllables": 5
+  },
+  {
+    "id": "p040",
+    "text": "Content + AI",
+    "syllables": 5
+  },
+  {
+    "id": "p041",
+    "text": "Oh hi, Gemini.",
+    "syllables": 5
+  },
+  {
+    "id": "p042",
+    "text": "Simplify HR.",
+    "syllables": 5
+  },
+  {
+    "id": "p043",
+    "text": "Risk mitigation.",
+    "syllables": 5
+  },
+  {
+    "id": "p044",
+    "text": "Instantly simple.",
+    "syllables": 5
+  },
+  {
+    "id": "p045",
+    "text": "How tomorrow works.",
+    "syllables": 5
+  },
+  {
+    "id": "p046",
+    "text": "Shot on iPhone 6",
+    "syllables": 5
+  },
+  {
+    "id": "p047",
+    "text": "You can just ship things.",
+    "syllables": 5
+  },
+  {
+    "id": "p048",
+    "text": "We make AI work.",
+    "syllables": 5
+  },
+  {
+    "id": "p049",
+    "text": "YOU CAN JUST DO THINGS",
+    "syllables": 5
+  },
+  {
+    "id": "p050",
+    "text": "For the Internet.",
+    "syllables": 5
+  },
+  {
+    "id": "p051",
+    "text": "Secure the future.",
+    "syllables": 5
+  },
+  {
+    "id": "p052",
+    "text": "Human first AI.",
+    "syllables": 5
+  },
+  {
+    "id": "p053",
+    "text": "Send like you know them.",
+    "syllables": 5
+  },
+  {
+    "id": "p054",
+    "text": "Not enterprise SAAS.",
+    "syllables": 5
+  },
+  {
+    "id": "p055",
+    "text": "Win customers' trust.",
+    "syllables": 5
+  },
+  {
+    "id": "p056",
+    "text": "Review AI Code.",
+    "syllables": 5
+  },
+  {
+    "id": "p057",
+    "text": "Explain AI Code.",
+    "syllables": 5
+  },
+  {
+    "id": "p058",
+    "text": "The voice of technology.",
+    "syllables": 7
+  },
+  {
+    "id": "p059",
+    "text": "In 10,000 sandboxes.",
+    "syllables": 7
+  },
+  {
+    "id": "p060",
+    "text": "Networking that's built, not bought.",
+    "syllables": 7
+  },
+  {
+    "id": "p061",
+    "text": "NurtureOS.ai",
+    "syllables": 7
+  },
+  {
+    "id": "p062",
+    "text": "Unified business software.",
+    "syllables": 7
+  },
+  {
+    "id": "p063",
+    "text": "Hate reviewing AI code?",
+    "syllables": 7
+  },
+  {
+    "id": "p064",
+    "text": "Damn, that's a lot of PRs.",
+    "syllables": 7
+  },
+  {
+    "id": "p065",
+    "text": "Everything is database.",
+    "syllables": 7
+  },
+  {
+    "id": "p066",
+    "text": "AI runs better on US",
+    "syllables": 7
+  },
+  {
+    "id": "p067",
+    "text": "WTF is \"VIBE WORKING\"?",
+    "syllables": 7
+  },
+  {
+    "id": "p068",
+    "text": "Secure agentic AI.",
+    "syllables": 7
+  },
+  {
+    "id": "p069",
+    "text": "Josh Grant, VP Growth, Webflow",
+    "syllables": 7
+  },
+  {
+    "id": "p070",
+    "text": "Not enough B2B SETS.",
+    "syllables": 7
+  },
+  {
+    "id": "p071",
+    "text": "Resurrect your side project.",
+    "syllables": 7
+  },
+  {
+    "id": "p072",
+    "text": "Busywork makes the dream hurt.",
+    "syllables": 7
+  },
+  {
+    "id": "p073",
+    "text": "Hire Artisans, not humans.",
+    "syllables": 7
+  },
+  {
+    "id": "p074",
+    "text": "not coming in today soz",
+    "syllables": 7
+  },
+  {
+    "id": "p075",
+    "text": "Welcome to AI Country.",
+    "syllables": 7
+  },
+  {
+    "id": "p076",
+    "text": "Population: everyone.",
+    "syllables": 7
+  },
+  {
+    "id": "p077",
+    "text": "The data is in: love wins.",
+    "syllables": 7
+  },
+  {
+    "id": "p078",
+    "text": "But someone using nooks will!",
+    "syllables": 7
+  },
+  {
+    "id": "p079",
+    "text": "Never wait on hold again.",
+    "syllables": 7
+  },
+  {
+    "id": "p080",
+    "text": "Architected for agents.",
+    "syllables": 7
+  },
+  {
+    "id": "p081",
+    "text": "Slides in the blink of AI.",
+    "syllables": 7
+  },
+  {
+    "id": "p082",
+    "text": "Try Notion AI for work.",
+    "syllables": 7
+  },
+  {
+    "id": "p083",
+    "text": "Better billing for AI.",
+    "syllables": 7
+  },
+  {
+    "id": "p084",
+    "text": "AI inference at scale.",
+    "syllables": 7
+  },
+  {
+    "id": "p085",
+    "text": "Modern finance runs on Ramp.",
+    "syllables": 7
+  },
+  {
+    "id": "p086",
+    "text": "Latest iPhone. Greatest price.",
+    "syllables": 7
+  },
+  {
+    "id": "p087",
+    "text": "Just publish it with Framer.",
+    "syllables": 7
+  },
+  {
+    "id": "p088",
+    "text": "This is enterprise AI.",
+    "syllables": 7
+  },
+  {
+    "id": "p089",
+    "text": "Hire fast. Train smart. Thank AI.",
+    "syllables": 7
+  },
+  {
+    "id": "p090",
+    "text": "Take traffic off your roadmap.",
+    "syllables": 7
+  },
+  {
+    "id": "p091",
+    "text": "Find the hottest tech talent.",
+    "syllables": 7
+  },
+  {
+    "id": "p092",
+    "text": "If it's fast, it's on Vercel.",
+    "syllables": 7
+  },
+  {
+    "id": "p093",
+    "text": "Great design is strategy",
+    "syllables": 7
+  },
+  {
+    "id": "p094",
+    "text": "AI can't replace teamwork.",
+    "syllables": 7
+  },
+  {
+    "id": "p095",
+    "text": "Sauna is better with friends.",
+    "syllables": 7
+  },
+  {
+    "id": "p096",
+    "text": "Hire humans. Pay them on Warp.",
+    "syllables": 7
+  },
+  {
+    "id": "p097",
+    "text": "Dominate the leaderboard.",
+    "syllables": 7
+  }
+]
