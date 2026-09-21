@@ -51,13 +51,6 @@ a {
     gap: 20px;
 }
 
-.eyebrow {
-    font-size: 12px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: rgba(20, 19, 14, 0.5);
-}
-
 .hero h1,
 .howto h2 {
     font-family: 'Montserrat', sans-serif;
@@ -69,6 +62,7 @@ a {
 
 .hero h1 {
     font-size: clamp(2.6rem, 7vw, 4.4rem);
+    white-space: nowrap;
     line-height: 1.05;
 }
 
@@ -154,7 +148,7 @@ a {
 .app {
     width: 100%;
     max-width: 1080px;
-    padding: 0 24px 88px;
+    padding: 0 24px 56px;
 }
 
 .footer {

@@ -243,28 +243,12 @@ export default function App() {
     return (
         <div className="page">
             <section className="hero">
-                <span className="eyebrow">South of Market, SF</span>
                 <h1>Billboard Haiku</h1>
                 <p>
                     A generator that assembles a 5-7-5 haiku from real startup-billboard one-liners, then hangs it on a SoMa
                     billboard. Every line picks its own typeface, weight, and ink on each roll, so no two postings look alike.
                 </p>
                 <a className="cta" href="#app">↓ Try it</a>
-            </section>
-
-            <section className="howto">
-                <h2>How to use it</h2>
-                <div className="cards">
-                    {STEPS.map((s) => (
-                        <div className="card" key={s.title}>
-                            <div className="card-icon" aria-hidden="true">{s.icon}</div>
-                            <div className="card-text">
-                                <div className="card-title">{s.title}</div>
-                                <div className="card-desc">{s.desc}</div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
             </section>
 
             <section id="app" className="app">
@@ -341,6 +325,21 @@ export default function App() {
                             {status}
                         </div>
                     </div>
+                </div>
+            </section>
+
+            <section className="howto">
+                <h2>How to use it</h2>
+                <div className="cards">
+                    {STEPS.map((s) => (
+                        <div className="card" key={s.title}>
+                            <div className="card-icon" aria-hidden="true">{s.icon}</div>
+                            <div className="card-text">
+                                <div className="card-title">{s.title}</div>
+                                <div className="card-desc">{s.desc}</div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </section>
 
