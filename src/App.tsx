@@ -16,50 +16,86 @@ const all = phrases as Phrase[]
 const LINES = [0, 1, 2] as const
 const SYLLABLES = [5, 7, 5]
 
-const INKS = ['#f6f1e7', '#ffb347', '#ff6f9c', '#6fe3ff', '#c8f24a', '#b79cff', '#ff4d3d', '#ffe45e']
+const INKS = ['#12141a', '#0047ff', '#e01020', '#00845c', '#7b2ff7', '#ff5c00', '#0098a6', '#c9007a']
 
 interface Face {
   family: string
   fallback: string
   weight: number
   italic: boolean
-  size: number
+  upper: boolean
   spacing: string
-  transform: 'none' | 'uppercase' | 'lowercase'
+  size: number
+  ink?: string
+  glow?: string
 }
+const F = (
+  family: string,
+  fallback: string,
+  weight: number,
+  italic: boolean,
+  upper: boolean,
+  spacing: string,
+  size: number,
+  ink?: string,
+  glow?: string,
+): Face => ({ family, fallback, weight, italic, upper, spacing, size, ink, glow })
+const S = 'sans-serif'
+const SR = 'serif'
+const M = 'monospace'
 const FACES: Face[] = [
-  { family: 'Playfair Display', fallback: 'serif', weight: 700, italic: false, size: 1.0, spacing: '-0.01em', transform: 'none' },
-  { family: 'Playfair Display', fallback: 'serif', weight: 500, italic: true, size: 1.02, spacing: '0', transform: 'none' },
-  { family: 'Bebas Neue', fallback: 'sans-serif', weight: 400, italic: false, size: 1.28, spacing: '0.03em', transform: 'uppercase' },
-  { family: 'Space Mono', fallback: 'monospace', weight: 700, italic: false, size: 0.82, spacing: '-0.02em', transform: 'lowercase' },
-  { family: 'Space Mono', fallback: 'monospace', weight: 400, italic: true, size: 0.84, spacing: '0', transform: 'none' },
-  { family: 'Abril Fatface', fallback: 'serif', weight: 400, italic: false, size: 0.98, spacing: '0', transform: 'none' },
-  { family: 'Caveat', fallback: 'cursive', weight: 600, italic: false, size: 1.34, spacing: '0', transform: 'none' },
-  { family: 'Libre Baskerville', fallback: 'serif', weight: 400, italic: true, size: 0.8, spacing: '0', transform: 'none' },
-  { family: 'Archivo Black', fallback: 'sans-serif', weight: 400, italic: false, size: 0.85, spacing: '-0.015em', transform: 'uppercase' },
-  { family: 'Cormorant Garamond', fallback: 'serif', weight: 400, italic: true, size: 1.22, spacing: '0.01em', transform: 'none' },
-  { family: 'Cormorant Garamond', fallback: 'serif', weight: 600, italic: false, size: 1.18, spacing: '0.06em', transform: 'uppercase' },
+  F('Archivo Black', S, 400, false, true, '-0.02em', 0.88),
+  F('Bebas Neue', S, 400, false, true, '0.02em', 1.3),
+  F('Barlow Condensed', S, 700, false, true, '0.02em', 1.2),
+  F('Big Shoulders Display', S, 800, false, true, '0.01em', 1.3),
+  F('Space Grotesk', S, 700, false, false, '-0.03em', 1.0),
+  F('Manrope', S, 800, false, false, '-0.03em', 1.0),
+  F('Sora', S, 700, false, false, '-0.02em', 0.95),
+  F('Righteous', S, 400, false, false, '0', 1.0),
+  F('Bungee', S, 400, false, true, '0', 0.82),
+  F('IBM Plex Mono', M, 500, true, false, '0', 0.88),
+  F('Space Mono', M, 700, false, false, '-0.02em', 0.88),
+  F('VT323', M, 400, false, false, '0.01em', 1.24),
+  F('DM Serif Display', SR, 400, false, false, '0', 1.12),
+  F('Instrument Serif', SR, 400, true, false, '0', 1.18),
+  F('Silkscreen', S, 700, false, true, '0.04em', 0.88, '#ff45a8'),
+  F('Audiowide', S, 400, false, false, '0', 0.88, '#e5177f', '0 0 5px rgba(229,23,127,0.18)'),
+  F('Wallpoet', S, 400, false, true, '0.02em', 0.94, '#ff2d95'),
+  F('Comic Neue', S, 700, true, false, '0', 1.05, '#ff2d95'),
+  F('Bungee Inline', S, 400, false, true, '0', 0.82, '#00b8d4'),
+  F('Turret Road', S, 800, false, true, '0.01em', 0.88, '#e07b00', '0 0 12px rgba(224,123,0,0.45)'),
+  F('Kanit', S, 800, true, true, '-0.01em', 0.94, '#e04e00'),
+  F('Bodoni Moda', SR, 900, false, false, '-0.01em', 1.18),
+  F('Playfair Display', SR, 900, false, false, '-0.015em', 1.12),
+  F('Prata', SR, 400, false, false, '0', 1.0),
+  F('Bricolage Grotesque', S, 800, false, false, '-0.03em', 1.0),
+  F('Libre Franklin', S, 900, false, true, '-0.01em', 0.88),
+  F('Epilogue', S, 800, true, false, '-0.03em', 1.0),
+  F('Newsreader', SR, 600, true, false, '0', 1.12),
 ]
-const BASE_SIZE = ['3.1cqw', '2.7cqw', '3.1cqw']
+const BASE_SIZE = ['4.8cqw', '4.2cqw', '4.8cqw']
 
 type Trio = [number, number, number]
 const pick = (n: number) => Math.floor(Math.random() * n)
+const colorOf = (face: number, ink: number) => FACES[face].ink ?? INKS[ink]
 
 function restyle(faces: Trio, inks: Trio, indices: number[]): { faces: Trio; inks: Trio } {
   const f = [...faces] as Trio
   const c = [...inks] as Trio
   for (const i of indices) {
     const others = LINES.filter((j) => j !== i)
+    const taken = () => others.map((j) => colorOf(f[j], c[j]))
     let face = pick(FACES.length)
-    let ink = pick(INKS.length)
-    for (let t = 0; t < 20; t++) {
+    for (let t = 0; t < 40; t++) {
+      const fixed = FACES[face].ink
       const clash =
         others.some((j) => FACES[f[j]].family === FACES[face].family) ||
-        others.some((j) => c[j] === ink)
+        (fixed !== undefined && taken().includes(fixed))
       if (!clash) break
       face = pick(FACES.length)
-      ink = pick(INKS.length)
     }
+    let ink = pick(INKS.length)
+    for (let t = 0; t < 20 && taken().includes(INKS[ink]); t++) ink = pick(INKS.length)
     f[i] = face
     c[i] = ink
   }
@@ -83,18 +119,58 @@ export default function App() {
 
   const fit = useCallback(() => {
     const box = boxRef.current
-    if (!box) return
+    const els = lineRefs.current
+    if (!box || els.some((e) => !e)) return
     const cs = getComputedStyle(box)
-    const avail = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
-    for (const el of lineRefs.current) {
-      if (!el) continue
-      el.style.transform = 'scale(1)'
-      const w = el.offsetWidth
-      if (avail > 0 && w > avail) el.style.transform = `scale(${avail / w})`
+    const availW = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
+    const availH = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)
+    const gap = parseFloat(cs.rowGap) || 0
+    if (availW <= 0 || availH <= 0) return
+    const w: number[] = []
+    const h: number[] = []
+    for (const el of els) {
+      el!.style.transform = 'scale(1)'
+      el!.style.margin = '0'
+      w.push(el!.offsetWidth)
+      h.push(el!.offsetHeight)
     }
+    if (w.some((x) => x === 0)) return
+    const lead = availH * 0.05
+    const budget = availH - lead * 3 - gap * 2
+    let s = [1, 1, 1]
+    for (const ratio of [0.88, 0.8, 0.72, 0.62, 0.52, 0.42]) {
+      const mid = Math.min(availW / w[1], 6)
+      const target = ratio * mid * w[1]
+      s = [Math.min(target / w[0], 6), mid, Math.min(target / w[2], 6)]
+      const total = s[0] * h[0] + s[1] * h[1] + s[2] * h[2]
+      if (total > budget) {
+        const left = budget - s[1] * h[1]
+        if (left > 0.22 * budget) {
+          const outer = s[0] * h[0] + s[2] * h[2]
+          const k = left / outer
+          s = [s[0] * k, s[1], s[2] * k]
+        } else {
+          const k = Math.max(budget / total, 0.2)
+          s = s.map((x) => x * k)
+        }
+      }
+      if (s[1] * w[1] >= 0.75 * availW) break
+    }
+    els.forEach((el, i) => {
+      el!.style.transform = `scale(${s[i]})`
+      el!.style.margin = `${(s[i] * h[i] - h[i]) / 2 + lead / 2}px 0`
+    })
   }, [])
 
   useLayoutEffect(fit)
+  useEffect(() => {
+    const raf = requestAnimationFrame(fit)
+    const timers = [120, 400, 1200].map((ms) => setTimeout(fit, ms))
+    return () => {
+      cancelAnimationFrame(raf)
+      timers.forEach(clearTimeout)
+    }
+  }, [fit, haiku, style])
   useEffect(() => {
     window.addEventListener('resize', fit)
     document.fonts?.ready.then(fit)
@@ -151,8 +227,9 @@ export default function App() {
       fontStyle: face.italic ? 'italic' : 'normal',
       fontSize: `calc(${BASE_SIZE[i]} * ${face.size})`,
       letterSpacing: face.spacing,
-      textTransform: face.transform,
-      color: INKS[style.inks[i]],
+      textTransform: face.upper ? 'uppercase' : 'none',
+      color: colorOf(style.faces[i], style.inks[i]),
+      textShadow: face.glow ?? 'none',
     }
   }
 
@@ -160,7 +237,7 @@ export default function App() {
     <div className="stage">
       <h1 className="visually-hidden">Haiku Generator</h1>
       <div className="frame">
-        <img src={billboard} alt="A South of Market billboard, blacked out" />
+        <img src={billboard} alt="A South of Market billboard" />
 
         <div ref={boxRef} data-testid="haiku" className="haiku" aria-live="polite">
           {LINES.map((i) => (
@@ -176,8 +253,7 @@ export default function App() {
             </span>
           ))}
         </div>
-        <div className="surface seams" />
-        <div className="surface wash" />
+        <div className="surface sheen" />
         <div className="surface vignette" />
 
         <div className="info">
@@ -201,29 +277,10 @@ export default function App() {
               <p>Every line picks its own typeface, weight, and ink on each roll, so no two postings look alike.</p>
               <dl>
                 <dt>Photo</dt>
-                <dd>
-                  “
-                  <a href="https://www.flickr.com/photos/thomashawk/52606988548" target="_blank" rel="noopener noreferrer">
-                    What's That You Got in Your Pocket
-                  </a>
-                  ” by{' '}
-                  <a href="https://www.flickr.com/photos/thomashawk/" target="_blank" rel="noopener noreferrer">
-                    Thomas Hawk
-                  </a>
-                  ,{' '}
-                  <a
-                    href="https://creativecommons.org/licenses/by-nc/2.0/deed.en"
-                    target="_blank"
-                    rel="license noopener noreferrer"
-                  >
-                    CC BY-NC 2.0
-                  </a>
-                  . Billboard digitally blanked.
-                </dd>
+                <dd>Photo credit to be added. Billboard face digitally blanked.</dd>
                 <dt>Type</dt>
                 <dd>
-                  Playfair Display, Bebas Neue, Space Mono, Abril Fatface, Caveat, Libre Baskerville, Archivo
-                  Black, Cormorant Garamond
+                  {[...new Set(FACES.map((f) => f.family))].join(', ')}
                 </dd>
                 <dt>Phrases</dt>
                 <dd>{all.length} in the pool</dd>
