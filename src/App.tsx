@@ -208,7 +208,7 @@ export default function App() {
     setRolls((r) =>
       r.map((x, j) => {
         const k = indices.indexOf(j)
-        return k < 0 ? x : { n: x.n + 1, delay: k * 180 }
+        return k < 0 ? x : { n: x.n + 1, delay: k * 60 }
       }),
     )
 
