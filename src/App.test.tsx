@@ -95,6 +95,16 @@ describe('App', () => {
     expect(new URL(writeText.mock.calls.at(-1)![0]).searchParams.get('s')).toBe(url.searchParams.get('s'))
   })
 
+  it('rerolls the font of one line without changing its text', async () => {
+    render(<App />)
+    const before = lines()
+    const style = screen.getByTestId('line-2').getAttribute('style')
+    for (let n = 0; n < 20 && screen.getByTestId('line-2').getAttribute('style') === style; n++)
+      await userEvent.click(screen.getByRole('button', { name: 'Reroll font for line 2' }))
+    expect(screen.getByTestId('line-2').getAttribute('style')).not.toBe(style)
+    expect(lines()).toEqual(before)
+  })
+
   it('shows a failure message when the clipboard rejects', async () => {
     writeText.mockRejectedValue(new Error('denied'))
     render(<App />)

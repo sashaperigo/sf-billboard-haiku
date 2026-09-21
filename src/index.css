@@ -277,6 +277,17 @@ a {
     font-size: 1.5cqw;
 }
 
+.font-btn {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1.2cqw;
+}
+
+.font-btn:disabled {
+    color: rgba(20, 19, 14, 0.3);
+    cursor: not-allowed;
+}
+
 .lock[aria-pressed='true'] {
     background: #ffe6bf;
     color: #b5730a;

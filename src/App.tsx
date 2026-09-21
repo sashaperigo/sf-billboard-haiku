@@ -77,6 +77,7 @@ const FACES: Face[] = [
 const STEPS = [
     { icon: '🎲', title: 'Reroll all', desc: 'Shuffle every unlocked line for a brand-new haiku.' },
     { icon: '🔒', title: 'Lock a line', desc: 'Keep a line you like, then reroll the rest around it.' },
+    { icon: 'Aa', title: 'Reroll font', desc: 'Give one line a new typeface and ink without changing its words.' },
     { icon: '⧉', title: 'Copy haiku', desc: 'Copy the three lines as plain text.' },
     { icon: '🔗', title: 'Copy link', desc: 'Copy a URL that reproduces this exact haiku, fonts and colors included.' },
 ]
@@ -243,6 +244,11 @@ export default function App() {
         setStyle(prev.style)
         setPrev(null)
     }
+    const rerollFont = (i: number) => {
+        setPrev({ haiku, style })
+        bump([i])
+        setStyle((s) => restyle(s.faces, s.inks, [i]))
+    }
     const rerollEverything = () => {
         setPrev({ haiku, style })
         bump(LINES.filter((i) => !locks[i]))
@@ -308,6 +314,16 @@ export default function App() {
                             {LINES.map((i) => (
                                 <div className="row" key={i}>
                                     <span className="syl">{SYLLABLES[i]}</span>
+                                    <button
+                                        type="button"
+                                        className="circle lock font-btn"
+                                        aria-label={`Reroll font for line ${i + 1}`}
+                                        data-tip="Reroll font"
+                                        disabled={locks[i]}
+                                        onClick={() => rerollFont(i)}
+                                    >
+                                        Aa
+                                    </button>
                                     <button
                                         type="button"
                                         className="circle lock"
