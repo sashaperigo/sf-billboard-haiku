@@ -177,6 +177,22 @@ export default function App() {
     const [status, setStatus] = useState('')
     const [prev, setPrev] = useState<{ haiku: Haiku; style: typeof style } | null>(null)
 
+    const [helpOpen, setHelpOpen] = useState(false)
+    const helpRef = useRef<HTMLDivElement>(null)
+    useEffect(() => {
+        if (!helpOpen) return
+        const onDown = (e: MouseEvent) => {
+            if (!helpRef.current?.contains(e.target as Node)) setHelpOpen(false)
+        }
+        const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setHelpOpen(false)
+        document.addEventListener('mousedown', onDown)
+        document.addEventListener('keydown', onKey)
+        return () => {
+            document.removeEventListener('mousedown', onDown)
+            document.removeEventListener('keydown', onKey)
+        }
+    }, [helpOpen])
+
     const boxRef = useRef < HTMLDivElement > (null)
     const lineRefs = useRef < (HTMLSpanElement | null)[] > ([])
     const statusTimer = useRef < ReturnType < typeof setTimeout >> (undefined)
@@ -303,6 +319,33 @@ export default function App() {
 
     return (
         <div className="page">
+            <div className="help" ref={helpRef}>
+                <button
+                    type="button"
+                    className="help-btn"
+                    aria-expanded={helpOpen}
+                    aria-controls="help-card"
+                    onClick={() => setHelpOpen((o) => !o)}
+                >
+                    Help
+                </button>
+                {helpOpen && (
+                    <div id="help-card" className="help-card" role="dialog" aria-label="How to use it">
+                        <h2>How to use it</h2>
+                        <ul>
+                            {STEPS.map((s) => (
+                                <li key={s.title}>
+                                    <span className="help-icon" aria-hidden="true">{s.icon}</span>
+                                    <span>
+                                        <strong>{s.title}</strong>
+                                        <span className="help-desc">{s.desc}</span>
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+            </div>
             <section className="hero">
                 <h1>Billboard Haiku</h1>
                 <p>
@@ -411,21 +454,6 @@ export default function App() {
                             {status}
                         </div>
                     </div>
-                </div>
-            </section>
-
-            <section className="howto">
-                <h2>How to use it</h2>
-                <div className="cards">
-                    {STEPS.map((s) => (
-                        <div className="card" key={s.title}>
-                            <div className="card-icon" aria-hidden="true">{s.icon}</div>
-                            <div className="card-text">
-                                <div className="card-title">{s.title}</div>
-                                <div className="card-desc">{s.desc}</div>
-                            </div>
-                        </div>
-                    ))}
                 </div>
             </section>
 
