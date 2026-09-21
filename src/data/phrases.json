@@ -530,11 +530,6 @@
     "syllables": 5
 },
 {
-    "id": "p120",
-    "text": "Data Powers Business",
-    "syllables": 7
-},
-{
     "id": "p121",
     "text": "Self-driving education",
     "syllables": 7
@@ -743,4 +738,144 @@
     "id": "p163",
     "text": "Suspiciously good",
     "syllables": 5
+},
+{
+    "id": "p164",
+    "text": "Don't hire BDRs",
+    "syllables": 5
+},
+{
+    "id": "p165",
+    "text": "Data + AI",
+    "syllables": 5
+},
+{
+    "id": "p166",
+    "text": "Accelerates Work",
+    "syllables": 5
+},
+{
+    "id": "p167",
+    "text": "AI-Native Cloud",
+    "syllables": 5
+},
+{
+    "id": "p168",
+    "text": "AI Moves the World",
+    "syllables": 5
+},
+{
+    "id": "p169",
+    "text": "The future is here",
+    "syllables": 5
+},
+{
+    "id": "p170",
+    "text": "Everyone is a coder",
+    "syllables": 7
+},
+{
+    "id": "p171",
+    "text": "AI fraud is everywhere",
+    "syllables": 7
+},
+{
+    "id": "p172",
+    "text": "Spend 70% less",
+    "syllables": 7
+},
+{
+    "id": "p173",
+    "text": "Large language models",
+    "syllables": 5
+},
+{
+    "id": "p174",
+    "text": "Olly for AI",
+    "syllables": 5
+},
+{
+    "id": "p175",
+    "text": "3 months of late-night building",
+    "syllables": 7
+},
+{
+    "id": "p176",
+    "text": "Built in 4 hours",
+    "syllables": 5
+},
+{
+    "id": "p177",
+    "text": "Who's your Dadd-AI?",
+    "syllables": 5
+},
+{
+    "id": "p178",
+    "text": "Truly Agentic",
+    "syllables": 5
+},
+{
+    "id": "p179",
+    "text": "Welcome to the Bay",
+    "syllables": 5
+},
+{
+    "id": "p180",
+    "text": "Secure DeepSeek Inference",
+    "syllables": 7
+},
+{
+    "id": "p181",
+    "text": "Relax, it's iPhone",
+    "syllables": 5
+},
+{
+    "id": "p182",
+    "text": "AI Agents are Humans",
+    "syllables": 5
+},
+{
+    "id": "p183",
+    "text": "AI therapist?",
+    "syllables": 5
+},
+{
+    "id": "p184",
+    "text": "Specialized Intelligence",
+    "syllables": 5
+},
+{
+    "id": "p185",
+    "text": "You know what we do",
+    "syllables": 5
+},
+{
+    "id": "p186",
+    "text": "Always connected",
+    "syllables": 5
+},
+{
+    "id": "p187",
+    "text": "Cryptocurrency",
+    "syllables": 5
+},
+{
+    "id": "p188",
+    "text": "Think outside the box",
+    "syllables": 5
+},
+{
+    "id": "p189",
+    "text": "Humans were the beta test",
+    "syllables": 7
+},
+{
+    "id": "p190",
+    "text": "Jumpstart your genius",
+    "syllables": 5
+},
+{
+    "id": "p191",
+    "text": "The AI with people skills",
+    "syllables": 7
 }]
