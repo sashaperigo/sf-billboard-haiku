@@ -1,0 +1,52 @@
+:root {
+  color-scheme: light dark;
+  --bg: #fbfaf7;
+  --fg: #1c1c1c;
+  --muted: #6b6b6b;
+  --border: #c9c5bb;
+  --accent: #1f5f8b;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16171a;
+    --fg: #ece9e2;
+    --muted: #9a978f;
+    --border: #45464b;
+    --accent: #7fb8e0;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); }
+main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 1.5rem 1rem;
+  text-align: center;
+}
+.haiku { display: flex; flex-direction: column; gap: 1.5rem; max-width: 100%; }
+.line p { margin: 0 0 0.5rem; font-size: clamp(1.4rem, 6vw, 2.5rem); line-height: 1.25; overflow-wrap: anywhere; }
+.line-controls, .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+button {
+  font: inherit;
+  font-size: 0.95rem;
+  padding: 0.45rem 0.9rem;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+button:hover:not(:disabled) { border-color: var(--accent); }
+button[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
