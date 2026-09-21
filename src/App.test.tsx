@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
 import phrases from './data/phrases.json'
@@ -70,7 +70,7 @@ describe('App', () => {
     render(<App />)
     await userEvent.click(screen.getByRole('button', { name: 'Copy haiku' }))
     expect(writeText).toHaveBeenCalledWith(lines().join('\n'))
-    expect(await screen.findByRole('button', { name: 'Copied' })).toBeInTheDocument()
+    expect(await screen.findByText('haiku copied')).toBeInTheDocument()
   })
 
   it('copies a share link that reproduces the haiku', async () => {
@@ -86,7 +86,6 @@ describe('App', () => {
     writeText.mockRejectedValue(new Error('denied'))
     render(<App />)
     await userEvent.click(screen.getByRole('button', { name: 'Copy haiku' }))
-    const btn = await screen.findByRole('button', { name: /copy failed/i })
-    expect(within(btn.parentElement!).getByRole('button', { name: /copy failed/i })).toBeInTheDocument()
+    expect(await screen.findByText('copy failed')).toBeInTheDocument()
   })
 })
