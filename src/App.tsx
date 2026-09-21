@@ -126,7 +126,7 @@ const measureCtx = document.createElement('canvas').getContext('2d') !
         return { top: base - m.actualBoundingBoxAscent, bottom: base + m.actualBoundingBoxDescent }
     }
 
-const CAPTION = ['Make yours at', 'haiku.guru']
+const CAPTION = ['haiku.guru']
 
 async function renderPng(stage: HTMLElement, lines: HTMLElement[]): Promise<Blob> {
     const img = stage.querySelector('img')!
