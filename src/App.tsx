@@ -126,7 +126,7 @@ const measureCtx = document.createElement('canvas').getContext('2d') !
         return { top: base - m.actualBoundingBoxAscent, bottom: base + m.actualBoundingBoxDescent }
     }
 
-const CAPTION = 'Make your own at haiku.guru'
+const CAPTION = ['Make yours at', 'haiku.guru']
 
 async function renderPng(stage: HTMLElement, lines: HTMLElement[]): Promise<Blob> {
     const img = stage.querySelector('img')!
@@ -184,7 +184,10 @@ async function renderPng(stage: HTMLElement, lines: HTMLElement[]): Promise<Blob
     ctx.shadowColor = 'rgba(0,0,0,0.6)'
     ctx.shadowBlur = canvas.width * 0.004
     const pad = canvas.width * 0.02
-    ctx.fillText(CAPTION, canvas.width - pad, canvas.height - pad)
+    const leading = Math.max(canvas.width * 0.022, 14) * 1.3
+    CAPTION.forEach((line, i) =>
+        ctx.fillText(line, canvas.width - pad, canvas.height - pad - (CAPTION.length - 1 - i) * leading),
+    )
     return new Promise((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error('toBlob failed'))), 'image/png'))
 }
 
