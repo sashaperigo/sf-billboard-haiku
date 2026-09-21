@@ -26,6 +26,9 @@ button:focus-visible, a:focus-visible { outline: 2px solid #7fb8e0; outline-offs
   mix-blend-mode: multiply; transition: color 0.3s;
 }
 
+.haiku span.reveal { animation: reveal 0.35s ease-out backwards; }
+@keyframes reveal { from { opacity: 0; } }
+
 .surface {
   position: absolute; left: 9.3%; top: 4.6%; width: 85.9%; height: 37.1%;
   transform: rotate(-0.28deg); pointer-events: none;

@@ -110,6 +110,7 @@ export default function App() {
   )
   const [locks, setLocks] = useState<Locks>([false, false, false])
   const [style, setStyle] = useState(() => restyle([0, 0, 0], [0, 0, 0], [0, 1, 2]))
+  const [rolls, setRolls] = useState<{ n: number; delay: number }[]>([0, 1, 2].map(() => ({ n: 0, delay: 0 })))
   const [status, setStatus] = useState('')
   const [aboutOpen, setAboutOpen] = useState(false)
 
@@ -203,12 +204,22 @@ export default function App() {
     return url.toString()
   }
 
+  const bump = (indices: number[]) =>
+    setRolls((r) =>
+      r.map((x, j) => {
+        const k = indices.indexOf(j)
+        return k < 0 ? x : { n: x.n + 1, delay: k * 180 }
+      }),
+    )
+
   const rerollOne = (i: 0 | 1 | 2) => {
     if (locks[i]) return
+    bump([i])
     setHaiku((h) => rerollLine(all, h, i, Math.random))
     setStyle((s) => restyle(s.faces, s.inks, [i]))
   }
   const rerollEverything = () => {
+    bump(LINES.filter((i) => !locks[i]))
     setHaiku((h) => rerollAll(all, h, locks, Math.random))
     setStyle((s) =>
       restyle(
@@ -230,6 +241,7 @@ export default function App() {
       textTransform: face.upper ? 'uppercase' : 'none',
       color: colorOf(style.faces[i], style.inks[i]),
       textShadow: face.glow ?? 'none',
+      animationDelay: `${rolls[i].delay}ms`,
     }
   }
 
@@ -242,7 +254,8 @@ export default function App() {
         <div ref={boxRef} data-testid="haiku" className="haiku" aria-live="polite">
           {LINES.map((i) => (
             <span
-              key={i}
+              key={`${i}-${rolls[i].n}`}
+              className={rolls[i].n > 0 ? 'reveal' : undefined}
               data-testid={`line-${i + 1}`}
               ref={(el) => {
                 lineRefs.current[i] = el
