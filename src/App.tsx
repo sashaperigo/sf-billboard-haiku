@@ -98,11 +98,19 @@ const UndoIcon = () => (
         <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
     </svg>
 )
+const DownloadIcon = () => (
+    <svg {...svgProps}>
+        <path d="M12 3v12" />
+        <path d="M7.5 10.5 12 15l4.5-4.5" />
+        <path d="M5 20h14" />
+    </svg>
+)
 const STEPS = [
     { icon: '🎲', title: 'Reroll all', desc: 'Shuffle every unlocked line for a brand-new haiku.' },
     { icon: '🔒', title: 'Lock a line', desc: 'Keep a line you like, then reroll the rest around it.' },
     { icon: 'Aa', title: 'Reroll font', desc: 'Give one line a new typeface and ink without changing its words.' },
     { icon: '⧉', title: 'Copy haiku', desc: 'Copy the three lines as plain text.' },
+    { icon: <DownloadIcon />, title: 'Download image', desc: 'Save the billboard with your haiku as a PNG.' },
     { icon: <ShareIcon />, title: 'Copy link', desc: 'Copy a URL that reproduces this exact haiku, fonts and colors included.' },
 ]
 const BASE_SIZE = ['4.8cqw', '4.2cqw', '4.8cqw']
@@ -117,6 +125,68 @@ const measureCtx = document.createElement('canvas').getContext('2d') !
         const base = (lineH - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2 + m.fontBoundingBoxAscent
         return { top: base - m.actualBoundingBoxAscent, bottom: base + m.actualBoundingBoxDescent }
     }
+
+const CAPTION = 'Generate your own AI Billboard Haiku at haiku.guru'
+
+async function renderPng(stage: HTMLElement, lines: HTMLElement[]): Promise<Blob> {
+    const img = stage.querySelector('img')!
+    await img.decode().catch(() => undefined)
+    const k = img.naturalWidth / stage.clientWidth
+    const canvas = document.createElement('canvas')
+    canvas.width = img.naturalWidth
+    canvas.height = Math.round(stage.clientHeight * k)
+    const ctx = canvas.getContext('2d')!
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+    const px = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    const lut = Array.from({ length: 256 }, (_, v) => Math.round(255 * (v / 255) ** 0.65))
+    for (let i = 0; i < px.data.length; i += 4) {
+        px.data[i] = lut[px.data[i]]
+        px.data[i + 1] = lut[px.data[i + 1]]
+        px.data[i + 2] = lut[px.data[i + 2]]
+    }
+    ctx.putImageData(px, 0, 0)
+
+    const specs = lines.map((el) => {
+        const st = getComputedStyle(el)
+        const scale = new DOMMatrix(st.transform).a * k
+        return { el, st, scale, font: `${st.fontStyle} ${st.fontWeight} ${parseFloat(st.fontSize) * scale}px ${st.fontFamily}` }
+    })
+    const caption = `italic 400 ${Math.max(canvas.width * 0.018, 14)}px 'Open Sans', sans-serif`
+    await Promise.all([...specs.map((s) => s.font), caption].map((f) => document.fonts.load(f, 'Aa')))
+
+    const sr = stage.getBoundingClientRect()
+    for (const { el, st, scale, font } of specs) {
+        const r = el.getBoundingClientRect()
+        const m = (ctx.font = font, ctx.measureText('Hg'))
+        ctx.save()
+        ctx.translate(((r.left + r.width / 2) - sr.left) * k, ((r.top + r.height / 2) - sr.top) * k)
+        ctx.rotate((-0.28 * Math.PI) / 180)
+        ctx.font = font
+        ctx.letterSpacing = `${(parseFloat(st.letterSpacing) || 0) * scale}px`
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'alphabetic'
+        ctx.globalAlpha = 0.92
+        ctx.globalCompositeOperation = 'multiply'
+        ctx.fillStyle = st.color
+        if (st.textShadow !== 'none') {
+            ctx.shadowColor = st.textShadow.match(/rgba?\([^)]+\)/)?.[0] ?? 'transparent'
+            ctx.shadowBlur = 12 * k
+        }
+        const text = st.textTransform === 'uppercase' ? (el.textContent ?? '').toUpperCase() : (el.textContent ?? '')
+        ctx.fillText(text, 0, (m.fontBoundingBoxAscent - m.fontBoundingBoxDescent) / 2)
+        ctx.restore()
+    }
+
+    ctx.font = caption
+    ctx.textAlign = 'left'
+    ctx.textBaseline = 'alphabetic'
+    ctx.fillStyle = '#ffffff'
+    ctx.shadowColor = 'rgba(0,0,0,0.6)'
+    ctx.shadowBlur = canvas.width * 0.004
+    const pad = canvas.width * 0.02
+    ctx.fillText(CAPTION, pad, canvas.height - pad)
+    return new Promise((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error('toBlob failed'))), 'image/png'))
+}
 
 const pick = (n: number) => Math.floor(Math.random() * n)
 const colorOf = (face: number, ink: number) => FACES[face].ink ?? INKS[ink]
@@ -257,6 +327,21 @@ export default function App() {
         }
     }
 
+    const stageRef = useRef<HTMLDivElement>(null)
+    const download = async () => {
+        if (!stageRef.current) return
+        try {
+            const blob = await renderPng(stageRef.current, lineRefs.current as HTMLElement[])
+            const a = document.createElement('a')
+            a.href = URL.createObjectURL(blob)
+            a.download = 'billboard-haiku.png'
+            a.click()
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+        } catch {
+            flash('download failed')
+        }
+    }
+
     const toggleLock = (i: number) =>
         setLocks((l) => l.map((v, j) => (j === i ? !v : v)) as unknown as Locks)
 
@@ -330,7 +415,7 @@ export default function App() {
                     Help
                 </button>
                 {helpOpen && (
-                    <div id="help-card" className="help-card" role="dialog" aria-label="How to use it">
+                    <div id="help-card" className="help-card" role="dialog" aria-label="Instructions">
                         <h2>How to use it</h2>
                         <ul>
                             {STEPS.map((s) => (
@@ -347,16 +432,15 @@ export default function App() {
                 )}
             </div>
             <section className="hero">
-                <h1>Billboard Haiku</h1>
+                <h1>Tech Billboard Haiku Generator</h1>
                 <p>
-                    A generator that assembles a 5-7-5 haiku from real startup-billboard one-liners, then hangs it on a SoMa
-                    billboard. Every line picks its own typeface, weight, and ink on each roll, so no two postings look alike.
+                    Click reroll to generate your very own 5-7-5 billboard haiku. All phrases have been taken from real AI ads displayed around the Bay Area.
                 </p>
             </section>
 
             <section id="app" className="app">
                 <div className="frame">
-                    <div className="stage">
+                    <div className="stage" ref={stageRef}>
                     <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true" focusable="false">
                         <filter id="lift-shadows" colorInterpolationFilters="sRGB">
                             <feComponentTransfer>
@@ -448,6 +532,15 @@ export default function App() {
                                 onClick={() => copy(haiku.map((p) => p.text).join('\n'), 'haiku copied')}
                             >
                                 ⧉
+                            </button>
+                            <button
+                                type="button"
+                                className="circle action"
+                                aria-label="Download image"
+                                data-tip="Download image"
+                                onClick={download}
+                            >
+                                <DownloadIcon />
                             </button>
                             <button
                                 type="button"
