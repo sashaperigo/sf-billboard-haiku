@@ -35,24 +35,13 @@ describe('App', () => {
     expect(screen.getByTestId('haiku')).toHaveAttribute('aria-live', 'polite')
   })
 
-  it('rerolls a single line only', async () => {
-    render(<App />)
-    const before = lines()
-    await userEvent.click(screen.getByRole('button', { name: 'Reroll line 2' }))
-    const after = lines()
-    expect(after[0]).toBe(before[0])
-    expect(after[2]).toBe(before[2])
-    expect(after[1]).not.toBe(before[1])
-  })
-
-  it('lock toggles aria-pressed, disables line reroll, and is kept on Reroll all', async () => {
+  it('lock toggles aria-pressed and is kept on Reroll all', async () => {
     render(<App />)
     const lock = screen.getByRole('button', { name: /lock line 1/i })
     expect(lock).toHaveAttribute('aria-pressed', 'false')
     const before = lines()
     await userEvent.click(lock)
     expect(lock).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByRole('button', { name: 'Reroll line 1' })).toBeDisabled()
     await userEvent.click(screen.getByRole('button', { name: 'Reroll all' }))
     const after = lines()
     expect(after[0]).toBe(before[0])

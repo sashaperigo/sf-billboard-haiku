@@ -10,7 +10,6 @@ import {
     generateHaiku,
     parseShareParam,
     rerollAll,
-    rerollLine,
 } from './lib/haiku'
 
 const all = phrases as Phrase[]
@@ -75,6 +74,12 @@ const FACES: Face[] = [
     F('Epilogue', S, 800, true, false, '-0.03em', 1.0),
     F('Newsreader', SR, 600, true, false, '0', 1.12),
 ]
+const STEPS = [
+    { icon: '🎲', title: 'Reroll all', desc: 'Shuffle every unlocked line for a brand-new haiku.' },
+    { icon: '🔒', title: 'Lock a line', desc: 'Keep a line you like, then reroll the rest around it.' },
+    { icon: '⧉', title: 'Copy haiku', desc: 'Copy the three lines as plain text.' },
+    { icon: '🔗', title: 'Copy link', desc: 'Copy a URL that reproduces this exact haiku, to share it.' },
+]
 const BASE_SIZE = ['4.8cqw', '4.2cqw', '4.8cqw']
 
 type Trio = [number, number, number]
@@ -124,7 +129,6 @@ export default function App() {
     const [style, setStyle] = useState(() => restyle([0, 0, 0], [0, 0, 0], [0, 1, 2]))
     const [rolls, setRolls] = useState < { n: number;delay: number } [] > ([0, 1, 2].map(() => ({ n: 0, delay: 0 })))
     const [status, setStatus] = useState('')
-    const [aboutOpen, setAboutOpen] = useState(false)
 
     const boxRef = useRef < HTMLDivElement > (null)
     const lineRefs = useRef < (HTMLSpanElement | null)[] > ([])
@@ -209,12 +213,6 @@ export default function App() {
             }),
         )
 
-    const rerollOne = (i: 0 | 1 | 2) => {
-        if (locks[i]) return
-        bump([i])
-        setHaiku((h) => rerollLine(all, h, i, Math.random))
-        setStyle((s) => restyle(s.faces, s.inks, [i]))
-    }
     const rerollEverything = () => {
         bump(LINES.filter((i) => !locks[i]))
         setHaiku((h) => rerollAll(all, h, locks, Math.random))
@@ -243,124 +241,114 @@ export default function App() {
     }
 
     return (
-        <div className="stage">
-      <h1 className="visually-hidden">Haiku Generator</h1>
-      <div className="frame">
-        <img src={billboard} alt="A South of Market billboard" />
+        <div className="page">
+            <section className="hero">
+                <span className="eyebrow">South of Market, SF</span>
+                <h1>Billboard Haiku</h1>
+                <p>
+                    A generator that assembles a 5-7-5 haiku from real startup-billboard one-liners, then hangs it on a SoMa
+                    billboard. Every line picks its own typeface, weight, and ink on each roll, so no two postings look alike.
+                </p>
+                <a className="cta" href="#app">↓ Try it</a>
+            </section>
 
-        <div ref={boxRef} data-testid="haiku" className="haiku" aria-live="polite">
-          {LINES.map((i) => (
-            <span
-              key={`${i}-${rolls[i].n}`}
-              className={rolls[i].n > 0 ? 'reveal' : undefined}
-              data-testid={`line-${i + 1}`}
-              ref={(el) => {
-                lineRefs.current[i] = el
-              }}
-              style={lineStyle(i)}
-            >
-              {haiku[i].text}
-            </span>
-          ))}
-        </div>
-        <div className="surface sheen" />
-        <div className="surface vignette" />
+            <section className="howto">
+                <h2>How to use it</h2>
+                <div className="cards">
+                    {STEPS.map((s) => (
+                        <div className="card" key={s.title}>
+                            <div className="card-icon" aria-hidden="true">{s.icon}</div>
+                            <div className="card-text">
+                                <div className="card-title">{s.title}</div>
+                                <div className="card-desc">{s.desc}</div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
 
-        <div className="info">
-          <button
-            type="button"
-            className="info-btn"
-            aria-label="About"
-            aria-expanded={aboutOpen}
-            onClick={() => setAboutOpen((o) => !o)}
-          >
-            i
-          </button>
-          {aboutOpen && (
-            <div className="about">
-              <h2>Billboard Haiku</h2>
-              <p>
-                A 5-7-5 haiku assembled from a bundled pool of prewritten phrases and posted to a South of
-                Market billboard. Reroll any line, lock the ones you like, then copy the poem or a share
-                link.
-              </p>
-              <p>Every line picks its own typeface, weight, and ink on each roll, so no two postings look alike.</p>
-              <dl>
-                <dt>Photo</dt>
-                <dd>Photo credit to be added. Billboard face digitally blanked.</dd>
-                <dt>Type</dt>
-                <dd>
-                  {[...new Set(FACES.map((f) => f.family))].join(', ')}
-                </dd>
-                <dt>Phrases</dt>
-                <dd>{all.length} in the pool</dd>
-              </dl>
-            </div>
-          )}
-        </div>
+            <section id="app" className="app">
+                <div className="frame">
+                    <img src={billboard} alt="A South of Market billboard" />
 
-        <div className="controls">
-          <div className="lines-card">
-            {LINES.map((i) => (
-              <div className="row" key={i}>
-                <span className="syl">{SYLLABLES[i]}</span>
-                <button
-                  type="button"
-                  className="circle lock"
-                  aria-label={`Lock line ${i + 1}`}
-                  aria-pressed={locks[i]}
-                  title={locks[i] ? `Unlock line ${i + 1}` : `Lock line ${i + 1}`}
-                  onClick={() => toggleLock(i)}
-                >
-                  {locks[i] ? '🔒' : '🔓'}
-                </button>
-                <button
-                  type="button"
-                  className="circle reroll-line"
-                  aria-label={`Reroll line ${i + 1}`}
-                  disabled={locks[i]}
-                  onClick={() => rerollOne(i)}
-                >
-                  ↻
-                </button>
-              </div>
-            ))}
-          </div>
-          <div className="actions">
-            <button
-              type="button"
-              className="pill"
-              aria-label="Reroll all"
-              title="Reroll the whole haiku"
-              disabled={locks.every(Boolean)}
-              onClick={rerollEverything}
-            >
-              🎲 reroll
-            </button>
-            <button
-              type="button"
-              className="round"
-              aria-label="Copy haiku"
-              title="Copy the haiku"
-              onClick={() => copy(haiku.map((p) => p.text).join('\n'), 'haiku copied')}
-            >
-              ⧉
-            </button>
-            <button
-              type="button"
-              className="round"
-              aria-label="Copy link"
-              title="Copy a share link"
-              onClick={() => copy(shareUrl(), 'link copied')}
-            >
-              🔗
-            </button>
-          </div>
-          <div className="status" role="status">
-            {status}
-          </div>
+                    <div ref={boxRef} data-testid="haiku" className="haiku" aria-live="polite">
+                        {LINES.map((i) => (
+                            <span
+                                key={`${i}-${rolls[i].n}`}
+                                className={rolls[i].n > 0 ? 'reveal' : undefined}
+                                data-testid={`line-${i + 1}`}
+                                ref={(el) => {
+                                    lineRefs.current[i] = el
+                                }}
+                                style={lineStyle(i)}
+                            >
+                                {haiku[i].text}
+                            </span>
+                        ))}
+                    </div>
+                    <div className="surface sheen" />
+                    <div className="surface vignette" />
+
+                    <div className="controls">
+                        <div className="lines-card">
+                            {LINES.map((i) => (
+                                <div className="row" key={i}>
+                                    <span className="syl">{SYLLABLES[i]}</span>
+                                    <button
+                                        type="button"
+                                        className="circle lock"
+                                        aria-label={`Lock line ${i + 1}`}
+                                        aria-pressed={locks[i]}
+                                        title={locks[i] ? `Unlock line ${i + 1}` : `Lock line ${i + 1}`}
+                                        onClick={() => toggleLock(i)}
+                                    >
+                                        {locks[i] ? '🔒' : '🔓'}
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="actions">
+                            <button
+                                type="button"
+                                className="circle action reroll-all"
+                                aria-label="Reroll all"
+                                title="Reroll the whole haiku"
+                                disabled={locks.every(Boolean)}
+                                onClick={rerollEverything}
+                            >
+                                🎲
+                            </button>
+                            <button
+                                type="button"
+                                className="circle action"
+                                aria-label="Copy haiku"
+                                title="Copy the haiku"
+                                onClick={() => copy(haiku.map((p) => p.text).join('\n'), 'haiku copied')}
+                            >
+                                ⧉
+                            </button>
+                            <button
+                                type="button"
+                                className="circle action"
+                                aria-label="Copy link"
+                                title="Copy a share link"
+                                onClick={() => copy(shareUrl(), 'link copied')}
+                            >
+                                🔗
+                            </button>
+                        </div>
+                        <div className="status" role="status">
+                            {status}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <footer className="footer">
+                <span>Made with ❤️ in San Francisco</span>
+                <span aria-hidden="true">·</span>
+                <span>Created by Sasha Perigo</span>
+            </footer>
         </div>
-      </div>
-    </div>
     )
 }
