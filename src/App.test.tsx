@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
 import phrases from './data/phrases.json'
@@ -81,6 +81,18 @@ describe('App', () => {
     const url = new URL(writeText.mock.calls[0][0])
     const ids = url.searchParams.get('h')!.split(',')
     expect(ids.map(textOf)).toEqual(before)
+  })
+
+  it('restores fonts from a share link', async () => {
+    render(<App />)
+    await userEvent.click(screen.getByRole('button', { name: 'Copy link' }))
+    const url = new URL(writeText.mock.calls.at(-1)![0])
+    expect(url.searchParams.get('s')).toMatch(/^\d+\.\d+,\d+\.\d+,\d+\.\d+$/)
+    cleanup()
+    window.history.pushState({}, '', url.search)
+    render(<App />)
+    await userEvent.click(screen.getByRole('button', { name: 'Copy link' }))
+    expect(new URL(writeText.mock.calls.at(-1)![0]).searchParams.get('s')).toBe(url.searchParams.get('s'))
   })
 
   it('shows a failure message when the clipboard rejects', async () => {

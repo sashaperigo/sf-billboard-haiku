@@ -78,7 +78,7 @@ const STEPS = [
     { icon: '🎲', title: 'Reroll all', desc: 'Shuffle every unlocked line for a brand-new haiku.' },
     { icon: '🔒', title: 'Lock a line', desc: 'Keep a line you like, then reroll the rest around it.' },
     { icon: '⧉', title: 'Copy haiku', desc: 'Copy the three lines as plain text.' },
-    { icon: '🔗', title: 'Copy link', desc: 'Copy a URL that reproduces this exact haiku, to share it.' },
+    { icon: '🔗', title: 'Copy link', desc: 'Copy a URL that reproduces this exact haiku, fonts and colors included.' },
 ]
 const BASE_SIZE = ['4.8cqw', '4.2cqw', '4.8cqw']
 
@@ -119,6 +119,23 @@ function restyle(faces: Trio, inks: Trio, indices: number[]): { faces: Trio;inks
     return { faces: f, inks: c }
 }
 
+const formatStyleParam = (st: { faces: Trio; inks: Trio }) =>
+    LINES.map((i) => `${st.faces[i]}.${st.inks[i]}`).join(',')
+
+function parseStyleParam(value: string | null): { faces: Trio; inks: Trio } | null {
+    const parts = value?.split(',')
+    if (parts?.length !== 3) return null
+    const faces: number[] = []
+    const inks: number[] = []
+    for (const part of parts) {
+        const m = /^(\d+)\.(\d+)$/.exec(part)
+        if (!m || +m[1] >= FACES.length || +m[2] >= INKS.length) return null
+        faces.push(+m[1])
+        inks.push(+m[2])
+    }
+    return { faces: faces as Trio, inks: inks as Trio }
+}
+
 export default function App() {
     const [haiku, setHaiku] = useState < Haiku > (
         () =>
@@ -126,7 +143,11 @@ export default function App() {
         generateHaiku(all, Math.random),
     )
     const [locks, setLocks] = useState < Locks > ([false, false, false])
-    const [style, setStyle] = useState(() => restyle([0, 0, 0], [0, 0, 0], [0, 1, 2]))
+    const [style, setStyle] = useState(
+        () =>
+            parseStyleParam(new URLSearchParams(window.location.search).get('s')) ??
+            restyle([0, 0, 0], [0, 0, 0], [0, 1, 2]),
+    )
     const [rolls, setRolls] = useState < { n: number;delay: number } [] > ([0, 1, 2].map(() => ({ n: 0, delay: 0 })))
     const [status, setStatus] = useState('')
     const [prev, setPrev] = useState<{ haiku: Haiku; style: typeof style } | null>(null)
@@ -203,6 +224,7 @@ export default function App() {
         url.search = ''
         url.hash = ''
         url.searchParams.set('h', formatShareParam(haiku))
+        url.searchParams.set('s', formatStyleParam(style))
         return url.toString()
     }
 
