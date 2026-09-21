@@ -74,12 +74,36 @@ const FACES: Face[] = [
     F('Epilogue', S, 800, true, false, '-0.03em', 1.0),
     F('Newsreader', SR, 600, true, false, '0', 1.12),
 ]
+const svgProps = {
+    viewBox: '0 0 24 24',
+    width: '1em',
+    height: '1em',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 2,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    'aria-hidden': true,
+} as const
+const ShareIcon = () => (
+    <svg {...svgProps}>
+        <path d="M12 15V3" />
+        <path d="M7.5 7.5 12 3l4.5 4.5" />
+        <path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v6A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5v-6A1.5 1.5 0 0 0 17.5 11H16" />
+    </svg>
+)
+const UndoIcon = () => (
+    <svg {...svgProps}>
+        <path d="M9 14 4 9l5-5" />
+        <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+    </svg>
+)
 const STEPS = [
     { icon: '🎲', title: 'Reroll all', desc: 'Shuffle every unlocked line for a brand-new haiku.' },
     { icon: '🔒', title: 'Lock a line', desc: 'Keep a line you like, then reroll the rest around it.' },
     { icon: 'Aa', title: 'Reroll font', desc: 'Give one line a new typeface and ink without changing its words.' },
     { icon: '⧉', title: 'Copy haiku', desc: 'Copy the three lines as plain text.' },
-    { icon: '🔗', title: 'Copy link', desc: 'Copy a URL that reproduces this exact haiku, fonts and colors included.' },
+    { icon: <ShareIcon />, title: 'Copy link', desc: 'Copy a URL that reproduces this exact haiku, fonts and colors included.' },
 ]
 const BASE_SIZE = ['4.8cqw', '4.2cqw', '4.8cqw']
 
@@ -346,7 +370,7 @@ export default function App() {
                                 disabled={!prev}
                                 onClick={undo}
                             >
-                                ↶
+                                <UndoIcon />
                             </button>
                             <button
                                 type="button"
@@ -374,7 +398,7 @@ export default function App() {
                                 data-tip="Copy share link"
                                 onClick={() => copy(shareUrl(), 'link copied')}
                             >
-                                🔗
+                                <ShareIcon />
                             </button>
                         </div>
                         <div className="status" role="status">
