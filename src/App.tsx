@@ -126,7 +126,7 @@ const measureCtx = document.createElement('canvas').getContext('2d') !
         return { top: base - m.actualBoundingBoxAscent, bottom: base + m.actualBoundingBoxDescent }
     }
 
-const CAPTION = 'Generate your own AI Billboard Haiku at haiku.guru'
+const CAPTION = 'Make your own at haiku.guru'
 
 async function renderPng(stage: HTMLElement, lines: HTMLElement[]): Promise<Blob> {
     const img = stage.querySelector('img')!
@@ -151,7 +151,7 @@ async function renderPng(stage: HTMLElement, lines: HTMLElement[]): Promise<Blob
         const scale = new DOMMatrix(st.transform).a * k
         return { el, st, scale, font: `${st.fontStyle} ${st.fontWeight} ${parseFloat(st.fontSize) * scale}px ${st.fontFamily}` }
     })
-    const caption = `italic 400 ${Math.max(canvas.width * 0.018, 14)}px 'Open Sans', sans-serif`
+    const caption = `italic 400 ${Math.max(canvas.width * 0.022, 14)}px 'Open Sans', sans-serif`
     await Promise.all([...specs.map((s) => s.font), caption].map((f) => document.fonts.load(f, 'Aa')))
 
     const sr = stage.getBoundingClientRect()
@@ -178,13 +178,13 @@ async function renderPng(stage: HTMLElement, lines: HTMLElement[]): Promise<Blob
     }
 
     ctx.font = caption
-    ctx.textAlign = 'left'
+    ctx.textAlign = 'right'
     ctx.textBaseline = 'alphabetic'
     ctx.fillStyle = '#ffffff'
     ctx.shadowColor = 'rgba(0,0,0,0.6)'
     ctx.shadowBlur = canvas.width * 0.004
     const pad = canvas.width * 0.02
-    ctx.fillText(CAPTION, pad, canvas.height - pad)
+    ctx.fillText(CAPTION, canvas.width - pad, canvas.height - pad)
     return new Promise((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error('toBlob failed'))), 'image/png'))
 }
 
