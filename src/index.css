@@ -175,7 +175,7 @@ a {
     bottom: 3.5%;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: stretch;
     gap: 0.7cqw;
 }
 
@@ -184,6 +184,7 @@ a {
     flex-direction: column;
     gap: 0.5cqw;
     padding: 1cqw 1.1cqw;
+    min-width: 22cqw;
     border-radius: 1.4cqw;
     background: #fff;
     border: 1px solid rgba(20, 19, 14, 0.14);
@@ -197,18 +198,14 @@ a {
 }
 
 .syl {
+    flex: 1;
     font-family: 'Open Sans', sans-serif;
     font-weight: 600;
-    font-size: 1.3cqw;
-    color: rgba(20, 19, 14, 0.45);
-    width: 2.2cqw;
-    min-width: 20px;
-    margin-right: 0.6cqw;
-    text-align: right;
-}
-
-.syl-long {
-    display: none;
+    font-size: max(1.3cqw, 12px);
+    color: rgba(20, 19, 14, 0.6);
+    white-space: nowrap;
+    margin-right: 1.5cqw;
+    text-align: left;
 }
 
 .circle {
@@ -249,6 +246,7 @@ a {
 
 .actions {
     display: flex;
+    justify-content: flex-start;
     gap: 0.6cqw;
     align-items: center;
 }
@@ -259,6 +257,10 @@ a {
     min-width: 36px;
     min-height: 36px;
     font-size: 2cqw;
+}
+
+.push-right {
+    margin-left: auto;
 }
 
 .reroll-all {
@@ -280,6 +282,7 @@ a {
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.4);
+    text-align: right;
     min-height: 1em;
 }
 

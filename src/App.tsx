@@ -442,7 +442,7 @@ export default function App() {
                             </button>
                             <button
                                 type="button"
-                                className="circle action"
+                                className="circle action push-right"
                                 aria-label="Copy haiku"
                                 data-tip="Copy haiku"
                                 onClick={() => copy(haiku.map((p) => p.text).join('\n'), 'haiku copied')}
