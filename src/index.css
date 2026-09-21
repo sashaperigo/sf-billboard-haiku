@@ -157,7 +157,11 @@ a {
     width: 100%;
 }
 
-.frame>img {
+.stage {
+    position: relative;
+}
+
+.stage>img {
     display: block;
     width: 100%;
     height: auto;
@@ -377,7 +381,7 @@ a {
         background: transparent;
     }
 
-    .frame>img {
+    .stage>img {
         border-radius: 6px;
     }
 

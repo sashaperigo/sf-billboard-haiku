@@ -313,6 +313,7 @@ export default function App() {
 
             <section id="app" className="app">
                 <div className="frame">
+                    <div className="stage">
                     <img src={billboard} alt="A South of Market billboard" />
 
                     <div ref={boxRef} data-testid="haiku" className="haiku" aria-live="polite">
@@ -332,6 +333,7 @@ export default function App() {
                     </div>
                     <div className="surface sheen" />
                     <div className="surface vignette" />
+                    </div>
 
                     <div className="controls">
                         <div className="lines-card">
