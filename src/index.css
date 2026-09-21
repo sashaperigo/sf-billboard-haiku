@@ -402,20 +402,22 @@ a {
 
 .help {
     position: absolute;
-    top: 16px;
-    right: 16px;
+    top: 28px;
+    right: 32px;
     z-index: 20;
 }
 
 .help-btn {
-    padding: 8px 16px;
-    border-radius: 999px;
-    border: 1px solid rgba(20, 19, 14, 0.14);
-    background: #fff;
-    color: #14140f;
-    font-weight: 600;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: rgba(20, 19, 14, 0.5);
     font-size: 14px;
-    box-shadow: 0 2px 8px rgba(20, 19, 14, 0.12);
+    text-decoration: underline;
+}
+
+.help-btn:hover {
+    color: rgba(20, 19, 14, 0.8);
 }
 
 .help-card {
