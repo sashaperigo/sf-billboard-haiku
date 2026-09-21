@@ -110,8 +110,8 @@ const STEPS = [
     { icon: '🔒', title: 'Lock a line', desc: 'Keep a line you like, then reroll the rest around it.' },
     { icon: 'Aa', title: 'Reroll font', desc: 'Give one line a new typeface and ink without changing its words.' },
     { icon: '⧉', title: 'Copy haiku', desc: 'Copy the three lines as plain text.' },
-    { icon: <DownloadIcon />, title: 'Download image', desc: 'Save the billboard with your haiku as a PNG.' },
     { icon: <ShareIcon />, title: 'Copy link', desc: 'Copy a URL that reproduces this exact haiku, fonts and colors included.' },
+    { icon: <DownloadIcon />, title: 'Download image', desc: 'Save the billboard with your haiku as a PNG.' },
 ]
 const BASE_SIZE = ['4.8cqw', '4.2cqw', '4.8cqw']
 
@@ -539,20 +539,20 @@ export default function App() {
                             <button
                                 type="button"
                                 className="circle action"
-                                aria-label="Download image"
-                                data-tip="Download image"
-                                onClick={download}
-                            >
-                                <DownloadIcon />
-                            </button>
-                            <button
-                                type="button"
-                                className="circle action"
                                 aria-label="Copy link"
                                 data-tip="Copy share link"
                                 onClick={() => copy(shareUrl(), 'link copied')}
                             >
                                 <ShareIcon />
+                            </button>
+                            <button
+                                type="button"
+                                className="circle action"
+                                aria-label="Download image"
+                                data-tip="Download image"
+                                onClick={download}
+                            >
+                                <DownloadIcon />
                             </button>
                         </div>
                         <div className="status" role="status">
