@@ -488,7 +488,6 @@ export default function App() {
                                         className="circle lock font-btn"
                                         aria-label={`Reroll font for line ${i + 1}`}
                                         data-tip="Reroll font"
-                                        disabled={locks[i]}
                                         onClick={() => rerollFont(i)}
                                     >
                                         Aa
