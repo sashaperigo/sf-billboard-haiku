@@ -61,6 +61,21 @@ describe('App', () => {
     expect(undo).toBeDisabled()
   })
 
+  it('undo steps back through multiple actions', async () => {
+    render(<App />)
+    const undo = screen.getByRole('button', { name: 'Undo' })
+    const first = lines()
+    await userEvent.click(screen.getByRole('button', { name: 'Reroll all' }))
+    const second = lines()
+    await userEvent.click(screen.getByRole('button', { name: 'Reroll all' }))
+    await userEvent.click(undo)
+    expect(lines()).toEqual(second)
+    expect(undo).toBeEnabled()
+    await userEvent.click(undo)
+    expect(lines()).toEqual(first)
+    expect(undo).toBeDisabled()
+  })
+
   it('disables Reroll all when every line is locked', async () => {
     render(<App />)
     for (const n of [1, 2, 3]) await userEvent.click(screen.getByRole('button', { name: `Lock line ${n}` }))

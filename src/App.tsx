@@ -248,7 +248,7 @@ export default function App() {
     )
     const [rolls, setRolls] = useState < { n: number;delay: number } [] > ([0, 1, 2].map(() => ({ n: 0, delay: 0 })))
     const [status, setStatus] = useState('')
-    const [prev, setPrev] = useState<{ haiku: Haiku; style: typeof style } | null>(null)
+    const [history, setHistory] = useState<{ haiku: Haiku; style: typeof style }[]>([])
 
     const [helpOpen, setHelpOpen] = useState(false)
     const helpRef = useRef<HTMLDivElement>(null)
@@ -366,19 +366,20 @@ export default function App() {
         )
 
     const undo = () => {
+        const prev = history[history.length - 1]
         if (!prev) return
         bump(LINES.filter((i) => prev.haiku[i].id !== haiku[i].id))
         setHaiku(prev.haiku)
         setStyle(prev.style)
-        setPrev(null)
+        setHistory((h) => h.slice(0, -1))
     }
     const rerollFont = (i: number) => {
-        setPrev({ haiku, style })
+        setHistory((h) => [...h, { haiku, style }])
         bump([i])
         setStyle((s) => restyle(s.faces, s.inks, [i]))
     }
     const rerollEverything = () => {
-        setPrev({ haiku, style })
+        setHistory((h) => [...h, { haiku, style }])
         bump(LINES.filter((i) => !locks[i]))
         setHaiku((h) => rerollAll(all, h, locks, Math.random))
         setStyle((s) =>
@@ -521,7 +522,7 @@ export default function App() {
                                 className="circle action undo"
                                 aria-label="Undo"
                                 data-tip="Undo"
-                                disabled={!prev}
+                                disabled={history.length === 0}
                                 onClick={undo}
                             >
                                 <UndoIcon />
