@@ -832,7 +832,7 @@
 {
     "id": "p182",
     "text": "AI Agents are Humans",
-    "syllables": 5
+    "syllables": 7
 },
 {
     "id": "p183",
@@ -877,5 +877,55 @@
 {
     "id": "p191",
     "text": "The AI with people skills",
+    "syllables": 7
+},
+{
+    "id": "p192",
+    "text": "Unlock your genius",
+    "syllables": 5
+},
+{
+    "id": "p193",
+    "text": "Humans search Google",
+    "syllables": 5
+},
+{
+    "id": "p194",
+    "text": "Sales-maxxing with nooks",
+    "syllables": 5
+},
+{
+    "id": "p195",
+    "text": "S'more than just an ERP",
+    "syllables": 7
+},
+{
+    "id": "p196",
+    "text": "Replace your CEO now",
+    "syllables": 7
+},
+{
+    "id": "p197",
+    "text": "Open-Source AI",
+    "syllables": 5
+},
+{
+    "id": "p198",
+    "text": "Transformation never stops",
+    "syllables": 7
+},
+{
+    "id": "p199",
+    "text": "Scale innovation faster",
+    "syllables": 7
+},
+{
+    "id": "p200",
+    "text": "Move fast, break nothing",
+    "syllables": 5
+},
+{
+    "id": "p201",
+    "text": "Is your data up for grabs?",
     "syllables": 7
 }]
