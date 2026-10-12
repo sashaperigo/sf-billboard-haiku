@@ -11,100 +11,21 @@ import {
     parseShareParam,
     rerollAll,
 } from './lib/haiku'
+import {
+    formatStyleParam,
+    lineCss,
+    parseStyleParam,
+    restyle,
+} from './lib/style'
+import { saveHaikuToGallery } from './lib/gallery'
+import { Gallery } from './components/Gallery'
+import { DownloadIcon, GalleryIcon, SaveIcon, ShareIcon, UndoIcon } from './components/icons'
 
 const all = phrases as Phrase[]
 const LINES = [0, 1, 2] as
 const
 const SYLLABLES = [5, 7, 5]
 
-const INKS = ['#12141a', '#000000', '#2b2d33', '#464a52', '#6a6e77', '#8b8f97', '#0047ff', '#e01020', '#00845c', '#7b2ff7', '#ff5c00', '#0098a6', '#c9007a']
-
-interface Face {
-    family: string
-    fallback: string
-    weight: number
-    italic: boolean
-    upper: boolean
-    spacing: string
-    size: number
-    ink?: string
-    glow?: string
-}
-const F = (
-    family: string,
-    fallback: string,
-    weight: number,
-    italic: boolean,
-    upper: boolean,
-    spacing: string,
-    size: number,
-    ink?: string,
-    glow?: string,
-): Face => ({ family, fallback, weight, italic, upper, spacing, size, ink, glow })
-const S = 'sans-serif'
-const SR = 'serif'
-const M = 'monospace'
-const FACES: Face[] = [
-    F('Archivo Black', S, 400, false, true, '-0.02em', 0.88),
-    F('Bebas Neue', S, 400, false, true, '0.02em', 1.3),
-    F('Barlow Condensed', S, 700, false, true, '0.02em', 1.2),
-    F('Big Shoulders Display', S, 800, false, true, '0.01em', 1.3),
-    F('Space Grotesk', S, 700, false, false, '-0.03em', 1.0),
-    F('Manrope', S, 800, false, false, '-0.03em', 1.0),
-    F('Sora', S, 700, false, false, '-0.02em', 0.95),
-    F('Righteous', S, 400, false, false, '0', 1.0),
-    F('Bungee', S, 400, false, true, '0', 0.82),
-    F('IBM Plex Mono', M, 500, true, false, '0', 0.88),
-    F('Space Mono', M, 700, false, false, '-0.02em', 0.88),
-    F('VT323', M, 400, false, false, '0.01em', 1.24),
-    F('DM Serif Display', SR, 400, false, false, '0', 1.12),
-    F('Instrument Serif', SR, 400, true, false, '0', 1.18),
-    F('Silkscreen', S, 700, false, true, '0.04em', 0.88, '#ff45a8'),
-    F('Audiowide', S, 400, false, false, '0', 0.88, '#e5177f', '0 0 5px rgba(229,23,127,0.18)'),
-    F('Wallpoet', S, 400, false, true, '0.02em', 0.94, '#ff2d95'),
-    F('Comic Neue', S, 700, true, false, '0', 1.05, '#ff2d95'),
-    F('Bungee Inline', S, 400, false, true, '0', 0.82, '#00b8d4'),
-    F('Turret Road', S, 800, false, true, '0.01em', 0.88, '#e07b00', '0 0 12px rgba(224,123,0,0.45)'),
-    F('Kanit', S, 800, true, true, '-0.01em', 0.94, '#e04e00'),
-    F('Bodoni Moda', SR, 900, false, false, '-0.01em', 1.18),
-    F('Playfair Display', SR, 900, false, false, '-0.015em', 1.12),
-    F('Prata', SR, 400, false, false, '0', 1.0),
-    F('Bricolage Grotesque', S, 800, false, false, '-0.03em', 1.0),
-    F('Libre Franklin', S, 900, false, true, '-0.01em', 0.88),
-    F('Epilogue', S, 800, true, false, '-0.03em', 1.0),
-    F('Newsreader', SR, 600, true, false, '0', 1.12),
-]
-const svgProps = {
-    viewBox: '0 0 24 24',
-    width: '1em',
-    height: '1em',
-    fill: 'none',
-    stroke: 'currentColor',
-    strokeWidth: 2,
-    strokeLinecap: 'round',
-    strokeLinejoin: 'round',
-    'aria-hidden': true,
-} as const
-const ShareIcon = () => (
-    <svg {...svgProps}>
-        <path d="M12 15V3" />
-        <path d="M7.5 7.5 12 3l4.5 4.5" />
-        <path d="M8 11H6.5A1.5 1.5 0 0 0 5 12.5v6A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5v-6A1.5 1.5 0 0 0 17.5 11H16" />
-    </svg>
-)
-const UndoIcon = () => (
-    <svg {...svgProps}>
-        <path d="M9 14 4 9l5-5" />
-        <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
-    </svg>
-)
-const DownloadIcon = () => (
-    <svg {...svgProps}>
-        <path d="M12 3v12" />
-        <path d="M7.5 10.5 12 15l4.5-4.5" />
-        <path d="M5 20h14" />
-    </svg>
-)
 const STEPS = [
     { icon: '🎲', title: 'Reroll all', desc: 'Shuffle every unlocked line for a brand-new haiku.' },
     { icon: '🔒', title: 'Lock a line', desc: 'Keep a line you like, then reroll the rest around it.' },
@@ -113,9 +34,7 @@ const STEPS = [
     { icon: <ShareIcon />, title: 'Copy link', desc: 'Copy a URL that reproduces this exact haiku, fonts and colors included.' },
     { icon: <DownloadIcon />, title: 'Download image', desc: 'Save the billboard with your haiku as a PNG.' },
 ]
-const BASE_SIZE = ['4.8cqw', '4.2cqw', '4.8cqw']
 
-type Trio = [number, number, number]
 const measureCtx = document.createElement('canvas').getContext('2d') !
     function inkBox(el: HTMLElement, lineH: number) {
         const st = getComputedStyle(el)
@@ -191,49 +110,6 @@ async function renderPng(stage: HTMLElement, lines: HTMLElement[]): Promise<Blob
     return new Promise((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error('toBlob failed'))), 'image/png'))
 }
 
-const pick = (n: number) => Math.floor(Math.random() * n)
-const colorOf = (face: number, ink: number) => FACES[face].ink ?? INKS[ink]
-
-function restyle(faces: Trio, inks: Trio, indices: number[]): { faces: Trio;inks: Trio } {
-    const f = [...faces] as Trio
-    const c = [...inks] as Trio
-    for (const i of indices) {
-        const others = LINES.filter((j) => j !== i)
-        const taken = () => others.map((j) => colorOf(f[j], c[j]))
-        let face = pick(FACES.length)
-        for (let t = 0; t < 40; t++) {
-            const fixed = FACES[face].ink
-            const clash =
-                others.some((j) => FACES[f[j]].family === FACES[face].family) ||
-                (fixed !== undefined && taken().includes(fixed))
-            if (!clash) break
-            face = pick(FACES.length)
-        }
-        let ink = pick(INKS.length)
-        for (let t = 0; t < 20 && taken().includes(INKS[ink]); t++) ink = pick(INKS.length)
-        f[i] = face
-        c[i] = ink
-    }
-    return { faces: f, inks: c }
-}
-
-const formatStyleParam = (st: { faces: Trio; inks: Trio }) =>
-    LINES.map((i) => `${st.faces[i]}.${st.inks[i]}`).join(',')
-
-function parseStyleParam(value: string | null): { faces: Trio; inks: Trio } | null {
-    const parts = value?.split(',')
-    if (parts?.length !== 3) return null
-    const faces: number[] = []
-    const inks: number[] = []
-    for (const part of parts) {
-        const m = /^(\d+)\.(\d+)$/.exec(part)
-        if (!m || +m[1] >= FACES.length || +m[2] >= INKS.length) return null
-        faces.push(+m[1])
-        inks.push(+m[2])
-    }
-    return { faces: faces as Trio, inks: inks as Trio }
-}
-
 export default function App() {
     const [haiku, setHaiku] = useState < Haiku > (
         () =>
@@ -249,6 +125,7 @@ export default function App() {
     const [rolls, setRolls] = useState < { n: number;delay: number } [] > ([0, 1, 2].map(() => ({ n: 0, delay: 0 })))
     const [status, setStatus] = useState('')
     const [history, setHistory] = useState<{ haiku: Haiku; style: typeof style }[]>([])
+    const [view, setView] = useState<'editor' | 'gallery'>('editor')
 
     const [helpOpen, setHelpOpen] = useState(false)
     const helpRef = useRef<HTMLDivElement>(null)
@@ -330,6 +207,15 @@ export default function App() {
         }
     }
 
+    const save = async () => {
+        try {
+            await saveHaikuToGallery(haiku, style)
+            flash('saved to gallery')
+        } catch {
+            flash('save failed')
+        }
+    }
+
     const stageRef = useRef<HTMLDivElement>(null)
     const download = async () => {
         if (!stageRef.current) return
@@ -391,19 +277,13 @@ export default function App() {
         )
     }
 
-    const lineStyle = (i: number): React.CSSProperties => {
-        const face = FACES[style.faces[i]]
-        return {
-            fontFamily: `'${face.family}', ${face.fallback}`,
-            fontWeight: face.weight,
-            fontStyle: face.italic ? 'italic' : 'normal',
-            fontSize: `calc(${BASE_SIZE[i]} * ${face.size})`,
-            letterSpacing: face.spacing,
-            textTransform: face.upper ? 'uppercase' : 'none',
-            color: colorOf(style.faces[i], style.inks[i]),
-            textShadow: face.glow ?? 'none',
-            animationDelay: `${rolls[i].delay}ms`,
-        }
+    const lineStyle = (i: number): React.CSSProperties => ({
+        ...lineCss(style, i),
+        animationDelay: `${rolls[i].delay}ms`,
+    })
+
+    if (view === 'gallery') {
+        return <Gallery allPhrases={all} onBack={() => setView('editor')} />
     }
 
     return (
@@ -435,6 +315,15 @@ export default function App() {
                     </div>
                 )}
             </div>
+            <button
+                type="button"
+                className="circle gallery-toggle"
+                aria-label="Open gallery"
+                data-tip="Browse gallery"
+                onClick={() => setView('gallery')}
+            >
+                <GalleryIcon />
+            </button>
             <section className="hero">
                 <h1>Tech Billboard Haiku Generator</h1>
                 <p>
@@ -553,6 +442,15 @@ export default function App() {
                                 onClick={download}
                             >
                                 <DownloadIcon />
+                            </button>
+                            <button
+                                type="button"
+                                className="circle action"
+                                aria-label="Save to gallery"
+                                data-tip="Save to gallery"
+                                onClick={save}
+                            >
+                                <SaveIcon />
                             </button>
                         </div>
                         <div className="status" role="status">

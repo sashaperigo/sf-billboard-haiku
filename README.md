@@ -1,6 +1,6 @@
 # Haiku Generator
 
-A single-page app that assembles a 5-7-5 haiku from a bundled list of prewritten phrases. Reroll lines, lock lines, copy the haiku, or copy a share link.
+A single-page app that assembles a 5-7-5 haiku from a bundled list of prewritten phrases. Reroll lines, lock lines, copy the haiku, copy a share link, or save it to the public gallery and upvote others' haikus.
 
 ## Run and build
 
@@ -13,6 +13,19 @@ npm run preview  # serve dist/ locally
 ```
 
 The build uses relative asset paths (`base: './'`), so `dist/` can be served from any static host or subpath.
+
+`npm test` and `npm run build` both work with no `.env` file present — the gallery's Supabase client degrades to `null` and gallery tests use an injected fake client, so neither needs network access or secrets.
+
+## Gallery (Supabase setup)
+
+The public gallery (save a haiku, browse, upvote) is backed by [Supabase](https://supabase.com). To run it locally:
+
+1. Create a free Supabase project.
+2. In the SQL editor, run the schema/RLS/RPC in `supabase/schema.sql`.
+3. Copy `.env.example` to `.env` and fill in the project's URL and anon/public API key (Settings → API). These are safe to ship in the public bundle — Supabase's security model relies on Row Level Security, not on keeping the anon key secret.
+4. For the deployed build, set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as repository **Variables** (not Secrets) under Settings → Secrets and variables → Actions, so the GitHub Actions build step picks them up.
+
+One vote per browser is enforced client-side only (a localStorage record of voted haiku IDs) — there's no login. Upvotes go through a `security definer` RPC that only ever increments one row by id; there's no `UPDATE`/`DELETE` policy for the public `anon` key.
 
 ## Phrase file
 

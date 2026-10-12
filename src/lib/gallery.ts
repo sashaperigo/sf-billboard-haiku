@@ -1,0 +1,80 @@
+import type { SupabaseClient } from '@supabase/supabase-js'
+import { type Haiku, type Phrase, formatShareParam, parseShareParam } from './haiku'
+import { type Trio, formatStyleParam, parseStyleParam } from './style'
+import { supabase } from './supabaseClient'
+
+export interface GalleryStyle {
+  faces: Trio
+  inks: Trio
+}
+
+export interface GalleryHaiku {
+  id: string
+  haiku: Haiku
+  style: GalleryStyle
+  upvotes: number
+}
+
+const PAGE_SIZE = 24
+
+interface HaikuRow {
+  id: string
+  haiku_param: string
+  style_param: string
+  upvotes: number
+}
+
+function parseRow(allPhrases: Phrase[], row: HaikuRow): GalleryHaiku | null {
+  const haiku = parseShareParam(allPhrases, row.haiku_param)
+  const style = parseStyleParam(row.style_param)
+  if (!haiku || !style) return null
+  return { id: row.id, haiku, style, upvotes: row.upvotes }
+}
+
+export function createGalleryApi(client: SupabaseClient) {
+  async function fetchGalleryPage(
+    allPhrases: Phrase[],
+    offset: number,
+  ): Promise<{ items: GalleryHaiku[]; hasMore: boolean }> {
+    const { data, error } = await client
+      .from('haikus')
+      .select('*')
+      .order('upvotes', { ascending: false })
+      .order('created_at', { ascending: false })
+      .range(offset, offset + PAGE_SIZE - 1)
+    if (error) throw error
+    const rows = (data ?? []) as HaikuRow[]
+    const items = rows
+      .map((row) => parseRow(allPhrases, row))
+      .filter((item): item is GalleryHaiku => item !== null)
+    return { items, hasMore: rows.length === PAGE_SIZE }
+  }
+
+  async function saveHaikuToGallery(haiku: Haiku, style: GalleryStyle): Promise<void> {
+    const { error } = await client.from('haikus').insert({
+      haiku_param: formatShareParam(haiku),
+      style_param: formatStyleParam(style),
+    })
+    if (error) throw error
+  }
+
+  async function upvoteHaiku(id: string): Promise<number> {
+    const { data, error } = await client.rpc('increment_upvote', { haiku_id: id })
+    if (error) throw error
+    return (data as { upvotes: number }).upvotes
+  }
+
+  return { fetchGalleryPage, saveHaikuToGallery, upvoteHaiku }
+}
+
+function requireClient(): SupabaseClient {
+  if (!supabase) throw new Error('Supabase is not configured (missing VITE_SUPABASE_URL/VITE_SUPABASE_ANON_KEY)')
+  return supabase
+}
+
+export const fetchGalleryPage: ReturnType<typeof createGalleryApi>['fetchGalleryPage'] = (...args) =>
+  createGalleryApi(requireClient()).fetchGalleryPage(...args)
+export const saveHaikuToGallery: ReturnType<typeof createGalleryApi>['saveHaikuToGallery'] = (...args) =>
+  createGalleryApi(requireClient()).saveHaikuToGallery(...args)
+export const upvoteHaiku: ReturnType<typeof createGalleryApi>['upvoteHaiku'] = (...args) =>
+  createGalleryApi(requireClient()).upvoteHaiku(...args)

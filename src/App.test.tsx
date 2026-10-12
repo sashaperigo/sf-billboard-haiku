@@ -1,7 +1,13 @@
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
 import phrases from './data/phrases.json'
+import { fetchGalleryPage, saveHaikuToGallery } from './lib/gallery'
+
+vi.mock('./lib/gallery', () => ({
+  fetchGalleryPage: vi.fn(),
+  saveHaikuToGallery: vi.fn(),
+}))
 
 const textOf = (id: string) => phrases.find((p) => p.id === id)!.text
 const lines = () => [1, 2, 3].map((n) => screen.getByTestId(`line-${n}`).textContent)
@@ -12,6 +18,8 @@ beforeEach(() => {
   window.history.pushState({}, '', '/')
   writeText = vi.fn().mockResolvedValue(undefined)
   Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
+  vi.mocked(fetchGalleryPage).mockReset().mockResolvedValue({ items: [], hasMore: false })
+  vi.mocked(saveHaikuToGallery).mockReset().mockResolvedValue(undefined)
 })
 
 describe('App', () => {
@@ -125,5 +133,31 @@ describe('App', () => {
     render(<App />)
     await userEvent.click(screen.getByRole('button', { name: 'Copy haiku' }))
     expect(await screen.findByText('copy failed')).toBeInTheDocument()
+  })
+
+  it('opens the gallery and returns to the editor with the same haiku', async () => {
+    render(<App />)
+    const before = lines()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Open gallery' }))
+    await waitFor(() => expect(fetchGalleryPage).toHaveBeenCalled())
+    expect(screen.queryByTestId('haiku')).toBeNull()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Back to editor' }))
+    expect(lines()).toEqual(before)
+  })
+
+  it('saves the current haiku to the gallery and shows a success message', async () => {
+    render(<App />)
+    await userEvent.click(screen.getByRole('button', { name: 'Save to gallery' }))
+    expect(await screen.findByText('saved to gallery')).toBeInTheDocument()
+    expect(saveHaikuToGallery).toHaveBeenCalled()
+  })
+
+  it('shows a failure message when saving to the gallery fails', async () => {
+    vi.mocked(saveHaikuToGallery).mockRejectedValue(new Error('boom'))
+    render(<App />)
+    await userEvent.click(screen.getByRole('button', { name: 'Save to gallery' }))
+    expect(await screen.findByText('save failed')).toBeInTheDocument()
   })
 })
