@@ -21,6 +21,7 @@ import { FACES, type LineCssInput, lineCss } from '../lib/style'
 export interface ShareDialogProps {
     haiku: Haiku
     style: LineCssInput
+    shareUrl: () => string
     onClose: () => void
 }
 
@@ -173,7 +174,7 @@ interface Render {
     url: string
 }
 
-export function ShareDialog({ haiku, style, onClose }: ShareDialogProps) {
+export function ShareDialog({ haiku, style, shareUrl, onClose }: ShareDialogProps) {
     const rootRef = useRef<HTMLDivElement>(null)
     const [selected, setSelected] = useState<ShareId>(SELECTED_DEFAULT)
     const [renders, setRenders] = useState<Partial<Record<ShareId, Render>>>({})
@@ -264,6 +265,15 @@ export function ShareDialog({ haiku, style, onClose }: ShareDialogProps) {
         } else download()
     }
 
+    const copyLink = async () => {
+        try {
+            await navigator.clipboard.writeText(shareUrl())
+            flash('link copied')
+        } catch {
+            flash('copy failed')
+        }
+    }
+
     const preview = renders[current]
     return (
         <>
@@ -285,8 +295,8 @@ export function ShareDialog({ haiku, style, onClose }: ShareDialogProps) {
                 <div className="share-side">
                     <div className="share-head">
                         <div>
-                            <h2 id="share-title">Share to Instagram</h2>
-                            <p>Pick a billboard. Images are 1080 × 1350, sized for the feed.</p>
+                            <h2 id="share-title">Share your haiku</h2>
+                            <p>Pick a billboard. Images are 1080 × 1350, sized for social feeds.</p>
                         </div>
                         <button type="button" className="pill share-close" aria-label="Close" onClick={onClose}>
                             ×
@@ -316,6 +326,9 @@ export function ShareDialog({ haiku, style, onClose }: ShareDialogProps) {
                         </button>
                         <button type="button" className="btn" onClick={share}>
                             Share…
+                        </button>
+                        <button type="button" className="btn" onClick={copyLink}>
+                            Copy link
                         </button>
                         <span className="status" role="status">
                             {status}

@@ -22,7 +22,7 @@ beforeEach(() => {
 
 describe('ShareDialog', () => {
   it('renders all four options and shows tiles as they finish', async () => {
-    render(<ShareDialog haiku={haiku} style={style} onClose={vi.fn()} />)
+    render(<ShareDialog haiku={haiku} style={style} shareUrl={() => 'https://x.test/?h=a'} onClose={vi.fn()} />)
     expect(screen.getByText('Rendering…')).toBeInTheDocument()
     await waitFor(() => expect(renderArtboard).toHaveBeenCalledTimes(4))
     for (const label of ['Classic', 'Twin Peaks', 'Rooftop', 'Night'])
@@ -31,7 +31,7 @@ describe('ShareDialog', () => {
   })
 
   it('selects a different backdrop', async () => {
-    render(<ShareDialog haiku={haiku} style={style} onClose={vi.fn()} />)
+    render(<ShareDialog haiku={haiku} style={style} shareUrl={() => 'https://x.test/?h=a'} onClose={vi.fn()} />)
     await screen.findByRole('img', { name: 'Night' })
     await userEvent.click(screen.getByRole('button', { name: /Night/ }))
     expect(screen.getByRole('button', { name: /Night/ })).toHaveAttribute('aria-pressed', 'true')
@@ -39,7 +39,7 @@ describe('ShareDialog', () => {
 
   it('downloads with the backdrop name in the filename', async () => {
     const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined)
-    render(<ShareDialog haiku={haiku} style={style} onClose={vi.fn()} />)
+    render(<ShareDialog haiku={haiku} style={style} shareUrl={() => 'https://x.test/?h=a'} onClose={vi.fn()} />)
     await screen.findByRole('img', { name: 'Night' })
     await userEvent.click(screen.getByRole('button', { name: /Rooftop/ }))
     await userEvent.click(screen.getByRole('button', { name: 'Download PNG' }))
@@ -51,14 +51,31 @@ describe('ShareDialog', () => {
 
   it('says still rendering before anything is ready', async () => {
     vi.mocked(renderArtboard).mockImplementation(() => new Promise(() => undefined))
-    render(<ShareDialog haiku={haiku} style={style} onClose={vi.fn()} />)
+    render(<ShareDialog haiku={haiku} style={style} shareUrl={() => 'https://x.test/?h=a'} onClose={vi.fn()} />)
     await userEvent.click(screen.getByRole('button', { name: 'Download PNG' }))
     expect(screen.getByRole('status')).toHaveTextContent('still rendering')
   })
 
+  it('copies the share link and confirms', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
+    render(<ShareDialog haiku={haiku} style={style} shareUrl={() => 'https://x.test/?h=a'} onClose={vi.fn()} />)
+    await userEvent.click(screen.getByRole('button', { name: 'Copy link' }))
+    expect(writeText).toHaveBeenCalledWith('https://x.test/?h=a')
+    expect(await screen.findByText('link copied')).toBeInTheDocument()
+  })
+
+  it('reports when the clipboard rejects', async () => {
+    const writeText = vi.fn().mockRejectedValue(new Error('denied'))
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
+    render(<ShareDialog haiku={haiku} style={style} shareUrl={() => 'https://x.test/?h=a'} onClose={vi.fn()} />)
+    await userEvent.click(screen.getByRole('button', { name: 'Copy link' }))
+    expect(await screen.findByText('copy failed')).toBeInTheDocument()
+  })
+
   it('closes on Escape and the close button, revoking URLs', async () => {
     const onClose = vi.fn()
-    const { unmount } = render(<ShareDialog haiku={haiku} style={style} onClose={onClose} />)
+    const { unmount } = render(<ShareDialog haiku={haiku} style={style} shareUrl={() => 'https://x.test/?h=a'} onClose={onClose} />)
     await screen.findByRole('img', { name: 'Night' })
     await userEvent.keyboard('{Escape}')
     await userEvent.click(screen.getByRole('button', { name: 'Close' }))

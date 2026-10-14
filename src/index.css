@@ -403,14 +403,6 @@ h2 {
 
 .share {
     margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.share-label {
-    font-size: 12px;
-    color: rgba(20, 19, 14, 0.5);
 }
 
 .save {
@@ -910,19 +902,9 @@ h2 {
     .share {
         order: 4;
         grid-column: 1 / -1;
+        height: 48px;
         margin: 0;
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    .share-label {
-        display: none;
-    }
-
-    .share .btn {
-        height: 44px;
-        border-radius: 10px;
-        padding: 0 6px;
+        border-radius: 12px;
     }
 
     .status {

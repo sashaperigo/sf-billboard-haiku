@@ -1,6 +1,6 @@
 # Haiku Generator
 
-A single-page app that assembles a 5-7-5 haiku from a bundled list of prewritten phrases. Reroll lines, lock lines, copy the haiku, copy a share link, or save it to the public gallery and upvote others' haikus.
+A single-page app that assembles a 5-7-5 haiku from a bundled list of prewritten phrases. Reroll lines, lock lines, share it as an image or link, or save it to the public gallery and upvote others' haikus.
 
 ## Run and build
 

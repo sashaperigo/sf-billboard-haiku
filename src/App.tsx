@@ -41,71 +41,6 @@ const measureCtx = document.createElement('canvas').getContext('2d') !
         return { top: base - m.actualBoundingBoxAscent, bottom: base + m.actualBoundingBoxDescent }
     }
 
-const CAPTION = ['haiku.guru']
-
-async function renderPng(stage: HTMLElement, lines: HTMLElement[]): Promise<Blob> {
-    const img = stage.querySelector('img')!
-    await img.decode().catch(() => undefined)
-    const k = img.naturalWidth / stage.clientWidth
-    const canvas = document.createElement('canvas')
-    canvas.width = img.naturalWidth
-    canvas.height = Math.round(stage.clientHeight * k)
-    const ctx = canvas.getContext('2d')!
-    ctx.drawImage(img, 0, 0)
-    const px = ctx.getImageData(0, 0, canvas.width, canvas.height)
-    const lut = Array.from({ length: 256 }, (_, v) => Math.round(255 * (v / 255) ** 0.65))
-    for (let i = 0; i < px.data.length; i += 4) {
-        px.data[i] = lut[px.data[i]]
-        px.data[i + 1] = lut[px.data[i + 1]]
-        px.data[i + 2] = lut[px.data[i + 2]]
-    }
-    ctx.putImageData(px, 0, 0)
-
-    const specs = lines.map((el) => {
-        const st = getComputedStyle(el)
-        const scale = new DOMMatrix(st.transform).a * k
-        return { el, st, scale, font: `${st.fontStyle} ${st.fontWeight} ${parseFloat(st.fontSize) * scale}px ${st.fontFamily}` }
-    })
-    const caption = `italic 400 ${Math.max(canvas.width * 0.022, 14)}px 'Open Sans', sans-serif`
-    await Promise.all([...specs.map((s) => s.font), caption].map((f) => document.fonts.load(f, 'Aa')))
-
-    const sr = stage.getBoundingClientRect()
-    for (const { el, st, scale, font } of specs) {
-        const r = el.getBoundingClientRect()
-        const m = (ctx.font = font, ctx.measureText('Hg'))
-        ctx.save()
-        ctx.translate(((r.left + r.width / 2) - sr.left) * k, ((r.top + r.height / 2) - sr.top) * k)
-        ctx.rotate((-0.28 * Math.PI) / 180)
-        ctx.font = font
-        ctx.letterSpacing = `${(parseFloat(st.letterSpacing) || 0) * scale}px`
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'alphabetic'
-        ctx.globalAlpha = 0.92
-        ctx.globalCompositeOperation = 'multiply'
-        ctx.fillStyle = st.color
-        if (st.textShadow !== 'none') {
-            ctx.shadowColor = st.textShadow.match(/rgba?\([^)]+\)/)?.[0] ?? 'transparent'
-            ctx.shadowBlur = 12 * k
-        }
-        const text = st.textTransform === 'uppercase' ? (el.textContent ?? '').toUpperCase() : (el.textContent ?? '')
-        ctx.fillText(text, 0, (m.fontBoundingBoxAscent - m.fontBoundingBoxDescent) / 2)
-        ctx.restore()
-    }
-
-    ctx.font = caption
-    ctx.textAlign = 'right'
-    ctx.textBaseline = 'alphabetic'
-    ctx.fillStyle = '#ffffff'
-    ctx.shadowColor = 'rgba(0,0,0,0.6)'
-    ctx.shadowBlur = canvas.width * 0.004
-    const pad = canvas.width * 0.02
-    const leading = Math.max(canvas.width * 0.022, 14) * 1.3
-    CAPTION.forEach((line, i) =>
-        ctx.fillText(line, canvas.width - pad, canvas.height - pad - (CAPTION.length - 1 - i) * leading),
-    )
-    return new Promise((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error('toBlob failed'))), 'image/png'))
-}
-
 export default function App() {
     const [haiku, setHaiku] = useState < Haiku > (
         () =>
@@ -187,15 +122,6 @@ export default function App() {
         clearTimeout(statusTimer.current)
         statusTimer.current = setTimeout(() => setStatus(''), 2000)
     }
-    const copy = async (text: string, ok: string) => {
-        try {
-            await navigator.clipboard.writeText(text)
-            flash(ok)
-        } catch {
-            flash('copy failed')
-        }
-    }
-
     const save = async () => {
         try {
             setJustSavedId(await saveHaikuToGallery(haiku, style))
@@ -204,21 +130,6 @@ export default function App() {
             setPreviewKey((k) => k + 1)
         } catch {
             flash('save failed')
-        }
-    }
-
-    const stageRef = useRef<HTMLDivElement>(null)
-    const download = async () => {
-        if (!stageRef.current) return
-        try {
-            const blob = await renderPng(stageRef.current, lineRefs.current as HTMLElement[])
-            const a = document.createElement('a')
-            a.href = URL.createObjectURL(blob)
-            a.download = 'billboard-haiku.png'
-            a.click()
-            setTimeout(() => URL.revokeObjectURL(a.href), 1000)
-        } catch {
-            flash('download failed')
         }
     }
 
@@ -290,7 +201,7 @@ export default function App() {
 
                     <section id="app" className="app">
                         <div className="frame">
-                            <div className="stage" ref={stageRef}>
+                            <div className="stage">
                             <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true" focusable="false">
                                 <filter id="lift-shadows" colorInterpolationFilters="sRGB">
                                     <feComponentTransfer>
@@ -331,15 +242,12 @@ export default function App() {
                             onRerollFont={rerollFont}
                             onRoll={rerollEverything}
                             onUndo={undo}
-                            onCopyText={() => copy(haiku.map((p) => p.text).join('\n'), 'haiku copied')}
-                            onCopyLink={() => copy(shareUrl(), 'link copied')}
-                            onDownload={download}
-                            onInstagram={() => setShareOpen(true)}
+                            onShare={() => setShareOpen(true)}
                             onSave={save}
                         />
                     </section>
 
-                    {shareOpen && <ShareDialog haiku={haiku} style={style} onClose={closeShare} />}
+                    {shareOpen && <ShareDialog haiku={haiku} style={style} shareUrl={shareUrl} onClose={closeShare} />}
 
                     <GalleryPreview allPhrases={all} count={count} refreshKey={previewKey} />
                 </>

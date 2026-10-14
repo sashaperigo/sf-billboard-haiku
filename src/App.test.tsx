@@ -14,6 +14,11 @@ vi.mock('./lib/gallery', () => ({
 const textOf = (id: string) => phrases.find((p) => p.id === id)!.text
 const lines = () => [1, 2, 3].map((n) => screen.getByTestId(`line-${n}`).textContent)
 
+const copyLink = async () => {
+  await userEvent.click(screen.getByRole('button', { name: 'Share' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Copy link' }))
+}
+
 let writeText: ReturnType<typeof vi.fn>
 
 beforeEach(() => {
@@ -94,17 +99,10 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'Roll unlocked lines' })).toBeDisabled()
   })
 
-  it('copies the haiku as plain text and confirms', async () => {
-    render(<App />)
-    await userEvent.click(screen.getByRole('button', { name: 'Copy text' }))
-    expect(writeText).toHaveBeenCalledWith(lines().join('\n'))
-    expect(await screen.findByText('haiku copied')).toBeInTheDocument()
-  })
-
   it('copies a share link that reproduces the haiku', async () => {
     render(<App />)
     const before = lines()
-    await userEvent.click(screen.getByRole('button', { name: 'Copy link' }))
+    await copyLink()
     const url = new URL(writeText.mock.calls[0][0])
     const ids = url.searchParams.get('h')!.split(',')
     expect(ids.map(textOf)).toEqual(before)
@@ -112,13 +110,13 @@ describe('App', () => {
 
   it('restores fonts from a share link', async () => {
     render(<App />)
-    await userEvent.click(screen.getByRole('button', { name: 'Copy link' }))
+    await copyLink()
     const url = new URL(writeText.mock.calls.at(-1)![0])
     expect(url.searchParams.get('s')).toMatch(/^\d+\.\d+,\d+\.\d+,\d+\.\d+$/)
     cleanup()
     window.history.pushState({}, '', url.search)
     render(<App />)
-    await userEvent.click(screen.getByRole('button', { name: 'Copy link' }))
+    await copyLink()
     expect(new URL(writeText.mock.calls.at(-1)![0]).searchParams.get('s')).toBe(url.searchParams.get('s'))
   })
 
@@ -135,7 +133,7 @@ describe('App', () => {
   it('shows a failure message when the clipboard rejects', async () => {
     writeText.mockRejectedValue(new Error('denied'))
     render(<App />)
-    await userEvent.click(screen.getByRole('button', { name: 'Copy text' }))
+    await copyLink()
     expect(await screen.findByText('copy failed')).toBeInTheDocument()
   })
 

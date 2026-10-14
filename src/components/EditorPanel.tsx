@@ -11,10 +11,7 @@ export interface EditorPanelProps {
   onRerollFont: (i: number) => void
   onRoll: () => void
   onUndo: () => void
-  onCopyText: () => void
-  onCopyLink: () => void
-  onDownload: () => void
-  onInstagram: () => void
+  onShare: () => void
   onSave: () => void
 }
 
@@ -65,21 +62,9 @@ export function EditorPanel(p: EditorPanelProps) {
         <span className="status" role="status">
           {p.status}
         </span>
-        <div className="share">
-          <span className="share-label">Share</span>
-          <button type="button" className="btn btn-small" onClick={p.onCopyText}>
-            Copy text
-          </button>
-          <button type="button" className="btn btn-small" onClick={p.onCopyLink}>
-            Copy link
-          </button>
-          <button type="button" className="btn btn-small" onClick={p.onDownload}>
-            Download PNG
-          </button>
-          <button type="button" className="btn btn-small" onClick={p.onInstagram}>
-            Instagram
-          </button>
-        </div>
+        <button type="button" className="btn btn-secondary share" onClick={p.onShare}>
+          Share
+        </button>
         <button type="button" className="btn btn-amber save" onClick={p.onSave}>
           Save to gallery
         </button>
