@@ -19,6 +19,8 @@ const setup = (over: Partial<EditorPanelProps> = {}) => {
     onUndo: vi.fn(),
     onSwap: vi.fn(),
     onShare: vi.fn(),
+    onShareImage: vi.fn(),
+    thumbs: {},
     onSave: vi.fn(),
     ...over,
   }
@@ -67,5 +69,14 @@ describe('EditorPanel', () => {
     for (const fn of [p.onRoll, p.onUndo, p.onSwap, p.onShare, p.onSave])
       expect(fn).toHaveBeenCalledTimes(1)
     expect(screen.getByRole('status')).toHaveTextContent('link copied')
+  })
+
+  it('opens the share dialog from the postcard strip, optionally on one backdrop', async () => {
+    const p = setup({ thumbs: { '1d': 'blob:night' } })
+    await userEvent.click(screen.getByRole('button', { name: 'Get images' }))
+    expect(p.onShareImage).toHaveBeenLastCalledWith()
+    await userEvent.click(screen.getByRole('button', { name: 'Download Night image' }))
+    expect(p.onShareImage).toHaveBeenLastCalledWith('1d')
+    expect(screen.getByRole('button', { name: 'Download Night image' })).toHaveStyle({ background: 'url(blob:night) center/cover' })
   })
 })

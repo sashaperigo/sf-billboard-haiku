@@ -19,18 +19,32 @@ import {
 } from './lib/style'
 import { countHaikus, saveHaikuToGallery } from './lib/gallery'
 import { setJustSavedId } from './lib/justSaved'
+import type { ShareId } from './lib/shareImage'
+import { useMediaQuery } from './lib/useMediaQuery'
+import { useShareRenders } from './lib/useShareRenders'
 import { useRoute } from './lib/route'
 import { EditorPanel } from './components/EditorPanel'
 import { GalleryPage } from './components/GalleryPage'
 import { GalleryPreview } from './components/GalleryPreview'
+import { HelpCard, HelpSheet } from './components/HelpPanel'
 import { Nav } from './components/Nav'
 import { SaveDialog } from './components/SaveDialog'
+import { Artboards } from './components/ShareArtboards'
 import { ShareDialog } from './components/ShareDialog'
 import { Steps } from './components/Steps'
 
 const all = phrases as Phrase[]
 const LINES = [0, 1, 2] as
 const
+
+const HELP_KEY = 'bh-help-dismissed'
+const readHelpDismissed = () => {
+    try {
+        return localStorage.getItem(HELP_KEY) === '1'
+    } catch {
+        return false
+    }
+}
 
 const measureCtx = document.createElement('canvas').getContext('2d') !
     function inkBox(el: HTMLElement, lineH: number) {
@@ -62,7 +76,43 @@ export default function App() {
     const [previewKey, setPreviewKey] = useState(0)
     const [shareOpen, setShareOpen] = useState(false)
     const [saveOpen, setSaveOpen] = useState(false)
+    const [shareInitial, setShareInitial] = useState<ShareId | undefined>()
+    const [helpOpen, setHelpOpen] = useState(false)
+    const [helpDismissed, setHelpDismissed] = useState(readHelpDismissed)
+    const [rendersIdle, setRendersIdle] = useState(false)
+    const isMobile = useMediaQuery('(max-width: 700px)')
     const closeShare = useCallback(() => setShareOpen(false), [])
+    const closeHelp = useCallback(() => setHelpOpen(false), [])
+    const artboardsRef = useRef<HTMLDivElement>(null)
+    const artboardsOn = route !== 'gallery' && (rendersIdle || shareOpen)
+    const renders = useShareRenders(artboardsRef, haiku, style, artboardsOn)
+    const openShare = (id?: ShareId) => {
+        setShareInitial(id)
+        setShareOpen(true)
+    }
+    const dismissHelp = useCallback(() => {
+        setHelpDismissed(true)
+        try {
+            localStorage.setItem(HELP_KEY, '1')
+        } catch {
+            /* storage unavailable */
+        }
+    }, [])
+    const openHelp = () => {
+        dismissHelp()
+        setHelpOpen(true)
+    }
+
+    // Start rendering the share images once the browser is idle, so the postcard
+    // thumbnails show the user's haiku without waiting for the dialog.
+    useEffect(() => {
+        if (typeof requestIdleCallback === 'function') {
+            const id = requestIdleCallback(() => setRendersIdle(true))
+            return () => cancelIdleCallback(id)
+        }
+        const t = setTimeout(() => setRendersIdle(true), 1000)
+        return () => clearTimeout(t)
+    }, [])
 
     const refreshCount = useCallback(() => {
         countHaikus().then(setCount, () => undefined)
@@ -200,7 +250,7 @@ export default function App() {
 
     return (
         <div className="page">
-            <Nav active={route} count={count} />
+            <Nav active={route} count={count} onHelp={openHelp} helpOpen={helpOpen} />
             {route === 'gallery' ? (
                 <GalleryPage allPhrases={all} count={count} />
             ) : (
@@ -212,6 +262,7 @@ export default function App() {
                         </p>
                     </section>
                     <Steps />
+                    {isMobile && !helpDismissed && <HelpCard onDismiss={dismissHelp} />}
 
                     <section id="app" className="app">
                         <div className="frame">
@@ -257,13 +308,28 @@ export default function App() {
                             onRoll={rerollEverything}
                             onUndo={undo}
                             onSwap={swapOuter}
-                            onShare={() => setShareOpen(true)}
+                            onShare={() => openShare()}
+                            onShareImage={openShare}
+                            thumbs={{
+                                '1a': renders['1a']?.url,
+                                '1b': renders['1b']?.url,
+                                '1c': renders['1c']?.url,
+                                '1d': renders['1d']?.url,
+                            }}
                             onSave={() => setSaveOpen(true)}
                         />
                     </section>
 
                     {saveOpen && <SaveDialog onSave={save} onClose={() => setSaveOpen(false)} />}
-                    {shareOpen && <ShareDialog haiku={haiku} style={style} shareUrl={shareUrl} onClose={closeShare} />}
+                    {shareOpen && (
+                        <ShareDialog renders={renders} initialSelected={shareInitial} shareUrl={shareUrl} onClose={closeShare} />
+                    )}
+                    {isMobile && helpOpen && <HelpSheet onClose={closeHelp} />}
+                    {artboardsOn && (
+                        <div ref={artboardsRef}>
+                            <Artboards haiku={haiku} style={style} />
+                        </div>
+                    )}
 
                     <GalleryPreview allPhrases={all} count={count} refreshKey={previewKey} />
                 </>

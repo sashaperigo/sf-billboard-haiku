@@ -1,5 +1,6 @@
-import { SwapIcon } from './icons'
+import { DownloadIcon, SwapIcon } from './icons'
 import type { Haiku, Locks } from '../lib/haiku'
+import { SHARE_OPTIONS, type ShareId } from '../lib/shareImage'
 import { type LineCssInput, plainCss } from '../lib/style'
 
 export interface EditorPanelProps {
@@ -14,6 +15,10 @@ export interface EditorPanelProps {
   onUndo: () => void
   onSwap: () => void
   onShare: () => void
+  /** Opens the share dialog, optionally on a specific backdrop. */
+  onShareImage: (id?: ShareId) => void
+  /** Rendered share image URLs; thumbnails fall back to the raw photos until ready. */
+  thumbs: Partial<Record<ShareId, string>>
   onSave: () => void
 }
 
@@ -78,6 +83,28 @@ export function EditorPanel(p: EditorPanelProps) {
         </button>
         <button type="button" className="btn btn-amber save" onClick={p.onSave}>
           Save to gallery
+        </button>
+      </div>
+      <div className="postcard">
+        <div className="postcard-text">
+          <strong>Download it as a postcard</strong>
+          <span>Your haiku on four real billboards, sized for Instagram.</span>
+        </div>
+        <div className="postcard-thumbs">
+          {SHARE_OPTIONS.map((o) => (
+            <button
+              key={o.id}
+              type="button"
+              className="postcard-thumb"
+              data-id={o.id}
+              aria-label={`Download ${o.label} image`}
+              style={p.thumbs[o.id] ? { background: `url(${p.thumbs[o.id]}) center/cover` } : undefined}
+              onClick={() => p.onShareImage(o.id)}
+            />
+          ))}
+        </div>
+        <button type="button" className="btn postcard-get" onClick={() => p.onShareImage()}>
+          <DownloadIcon /> Get images
         </button>
       </div>
     </div>

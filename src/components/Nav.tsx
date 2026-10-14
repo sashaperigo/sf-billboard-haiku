@@ -6,9 +6,12 @@ export interface NavProps {
   active: Route
   /** Total haikus saved, or null while unknown. */
   count: number | null
+  /** Opens the mobile help sheet; the ? button shows on mobile home only. */
+  onHelp?: () => void
+  helpOpen?: boolean
 }
 
-export function Nav({ active, count }: NavProps) {
+export function Nav({ active, count, onHelp, helpOpen = false }: NavProps) {
   const isMobile = useMediaQuery('(max-width: 700px)')
   const onGallery = active === 'gallery'
   const wordmark = (
@@ -36,7 +39,21 @@ export function Nav({ active, count }: NavProps) {
         ) : (
           <>
             {wordmark}
-            {gallery}
+            <div className="nav-links">
+              {gallery}
+              {onHelp && (
+                <button
+                  type="button"
+                  className="help-btn"
+                  aria-label="Help"
+                  title="Help"
+                  aria-expanded={helpOpen}
+                  onClick={onHelp}
+                >
+                  ?
+                </button>
+              )}
+            </div>
           </>
         )}
       </nav>

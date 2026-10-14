@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { Nav } from './Nav'
 
 describe('Nav', () => {
@@ -21,5 +22,18 @@ describe('Nav', () => {
     render(<Nav active="gallery" count={5} />)
     expect(screen.getByRole('link', { name: /^Gallery/ })).toHaveAttribute('aria-current', 'page')
     expect(screen.getByRole('link', { name: 'Make a haiku' })).toHaveAttribute('href', '/')
+  })
+
+  it('shows the Help button only on mobile home, and calls onHelp', async () => {
+    const onHelp = vi.fn()
+    const mm = vi.fn((q: string) => ({ matches: true, media: q, addEventListener: vi.fn(), removeEventListener: vi.fn() }))
+    vi.stubGlobal('matchMedia', mm)
+    const { unmount } = render(<Nav active="home" count={1} onHelp={onHelp} />)
+    await userEvent.click(screen.getByRole('button', { name: 'Help' }))
+    expect(onHelp).toHaveBeenCalledTimes(1)
+    unmount()
+    render(<Nav active="gallery" count={1} onHelp={onHelp} />)
+    expect(screen.queryByRole('button', { name: 'Help' })).toBeNull()
+    vi.unstubAllGlobals()
   })
 })

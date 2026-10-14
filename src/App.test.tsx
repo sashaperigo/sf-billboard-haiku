@@ -1,8 +1,13 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
 import phrases from './data/phrases.json'
 import { countHaikus, fetchGalleryPage, saveHaikuToGallery } from './lib/gallery'
+
+vi.mock('./lib/shareImage', async (orig) => ({
+  ...(await orig<typeof import('./lib/shareImage')>()),
+  renderArtboard: vi.fn(async () => new Blob(['x'], { type: 'image/png' })),
+}))
 
 vi.mock('./lib/gallery', () => ({
   fetchGalleryPage: vi.fn(),
@@ -105,6 +110,25 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'Lock line 3' })).toHaveAttribute('aria-pressed', 'true')
     await userEvent.click(screen.getByRole('button', { name: 'Undo' }))
     expect(lines()).toEqual([a.text, seven.text, b.text])
+  })
+
+  it('opens the share dialog on the clicked postcard thumbnail', async () => {
+    render(<App />)
+    await userEvent.click(screen.getByRole('button', { name: 'Download Night image' }))
+    const dialog = within(screen.getByRole('dialog'))
+    expect(dialog.getByRole('button', { name: /Night/ })).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it('shows the help card on first mobile visit and remembers dismissal', async () => {
+    localStorage.clear()
+    vi.stubGlobal('matchMedia', (q: string) => ({ matches: true, media: q, addEventListener: vi.fn(), removeEventListener: vi.fn() }))
+    render(<App />)
+    await userEvent.click(screen.getByRole('button', { name: 'Got it' }))
+    expect(screen.queryByRole('button', { name: 'Got it' })).toBeNull()
+    expect(localStorage.getItem('bh-help-dismissed')).toBe('1')
+    await userEvent.click(screen.getByRole('button', { name: 'Help' }))
+    expect(screen.getByRole('dialog', { name: 'How it works' })).toBeInTheDocument()
+    vi.unstubAllGlobals()
   })
 
   it('disables Roll when every line is locked', async () => {
