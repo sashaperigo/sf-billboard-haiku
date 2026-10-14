@@ -19,7 +19,7 @@ beforeEach(() => {
   writeText = vi.fn().mockResolvedValue(undefined)
   Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
   vi.mocked(fetchGalleryPage).mockReset().mockResolvedValue({ items: [], hasMore: false })
-  vi.mocked(saveHaikuToGallery).mockReset().mockResolvedValue(undefined)
+  vi.mocked(saveHaikuToGallery).mockReset().mockResolvedValue('new-id')
 })
 
 describe('App', () => {

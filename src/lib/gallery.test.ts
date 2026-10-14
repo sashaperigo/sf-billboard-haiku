@@ -19,22 +19,32 @@ const row = (overrides: Partial<{ id: string; haiku_param: string; style_param: 
 })
 
 function fakeClient(opts: {
-  selectResult?: { data: unknown[] | null; error: unknown }
-  insertResult?: { error: unknown }
+  selectResult?: { data: unknown[] | null; error: unknown; count?: number | null }
+  insertResult?: { data?: unknown; error: unknown }
   rpcResult?: { data: unknown; error: unknown }
 }) {
-  const from = vi.fn(() => ({
-    select: vi.fn(() => ({
-      order: vi.fn(() => ({
-        order: vi.fn(() => ({
-          range: vi.fn(() => Promise.resolve(opts.selectResult ?? { data: [], error: null })),
-        })),
-      })),
-    })),
-    insert: vi.fn(() => Promise.resolve(opts.insertResult ?? { error: null })),
-  }))
+  const calls: { method: string; args: unknown[] }[] = []
+  // Chainable + thenable, like a PostgREST builder: records every call, resolves to the configured result.
+  const builder: any = new Proxy(
+    {},
+    {
+      get(_t, method: string) {
+        if (method === 'then') {
+          const result = calls.some((c) => c.method === 'insert')
+            ? (opts.insertResult ?? { data: { id: 'new-id' }, error: null })
+            : (opts.selectResult ?? { data: [], error: null })
+          return (res: (v: unknown) => unknown, rej: (e: unknown) => unknown) => Promise.resolve(result).then(res, rej)
+        }
+        return (...args: unknown[]) => {
+          calls.push({ method, args })
+          return builder
+        }
+      },
+    },
+  )
+  const from = vi.fn(() => builder)
   const rpc = vi.fn(() => Promise.resolve(opts.rpcResult ?? { data: null, error: null }))
-  return { from, rpc } as any
+  return { from, rpc, calls } as any
 }
 
 describe('fetchGalleryPage', () => {
@@ -78,6 +88,43 @@ describe('fetchGalleryPage', () => {
 
     await expect(api.fetchGalleryPage(allPhrases, 0)).rejects.toThrow()
   })
+
+  const orders = (client: any) =>
+    client.calls.filter((c: any) => c.method === 'order').map((c: any) => [c.args[0], c.args[1].ascending])
+
+  it('sorts by upvotes then recency by default (top)', async () => {
+    const client = fakeClient({})
+    await createGalleryApi(client).fetchGalleryPage(allPhrases, 0)
+    expect(orders(client)).toEqual([['upvotes', false], ['created_at', false]])
+  })
+
+  it('sorts by recency only for new', async () => {
+    const client = fakeClient({})
+    await createGalleryApi(client).fetchGalleryPage(allPhrases, 0, { sort: 'new' })
+    expect(orders(client)).toEqual([['created_at', false]])
+  })
+
+  it('honours a custom limit for the range and hasMore', async () => {
+    const data = [row({ id: 'a' }), row({ id: 'b' }), row({ id: 'c' })]
+    const client = fakeClient({ selectResult: { data, error: null } })
+    const { hasMore } = await createGalleryApi(client).fetchGalleryPage(allPhrases, 0, { limit: 3 })
+    expect(client.calls.find((c: any) => c.method === 'range').args).toEqual([0, 2])
+    expect(hasMore).toBe(true)
+  })
+})
+
+describe('countHaikus', () => {
+  it('does a head-only exact count', async () => {
+    const client = fakeClient({ selectResult: { data: null, error: null, count: 312 } })
+    const count = await createGalleryApi(client).countHaikus()
+    expect(count).toBe(312)
+    expect(client.calls[0]).toEqual({ method: 'select', args: ['*', { count: 'exact', head: true }] })
+  })
+
+  it('throws when the count errors', async () => {
+    const client = fakeClient({ selectResult: { data: null, error: new Error('boom'), count: null } })
+    await expect(createGalleryApi(client).countHaikus()).rejects.toThrow()
+  })
 })
 
 describe('saveHaikuToGallery', () => {
@@ -88,8 +135,16 @@ describe('saveHaikuToGallery', () => {
 
     await api.saveHaikuToGallery(haiku, { faces: [0, 1, 2], inks: [3, 4, 5] })
 
-    const insertCall = client.from.mock.results[0].value.insert.mock.calls[0][0]
+    const insertCall = client.calls.find((c: any) => c.method === 'insert').args[0]
     expect(insertCall).toEqual({ haiku_param: 'f1,s1,f2', style_param: '0.3,1.4,2.5' })
+  })
+
+  it('returns the id of the new row', async () => {
+    const client = fakeClient({ insertResult: { data: { id: 'new-id' }, error: null } })
+    const api = createGalleryApi(client)
+    const haiku = [allPhrases[0], allPhrases[3], allPhrases[1]] as [Phrase, Phrase, Phrase]
+
+    await expect(api.saveHaikuToGallery(haiku, { faces: [0, 1, 2], inks: [3, 4, 5] })).resolves.toBe('new-id')
   })
 
   it('throws when the insert errors', async () => {

@@ -17,6 +17,13 @@ export interface GalleryHaiku {
 
 const PAGE_SIZE = 24
 
+export type GallerySort = 'top' | 'new'
+
+export interface FetchOptions {
+  sort?: GallerySort
+  limit?: number
+}
+
 interface HaikuRow {
   id: string
   haiku_param: string
@@ -35,27 +42,38 @@ export function createGalleryApi(client: SupabaseClient) {
   async function fetchGalleryPage(
     allPhrases: Phrase[],
     offset: number,
+    { sort = 'top', limit = PAGE_SIZE }: FetchOptions = {},
   ): Promise<{ items: GalleryHaiku[]; hasMore: boolean }> {
-    const { data, error } = await client
-      .from('haikus')
-      .select('*')
-      .order('upvotes', { ascending: false })
+    let query = client.from('haikus').select('*')
+    if (sort === 'top') query = query.order('upvotes', { ascending: false })
+    const { data, error } = await query
       .order('created_at', { ascending: false })
-      .range(offset, offset + PAGE_SIZE - 1)
+      .range(offset, offset + limit - 1)
     if (error) throw error
     const rows = (data ?? []) as HaikuRow[]
     const items = rows
       .map((row) => parseRow(allPhrases, row))
       .filter((item): item is GalleryHaiku => item !== null)
-    return { items, hasMore: rows.length === PAGE_SIZE }
+    return { items, hasMore: rows.length === limit }
   }
 
-  async function saveHaikuToGallery(haiku: Haiku, style: GalleryStyle): Promise<void> {
-    const { error } = await client.from('haikus').insert({
-      haiku_param: formatShareParam(haiku),
-      style_param: formatStyleParam(style),
-    })
+  async function countHaikus(): Promise<number> {
+    const { count, error } = await client.from('haikus').select('*', { count: 'exact', head: true })
     if (error) throw error
+    return count ?? 0
+  }
+
+  async function saveHaikuToGallery(haiku: Haiku, style: GalleryStyle): Promise<string> {
+    const { data, error } = await client
+      .from('haikus')
+      .insert({
+        haiku_param: formatShareParam(haiku),
+        style_param: formatStyleParam(style),
+      })
+      .select('id')
+      .single()
+    if (error) throw error
+    return (data as { id: string }).id
   }
 
   async function upvoteHaiku(id: string): Promise<number> {
@@ -64,7 +82,7 @@ export function createGalleryApi(client: SupabaseClient) {
     return (data as { upvotes: number }).upvotes
   }
 
-  return { fetchGalleryPage, saveHaikuToGallery, upvoteHaiku }
+  return { fetchGalleryPage, countHaikus, saveHaikuToGallery, upvoteHaiku }
 }
 
 function requireClient(): SupabaseClient {
@@ -74,6 +92,8 @@ function requireClient(): SupabaseClient {
 
 export const fetchGalleryPage: ReturnType<typeof createGalleryApi>['fetchGalleryPage'] = (...args) =>
   createGalleryApi(requireClient()).fetchGalleryPage(...args)
+export const countHaikus: ReturnType<typeof createGalleryApi>['countHaikus'] = (...args) =>
+  createGalleryApi(requireClient()).countHaikus(...args)
 export const saveHaikuToGallery: ReturnType<typeof createGalleryApi>['saveHaikuToGallery'] = (...args) =>
   createGalleryApi(requireClient()).saveHaikuToGallery(...args)
 export const upvoteHaiku: ReturnType<typeof createGalleryApi>['upvoteHaiku'] = (...args) =>
