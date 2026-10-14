@@ -2,11 +2,13 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
 import phrases from './data/phrases.json'
-import { fetchGalleryPage, saveHaikuToGallery } from './lib/gallery'
+import { countHaikus, fetchGalleryPage, saveHaikuToGallery } from './lib/gallery'
 
 vi.mock('./lib/gallery', () => ({
   fetchGalleryPage: vi.fn(),
   saveHaikuToGallery: vi.fn(),
+  countHaikus: vi.fn(),
+  upvoteHaiku: vi.fn(),
 }))
 
 const textOf = (id: string) => phrases.find((p) => p.id === id)!.text
@@ -16,9 +18,11 @@ let writeText: ReturnType<typeof vi.fn>
 
 beforeEach(() => {
   window.history.pushState({}, '', '/')
+  sessionStorage.clear()
   writeText = vi.fn().mockResolvedValue(undefined)
   Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
   vi.mocked(fetchGalleryPage).mockReset().mockResolvedValue({ items: [], hasMore: false })
+  vi.mocked(countHaikus).mockReset().mockResolvedValue(312)
   vi.mocked(saveHaikuToGallery).mockReset().mockResolvedValue('new-id')
 })
 
@@ -50,7 +54,7 @@ describe('App', () => {
     const before = lines()
     await userEvent.click(lock)
     expect(lock).toHaveAttribute('aria-pressed', 'true')
-    await userEvent.click(screen.getByRole('button', { name: 'Reroll all' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Roll unlocked lines' }))
     const after = lines()
     expect(after[0]).toBe(before[0])
     expect(after[1]).not.toBe(before[1])
@@ -62,7 +66,7 @@ describe('App', () => {
     const undo = screen.getByRole('button', { name: 'Undo' })
     expect(undo).toBeDisabled()
     const before = lines()
-    await userEvent.click(screen.getByRole('button', { name: 'Reroll all' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Roll unlocked lines' }))
     expect(undo).toBeEnabled()
     await userEvent.click(undo)
     expect(lines()).toEqual(before)
@@ -73,9 +77,9 @@ describe('App', () => {
     render(<App />)
     const undo = screen.getByRole('button', { name: 'Undo' })
     const first = lines()
-    await userEvent.click(screen.getByRole('button', { name: 'Reroll all' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Roll unlocked lines' }))
     const second = lines()
-    await userEvent.click(screen.getByRole('button', { name: 'Reroll all' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Roll unlocked lines' }))
     await userEvent.click(undo)
     expect(lines()).toEqual(second)
     expect(undo).toBeEnabled()
@@ -84,15 +88,15 @@ describe('App', () => {
     expect(undo).toBeDisabled()
   })
 
-  it('disables Reroll all when every line is locked', async () => {
+  it('disables Roll when every line is locked', async () => {
     render(<App />)
     for (const n of [1, 2, 3]) await userEvent.click(screen.getByRole('button', { name: `Lock line ${n}` }))
-    expect(screen.getByRole('button', { name: 'Reroll all' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Roll unlocked lines' })).toBeDisabled()
   })
 
   it('copies the haiku as plain text and confirms', async () => {
     render(<App />)
-    await userEvent.click(screen.getByRole('button', { name: 'Copy haiku' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Copy text' }))
     expect(writeText).toHaveBeenCalledWith(lines().join('\n'))
     expect(await screen.findByText('haiku copied')).toBeInTheDocument()
   })
@@ -123,7 +127,7 @@ describe('App', () => {
     const before = lines()
     const style = screen.getByTestId('line-2').getAttribute('style')
     for (let n = 0; n < 20 && screen.getByTestId('line-2').getAttribute('style') === style; n++)
-      await userEvent.click(screen.getByRole('button', { name: 'Reroll font for line 2' }))
+      await userEvent.click(screen.getByRole('button', { name: 'New font for line 2' }))
     expect(screen.getByTestId('line-2').getAttribute('style')).not.toBe(style)
     expect(lines()).toEqual(before)
   })
@@ -131,20 +135,38 @@ describe('App', () => {
   it('shows a failure message when the clipboard rejects', async () => {
     writeText.mockRejectedValue(new Error('denied'))
     render(<App />)
-    await userEvent.click(screen.getByRole('button', { name: 'Copy haiku' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Copy text' }))
     expect(await screen.findByText('copy failed')).toBeInTheDocument()
   })
 
-  it('opens the gallery and returns to the editor with the same haiku', async () => {
+  it('opens the gallery page from the nav, keeps the haiku, and returns with the same haiku', async () => {
     render(<App />)
     const before = lines()
 
-    await userEvent.click(screen.getByRole('button', { name: 'Open gallery' }))
-    await waitFor(() => expect(fetchGalleryPage).toHaveBeenCalled())
+    await userEvent.click(screen.getByRole('link', { name: /^Gallery/ }))
+    await waitFor(() => expect(fetchGalleryPage).toHaveBeenCalledWith(expect.anything(), 0, { sort: 'top' }))
+    expect(window.location.pathname).toBe('/gallery')
+    expect(screen.getByRole('heading', { name: 'The gallery' })).toBeInTheDocument()
     expect(screen.queryByTestId('haiku')).toBeNull()
 
-    await userEvent.click(screen.getByRole('button', { name: 'Back to editor' }))
+    await userEvent.click(screen.getByRole('link', { name: 'Make a haiku' }))
+    expect(window.location.pathname).toBe('/')
     expect(lines()).toEqual(before)
+  })
+
+  it('renders the gallery page directly from the /gallery URL', async () => {
+    window.history.pushState({}, '', '/gallery/')
+    render(<App />)
+    expect(screen.getByRole('heading', { name: 'The gallery' })).toBeInTheDocument()
+    expect(await screen.findByRole('link', { name: 'Gallery 312' })).toHaveAttribute('aria-current', 'page')
+  })
+
+  it('shows the explainer steps and the gallery preview with the total count', async () => {
+    vi.mocked(fetchGalleryPage).mockResolvedValue({ items: [], hasMore: false })
+    render(<App />)
+    expect(screen.getByText('Tune')).toBeInTheDocument()
+    expect(await screen.findByText(/The most upvoted of 312 haikus/)).toBeInTheDocument()
+    expect(fetchGalleryPage).toHaveBeenCalledWith(expect.anything(), 0, { sort: 'top', limit: 3 })
   })
 
   it('saves the current haiku to the gallery and shows a success message', async () => {
@@ -154,8 +176,20 @@ describe('App', () => {
     expect(saveHaikuToGallery).toHaveBeenCalled()
   })
 
+  it('remembers the saved id, and refreshes the count and preview after saving', async () => {
+    vi.mocked(saveHaikuToGallery).mockResolvedValue('abc')
+    render(<App />)
+    await waitFor(() => expect(fetchGalleryPage).toHaveBeenCalledTimes(1))
+    await userEvent.click(screen.getByRole('button', { name: 'Save to gallery' }))
+    await screen.findByText('saved to gallery')
+    expect(sessionStorage.getItem('justSavedHaikuId')).toBe('abc')
+    await waitFor(() => expect(fetchGalleryPage).toHaveBeenCalledTimes(2))
+    expect(countHaikus).toHaveBeenCalledTimes(2)
+  })
+
   it('shows a failure message when saving to the gallery fails', async () => {
-    vi.mocked(saveHaikuToGallery).mockRejectedValue(new Error('boom'))
+    vi.mocked(countHaikus).mockReset().mockResolvedValue(312)
+  vi.mocked(saveHaikuToGallery).mockRejectedValue(new Error('boom'))
     render(<App />)
     await userEvent.click(screen.getByRole('button', { name: 'Save to gallery' }))
     expect(await screen.findByText('save failed')).toBeInTheDocument()

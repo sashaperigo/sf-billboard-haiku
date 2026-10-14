@@ -17,23 +17,18 @@ import {
     parseStyleParam,
     restyle,
 } from './lib/style'
-import { saveHaikuToGallery } from './lib/gallery'
-import { Gallery } from './components/Gallery'
-import { DownloadIcon, GalleryIcon, SaveIcon, ShareIcon, UndoIcon } from './components/icons'
+import { countHaikus, saveHaikuToGallery } from './lib/gallery'
+import { setJustSavedId } from './lib/justSaved'
+import { useRoute } from './lib/route'
+import { EditorPanel } from './components/EditorPanel'
+import { GalleryPage } from './components/GalleryPage'
+import { GalleryPreview } from './components/GalleryPreview'
+import { Nav } from './components/Nav'
+import { Steps } from './components/Steps'
 
 const all = phrases as Phrase[]
 const LINES = [0, 1, 2] as
 const
-const SYLLABLES = [5, 7, 5]
-
-const STEPS = [
-    { icon: '🎲', title: 'Reroll all', desc: 'Shuffle every unlocked line for a brand-new haiku.' },
-    { icon: '🔒', title: 'Lock a line', desc: 'Keep a line you like, then reroll the rest around it.' },
-    { icon: 'Aa', title: 'Reroll font', desc: 'Give one line a new typeface and ink without changing its words.' },
-    { icon: '⧉', title: 'Copy haiku', desc: 'Copy the three lines as plain text.' },
-    { icon: <ShareIcon />, title: 'Copy link', desc: 'Copy a URL that reproduces this exact haiku, fonts and colors included.' },
-    { icon: <DownloadIcon />, title: 'Download image', desc: 'Save the billboard with your haiku as a PNG.' },
-]
 
 const measureCtx = document.createElement('canvas').getContext('2d') !
     function inkBox(el: HTMLElement, lineH: number) {
@@ -125,23 +120,14 @@ export default function App() {
     const [rolls, setRolls] = useState < { n: number;delay: number } [] > ([0, 1, 2].map(() => ({ n: 0, delay: 0 })))
     const [status, setStatus] = useState('')
     const [history, setHistory] = useState<{ haiku: Haiku; style: typeof style }[]>([])
-    const [view, setView] = useState<'editor' | 'gallery'>('editor')
+    const route = useRoute()
+    const [count, setCount] = useState<number | null>(null)
+    const [previewKey, setPreviewKey] = useState(0)
 
-    const [helpOpen, setHelpOpen] = useState(false)
-    const helpRef = useRef<HTMLDivElement>(null)
-    useEffect(() => {
-        if (!helpOpen) return
-        const onDown = (e: MouseEvent) => {
-            if (!helpRef.current?.contains(e.target as Node)) setHelpOpen(false)
-        }
-        const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setHelpOpen(false)
-        document.addEventListener('mousedown', onDown)
-        document.addEventListener('keydown', onKey)
-        return () => {
-            document.removeEventListener('mousedown', onDown)
-            document.removeEventListener('keydown', onKey)
-        }
-    }, [helpOpen])
+    const refreshCount = useCallback(() => {
+        countHaikus().then(setCount, () => undefined)
+    }, [])
+    useEffect(refreshCount, [refreshCount])
 
     const boxRef = useRef < HTMLDivElement > (null)
     const lineRefs = useRef < (HTMLSpanElement | null)[] > ([])
@@ -185,7 +171,7 @@ export default function App() {
             cancelAnimationFrame(raf)
             timers.forEach(clearTimeout)
         }
-    }, [fit, haiku, style])
+    }, [fit, haiku, style, route])
     useEffect(() => {
         window.addEventListener('resize', fit)
         document.fonts ?.ready.then(fit)
@@ -209,8 +195,10 @@ export default function App() {
 
     const save = async () => {
         try {
-            await saveHaikuToGallery(haiku, style)
+            setJustSavedId(await saveHaikuToGallery(haiku, style))
             flash('saved to gallery')
+            refreshCount()
+            setPreviewKey((k) => k + 1)
         } catch {
             flash('save failed')
         }
@@ -282,183 +270,74 @@ export default function App() {
         animationDelay: `${rolls[i].delay}ms`,
     })
 
-    if (view === 'gallery') {
-        return <Gallery allPhrases={all} onBack={() => setView('editor')} />
-    }
-
     return (
         <div className="page">
-            <div className="help" ref={helpRef}>
-                <button
-                    type="button"
-                    className="help-btn"
-                    aria-expanded={helpOpen}
-                    aria-controls="help-card"
-                    onClick={() => setHelpOpen((o) => !o)}
-                >
-                    Help
-                </button>
-                {helpOpen && (
-                    <div id="help-card" className="help-card" role="dialog" aria-label="Instructions">
-                        <h2>How to use it</h2>
-                        <ul>
-                            {STEPS.map((s) => (
-                                <li key={s.title}>
-                                    <span className="help-icon" aria-hidden="true">{s.icon}</span>
-                                    <span>
-                                        <strong>{s.title}</strong>
-                                        <span className="help-desc">{s.desc}</span>
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-            </div>
-            <button
-                type="button"
-                className="circle gallery-toggle"
-                aria-label="Open gallery"
-                data-tip="Browse gallery"
-                onClick={() => setView('gallery')}
-            >
-                <GalleryIcon />
-            </button>
-            <section className="hero">
-                <h1>Tech Billboard Haiku Generator</h1>
-                <p>
-                    Click reroll to generate your very own 5-7-5 billboard haiku. All phrases have been taken from real AI ads displayed around the Bay Area.
-                </p>
-            </section>
+            <Nav active={route} count={count} />
+            {route === 'gallery' ? (
+                <GalleryPage allPhrases={all} count={count} />
+            ) : (
+                <>
+                    <section className="hero">
+                        <h1>Tech Billboard Haiku Generator</h1>
+                        <p>
+                            Click reroll to generate your very own 5-7-5 billboard haiku. All phrases have been taken from real AI ads displayed around the Bay Area.
+                        </p>
+                    </section>
+                    <Steps />
 
-            <section id="app" className="app">
-                <div className="frame">
-                    <div className="stage" ref={stageRef}>
-                    <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true" focusable="false">
-                        <filter id="lift-shadows" colorInterpolationFilters="sRGB">
-                            <feComponentTransfer>
-                                <feFuncR type="gamma" amplitude="1" exponent="0.65" offset="0" />
-                                <feFuncG type="gamma" amplitude="1" exponent="0.65" offset="0" />
-                                <feFuncB type="gamma" amplitude="1" exponent="0.65" offset="0" />
-                            </feComponentTransfer>
-                        </filter>
-                    </svg>
-                    <img src={billboard} alt="A South of Market billboard" />
+                    <section id="app" className="app">
+                        <div className="frame">
+                            <div className="stage" ref={stageRef}>
+                            <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true" focusable="false">
+                                <filter id="lift-shadows" colorInterpolationFilters="sRGB">
+                                    <feComponentTransfer>
+                                        <feFuncR type="gamma" amplitude="1" exponent="0.65" offset="0" />
+                                        <feFuncG type="gamma" amplitude="1" exponent="0.65" offset="0" />
+                                        <feFuncB type="gamma" amplitude="1" exponent="0.65" offset="0" />
+                                    </feComponentTransfer>
+                                </filter>
+                            </svg>
+                            <img src={billboard} alt="A South of Market billboard" />
 
-                    <div ref={boxRef} data-testid="haiku" className="haiku" aria-live="polite">
-                        {LINES.map((i) => (
-                            <span
-                                key={`${i}-${rolls[i].n}`}
-                                className={rolls[i].n > 0 ? 'reveal' : undefined}
-                                data-testid={`line-${i + 1}`}
-                                ref={(el) => {
-                                    lineRefs.current[i] = el
-                                }}
-                                style={lineStyle(i)}
-                            >
-                                {haiku[i].text}
-                            </span>
-                        ))}
-                    </div>
-                    <div className="surface sheen" />
-                    <div className="surface vignette" />
-                    </div>
-
-                    <div className="controls">
-                        <div className="lines-card">
-                            {LINES.map((i) => (
-                                <div className="row" key={i}>
-                                    <span className="syl">
-                                        <span className="syl-long">Line {i + 1} · </span>
-                                        {SYLLABLES[i]}
-                                        <span className="syl-long"> syllables</span>
-                                    </span>
-                                    <button
-                                        type="button"
-                                        className="circle lock font-btn"
-                                        aria-label={`Reroll font for line ${i + 1}`}
-                                        data-tip="Reroll font"
-                                        onClick={() => rerollFont(i)}
+                            <div ref={boxRef} data-testid="haiku" className="haiku" aria-live="polite">
+                                {LINES.map((i) => (
+                                    <span
+                                        key={`${i}-${rolls[i].n}`}
+                                        className={rolls[i].n > 0 ? 'reveal' : undefined}
+                                        data-testid={`line-${i + 1}`}
+                                        ref={(el) => {
+                                            lineRefs.current[i] = el
+                                        }}
+                                        style={lineStyle(i)}
                                     >
-                                        Aa
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="circle lock"
-                                        aria-label={`Lock line ${i + 1}`}
-                                        aria-pressed={locks[i]}
-                                        data-tip={locks[i] ? `Unlock line ${i + 1}` : `Lock line ${i + 1}`}
-                                        onClick={() => toggleLock(i)}
-                                    >
-                                        {locks[i] ? '🔒' : '🔓'}
-                                    </button>
-                                </div>
-                            ))}
+                                        {haiku[i].text}
+                                    </span>
+                                ))}
+                            </div>
+                            <div className="surface sheen" />
+                            <div className="surface vignette" />
+                            </div>
                         </div>
-                        <div className="actions">
-                            <button
-                                type="button"
-                                className="circle action reroll-all"
-                                aria-label="Reroll all"
-                                data-tip="Reroll all"
-                                disabled={locks.every(Boolean)}
-                                onClick={rerollEverything}
-                            >
-                                🎲
-                            </button>
-                            <button
-                                type="button"
-                                className="circle action undo"
-                                aria-label="Undo"
-                                data-tip="Undo"
-                                disabled={history.length === 0}
-                                onClick={undo}
-                            >
-                                <UndoIcon />
-                            </button>
-                            <button
-                                type="button"
-                                className="circle action push-right"
-                                aria-label="Copy haiku"
-                                data-tip="Copy haiku"
-                                onClick={() => copy(haiku.map((p) => p.text).join('\n'), 'haiku copied')}
-                            >
-                                ⧉
-                            </button>
-                            <button
-                                type="button"
-                                className="circle action"
-                                aria-label="Copy link"
-                                data-tip="Copy share link"
-                                onClick={() => copy(shareUrl(), 'link copied')}
-                            >
-                                <ShareIcon />
-                            </button>
-                            <button
-                                type="button"
-                                className="circle action"
-                                aria-label="Download image"
-                                data-tip="Download image"
-                                onClick={download}
-                            >
-                                <DownloadIcon />
-                            </button>
-                            <button
-                                type="button"
-                                className="circle action"
-                                aria-label="Save to gallery"
-                                data-tip="Save to gallery"
-                                onClick={save}
-                            >
-                                <SaveIcon />
-                            </button>
-                        </div>
-                        <div className="status" role="status">
-                            {status}
-                        </div>
-                    </div>
-                </div>
-            </section>
+                        <EditorPanel
+                            haiku={haiku}
+                            style={style}
+                            locks={locks}
+                            canUndo={history.length > 0}
+                            status={status}
+                            onToggleLock={toggleLock}
+                            onRerollFont={rerollFont}
+                            onRoll={rerollEverything}
+                            onUndo={undo}
+                            onCopyText={() => copy(haiku.map((p) => p.text).join('\n'), 'haiku copied')}
+                            onCopyLink={() => copy(shareUrl(), 'link copied')}
+                            onDownload={download}
+                            onSave={save}
+                        />
+                    </section>
+
+                    <GalleryPreview allPhrases={all} count={count} refreshKey={previewKey} />
+                </>
+            )}
 
             <footer className="footer">
                 <span>Made with ❤️ in San Francisco</span>

@@ -1,4 +1,4 @@
-import { FACES, INKS, colorOf, formatStyleParam, parseStyleParam, restyle, type Trio } from './style'
+import { FACES, INKS, colorOf, plainCss, formatStyleParam, parseStyleParam, restyle, type Trio } from './style'
 
 describe('style param', () => {
   const style = { faces: [3, 10, 20] as Trio, inks: [1, 2, 3] as Trio }
@@ -50,5 +50,16 @@ describe('restyle', () => {
     for (const f of next.faces) expect(f).toBeLessThan(FACES.length)
     for (const c of next.inks) expect(c).toBeGreaterThanOrEqual(0)
     for (const c of next.inks) expect(c).toBeLessThan(INKS.length)
+  })
+})
+
+describe('plainCss', () => {
+  const style = { faces: [3, 10, 20] as Trio, inks: [1, 2, 3] as Trio }
+
+  it('keeps the face, ink and spacing of lineCss but sizes in px scaled by the face', () => {
+    const css = plainCss(style, 1, 19)
+    expect(css.fontFamily).toContain(FACES[10].family)
+    expect(css.color).toBe(colorOf(10, 2))
+    expect(css.fontSize).toBe(`calc(19px * ${FACES[10].size})`)
   })
 })

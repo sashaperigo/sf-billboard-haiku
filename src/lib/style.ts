@@ -128,3 +128,8 @@ export function lineCss(style: LineCssInput, i: number): React.CSSProperties {
     textShadow: face.glow ?? 'none',
   }
 }
+
+/** Like lineCss but sized in px, for text outside the billboard (editor rows, gallery cards). */
+export function plainCss(style: LineCssInput, i: number, basePx: number): React.CSSProperties {
+  return { ...lineCss(style, i), fontSize: `calc(${basePx}px * ${FACES[style.faces[i]].size})` }
+}

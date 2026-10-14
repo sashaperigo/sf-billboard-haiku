@@ -1,16 +1,20 @@
 import type { Haiku } from '../lib/haiku'
-import { type LineCssInput, lineCss } from '../lib/style'
+import { type LineCssInput, plainCss } from '../lib/style'
 
 export interface HaikuCardProps {
   haiku: Haiku
   style: LineCssInput
+  /** Multiplier on the base type size (the gallery page uses a slightly smaller one). */
+  scale?: number
 }
 
-export function HaikuCard({ haiku, style }: HaikuCardProps) {
+const BASE_PX = [19, 17, 19]
+
+export function HaikuCard({ haiku, style, scale = 1 }: HaikuCardProps) {
   return (
-    <div className="gallery-card">
+    <div className="haiku-lines">
       {haiku.map((phrase, i) => (
-        <p key={i} style={lineCss(style, i)}>
+        <p key={i} style={plainCss(style, i, BASE_PX[i] * scale)}>
           {phrase.text}
         </p>
       ))}
