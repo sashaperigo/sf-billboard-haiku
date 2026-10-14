@@ -777,6 +777,16 @@ h2 {
         grid-template-columns: minmax(0, 1fr);
         padding: 20px;
         gap: 20px;
+        position: relative;
+    }
+
+    .share-close {
+        position: absolute;
+        top: 28px;
+        right: 28px;
+        z-index: 1;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 1px 4px rgba(20, 19, 14, 0.25);
     }
 }
 
