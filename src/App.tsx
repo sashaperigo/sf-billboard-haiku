@@ -24,6 +24,7 @@ import { EditorPanel } from './components/EditorPanel'
 import { GalleryPage } from './components/GalleryPage'
 import { GalleryPreview } from './components/GalleryPreview'
 import { Nav } from './components/Nav'
+import { ShareDialog } from './components/ShareDialog'
 import { Steps } from './components/Steps'
 
 const all = phrases as Phrase[]
@@ -123,6 +124,8 @@ export default function App() {
     const route = useRoute()
     const [count, setCount] = useState<number | null>(null)
     const [previewKey, setPreviewKey] = useState(0)
+    const [shareOpen, setShareOpen] = useState(false)
+    const closeShare = useCallback(() => setShareOpen(false), [])
 
     const refreshCount = useCallback(() => {
         countHaikus().then(setCount, () => undefined)
@@ -331,9 +334,12 @@ export default function App() {
                             onCopyText={() => copy(haiku.map((p) => p.text).join('\n'), 'haiku copied')}
                             onCopyLink={() => copy(shareUrl(), 'link copied')}
                             onDownload={download}
+                            onInstagram={() => setShareOpen(true)}
                             onSave={save}
                         />
                     </section>
+
+                    {shareOpen && <ShareDialog haiku={haiku} style={style} onClose={closeShare} />}
 
                     <GalleryPreview allPhrases={all} count={count} refreshKey={previewKey} />
                 </>

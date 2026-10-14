@@ -14,6 +14,7 @@ export interface EditorPanelProps {
   onCopyText: () => void
   onCopyLink: () => void
   onDownload: () => void
+  onInstagram: () => void
   onSave: () => void
 }
 
@@ -74,6 +75,9 @@ export function EditorPanel(p: EditorPanelProps) {
           </button>
           <button type="button" className="btn btn-small" onClick={p.onDownload}>
             Download PNG
+          </button>
+          <button type="button" className="btn btn-small" onClick={p.onInstagram}>
+            Instagram
           </button>
         </div>
         <button type="button" className="btn btn-amber save" onClick={p.onSave}>

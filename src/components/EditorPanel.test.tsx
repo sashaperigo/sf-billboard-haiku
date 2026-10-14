@@ -20,6 +20,7 @@ const setup = (over: Partial<EditorPanelProps> = {}) => {
     onCopyText: vi.fn(),
     onCopyLink: vi.fn(),
     onDownload: vi.fn(),
+    onInstagram: vi.fn(),
     onSave: vi.fn(),
     ...over,
   }
@@ -65,8 +66,9 @@ describe('EditorPanel', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Copy text' }))
     await userEvent.click(screen.getByRole('button', { name: 'Copy link' }))
     await userEvent.click(screen.getByRole('button', { name: 'Download PNG' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Instagram' }))
     await userEvent.click(screen.getByRole('button', { name: 'Save to gallery' }))
-    for (const fn of [p.onRoll, p.onUndo, p.onCopyText, p.onCopyLink, p.onDownload, p.onSave])
+    for (const fn of [p.onRoll, p.onUndo, p.onCopyText, p.onCopyLink, p.onDownload, p.onInstagram, p.onSave])
       expect(fn).toHaveBeenCalledTimes(1)
     expect(screen.getByRole('status')).toHaveTextContent('link copied')
   })
