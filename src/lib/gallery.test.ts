@@ -9,7 +9,7 @@ const mk = (n: 5 | 7, count: number, prefix: string): Phrase[] =>
   }))
 const allPhrases = [...mk(5, 3, 'f'), ...mk(7, 2, 's')]
 
-const row = (overrides: Partial<{ id: string; haiku_param: string; style_param: string; upvotes: number }>) => ({
+const row = (overrides: Partial<{ id: string; haiku_param: string; style_param: string; upvotes: number; creator_name: string | null }>) => ({
   id: 'row-1',
   created_at: '2026-01-01T00:00:00Z',
   haiku_param: 'f1,s1,f2',
@@ -133,10 +133,10 @@ describe('saveHaikuToGallery', () => {
     const api = createGalleryApi(client)
     const haiku = [allPhrases[0], allPhrases[3], allPhrases[1]] as [Phrase, Phrase, Phrase]
 
-    await api.saveHaikuToGallery(haiku, { faces: [0, 1, 2], inks: [3, 4, 5] })
+    await api.saveHaikuToGallery(haiku, { faces: [0, 1, 2], inks: [3, 4, 5] }, '  Sasha ')
 
     const insertCall = client.calls.find((c: any) => c.method === 'insert').args[0]
-    expect(insertCall).toEqual({ haiku_param: 'f1,s1,f2', style_param: '0.3,1.4,2.5' })
+    expect(insertCall).toEqual({ haiku_param: 'f1,s1,f2', style_param: '0.3,1.4,2.5', creator_name: 'Sasha' })
   })
 
   it('returns the id of the new row', async () => {
@@ -144,7 +144,7 @@ describe('saveHaikuToGallery', () => {
     const api = createGalleryApi(client)
     const haiku = [allPhrases[0], allPhrases[3], allPhrases[1]] as [Phrase, Phrase, Phrase]
 
-    await expect(api.saveHaikuToGallery(haiku, { faces: [0, 1, 2], inks: [3, 4, 5] })).resolves.toBe('new-id')
+    await expect(api.saveHaikuToGallery(haiku, { faces: [0, 1, 2], inks: [3, 4, 5] }, 'x')).resolves.toBe('new-id')
   })
 
   it('throws when the insert errors', async () => {
@@ -152,7 +152,7 @@ describe('saveHaikuToGallery', () => {
     const api = createGalleryApi(client)
     const haiku = [allPhrases[0], allPhrases[3], allPhrases[1]] as [Phrase, Phrase, Phrase]
 
-    await expect(api.saveHaikuToGallery(haiku, { faces: [0, 1, 2], inks: [3, 4, 5] })).rejects.toThrow()
+    await expect(api.saveHaikuToGallery(haiku, { faces: [0, 1, 2], inks: [3, 4, 5] }, 'x')).rejects.toThrow()
   })
 })
 

@@ -15,6 +15,8 @@ export function GalleryCard({ item, voted, yours, scale, onToggleVote }: Gallery
     <div className="gallery-card">
       {yours && <span className="yours-tag">Yours · just saved</span>}
       <HaikuCard haiku={item.haiku} style={item.style} scale={scale} />
+      <div className="gallery-card-foot">
+        <span className="creator">by {item.creator}</span>
       <button
         type="button"
         className="upvote"
@@ -25,6 +27,7 @@ export function GalleryCard({ item, voted, yours, scale, onToggleVote }: Gallery
         <UpvoteIcon />
         <span className="upvote-count">{item.upvotes}</span>
       </button>
+      </div>
     </div>
   )
 }

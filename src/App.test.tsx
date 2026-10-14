@@ -170,8 +170,10 @@ describe('App', () => {
   it('saves the current haiku to the gallery and shows a success message', async () => {
     render(<App />)
     await userEvent.click(screen.getByRole('button', { name: 'Save to gallery' }))
+    await userEvent.type(screen.getByLabelText('Nickname'), 'Sasha')
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }))
     expect(await screen.findByText('saved to gallery')).toBeInTheDocument()
-    expect(saveHaikuToGallery).toHaveBeenCalled()
+    expect(saveHaikuToGallery).toHaveBeenCalledWith(expect.anything(), expect.anything(), 'Sasha')
   })
 
   it('remembers the saved id, and refreshes the count and preview after saving', async () => {
@@ -179,6 +181,8 @@ describe('App', () => {
     render(<App />)
     await waitFor(() => expect(fetchGalleryPage).toHaveBeenCalledTimes(1))
     await userEvent.click(screen.getByRole('button', { name: 'Save to gallery' }))
+    await userEvent.type(screen.getByLabelText('Nickname'), 'Sasha')
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }))
     await screen.findByText('saved to gallery')
     expect(sessionStorage.getItem('justSavedHaikuId')).toBe('abc')
     await waitFor(() => expect(fetchGalleryPage).toHaveBeenCalledTimes(2))
@@ -190,6 +194,8 @@ describe('App', () => {
   vi.mocked(saveHaikuToGallery).mockRejectedValue(new Error('boom'))
     render(<App />)
     await userEvent.click(screen.getByRole('button', { name: 'Save to gallery' }))
+    await userEvent.type(screen.getByLabelText('Nickname'), 'Sasha')
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }))
     expect(await screen.findByText('save failed')).toBeInTheDocument()
   })
 })

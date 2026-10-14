@@ -5,7 +5,9 @@ create table public.haikus (
   created_at timestamptz not null default now(),
   haiku_param text not null,   -- formatShareParam output, e.g. "p001,p045,p112"
   style_param text not null,   -- formatStyleParam output, e.g. "3.2,14.0,7.5"
-  upvotes integer not null default 0
+  upvotes integer not null default 0,
+  creator_name text not null default 'haikuguru'
+    check (char_length(btrim(creator_name)) between 1 and 24)
 );
 
 alter table public.haikus enable row level security;

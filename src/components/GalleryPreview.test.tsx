@@ -13,6 +13,7 @@ const entry = (id: string, upvotes: number): GalleryHaiku => ({
   haiku: [phrase(`${id}-1`, 5), phrase(`${id}-2`, 7), phrase(`${id}-3`, 5)],
   style: { faces: [0, 1, 2], inks: [0, 1, 2] },
   upvotes,
+  creator: 'haikuguru',
 })
 
 beforeEach(() => {

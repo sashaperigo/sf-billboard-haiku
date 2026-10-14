@@ -1034,3 +1034,66 @@ h2 {
         min-height: 44px;
     }
 }
+
+/* ---- save dialog ---- */
+
+.save-dialog {
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    background: #fff;
+    border: 1px solid rgba(20, 19, 14, 0.14);
+    border-radius: 14px;
+    padding: 24px;
+    color: #14140f;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.save-dialog h2 {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 22px;
+}
+
+.save-dialog p {
+    margin: 0 0 8px;
+    font-size: 14px;
+    color: rgba(20, 19, 14, 0.65);
+}
+
+.save-dialog label {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.save-dialog input {
+    font: inherit;
+    padding: 10px 12px;
+    border: 1px solid rgba(20, 19, 14, 0.25);
+    border-radius: 8px;
+}
+
+.save-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.gallery-card-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.creator {
+    font-size: 13px;
+    color: rgba(20, 19, 14, 0.6);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

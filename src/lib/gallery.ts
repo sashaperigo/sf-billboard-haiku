@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { type Haiku, type Phrase, formatShareParam, parseShareParam } from './haiku'
 import { type Trio, formatStyleParam, parseStyleParam } from './style'
+import { DEFAULT_CREATOR, MAX_CREATOR_LENGTH } from './creator'
 import { supabase } from './supabaseClient'
 
 export interface GalleryStyle {
@@ -13,6 +14,7 @@ export interface GalleryHaiku {
   haiku: Haiku
   style: GalleryStyle
   upvotes: number
+  creator: string
 }
 
 const PAGE_SIZE = 24
@@ -29,13 +31,14 @@ interface HaikuRow {
   haiku_param: string
   style_param: string
   upvotes: number
+  creator_name: string | null
 }
 
 function parseRow(allPhrases: Phrase[], row: HaikuRow): GalleryHaiku | null {
   const haiku = parseShareParam(allPhrases, row.haiku_param)
   const style = parseStyleParam(row.style_param)
   if (!haiku || !style) return null
-  return { id: row.id, haiku, style, upvotes: row.upvotes }
+  return { id: row.id, haiku, style, upvotes: row.upvotes, creator: row.creator_name || DEFAULT_CREATOR }
 }
 
 export function createGalleryApi(client: SupabaseClient) {
@@ -63,12 +66,13 @@ export function createGalleryApi(client: SupabaseClient) {
     return count ?? 0
   }
 
-  async function saveHaikuToGallery(haiku: Haiku, style: GalleryStyle): Promise<string> {
+  async function saveHaikuToGallery(haiku: Haiku, style: GalleryStyle, creator: string): Promise<string> {
     const { data, error } = await client
       .from('haikus')
       .insert({
         haiku_param: formatShareParam(haiku),
         style_param: formatStyleParam(style),
+        creator_name: creator.trim().slice(0, MAX_CREATOR_LENGTH) || DEFAULT_CREATOR,
       })
       .select('id')
       .single()

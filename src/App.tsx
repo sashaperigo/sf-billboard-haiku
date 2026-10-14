@@ -24,6 +24,7 @@ import { EditorPanel } from './components/EditorPanel'
 import { GalleryPage } from './components/GalleryPage'
 import { GalleryPreview } from './components/GalleryPreview'
 import { Nav } from './components/Nav'
+import { SaveDialog } from './components/SaveDialog'
 import { ShareDialog } from './components/ShareDialog'
 import { Steps } from './components/Steps'
 
@@ -60,6 +61,7 @@ export default function App() {
     const [count, setCount] = useState<number | null>(null)
     const [previewKey, setPreviewKey] = useState(0)
     const [shareOpen, setShareOpen] = useState(false)
+    const [saveOpen, setSaveOpen] = useState(false)
     const closeShare = useCallback(() => setShareOpen(false), [])
 
     const refreshCount = useCallback(() => {
@@ -122,9 +124,10 @@ export default function App() {
         clearTimeout(statusTimer.current)
         statusTimer.current = setTimeout(() => setStatus(''), 2000)
     }
-    const save = async () => {
+    const save = async (creator: string) => {
+        setSaveOpen(false)
         try {
-            setJustSavedId(await saveHaikuToGallery(haiku, style))
+            setJustSavedId(await saveHaikuToGallery(haiku, style, creator))
             flash('saved to gallery')
             refreshCount()
             setPreviewKey((k) => k + 1)
@@ -243,10 +246,11 @@ export default function App() {
                             onRoll={rerollEverything}
                             onUndo={undo}
                             onShare={() => setShareOpen(true)}
-                            onSave={save}
+                            onSave={() => setSaveOpen(true)}
                         />
                     </section>
 
+                    {saveOpen && <SaveDialog onSave={save} onClose={() => setSaveOpen(false)} />}
                     {shareOpen && <ShareDialog haiku={haiku} style={style} shareUrl={shareUrl} onClose={closeShare} />}
 
                     <GalleryPreview allPhrases={all} count={count} refreshKey={previewKey} />
