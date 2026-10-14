@@ -42,7 +42,7 @@ describe('ShareDialog', () => {
     render(<ShareDialog haiku={haiku} style={style} shareUrl={() => 'https://x.test/?h=a'} onClose={vi.fn()} />)
     await screen.findByRole('img', { name: 'Night' })
     await userEvent.click(screen.getByRole('button', { name: /Rooftop/ }))
-    await userEvent.click(screen.getByRole('button', { name: 'Download PNG' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Save image' }))
     expect(click).toHaveBeenCalledTimes(1)
     expect(click.mock.contexts[0]).toHaveProperty('download', 'billboard-haiku-rooftop-4x5.png')
     expect(screen.getByRole('status')).toHaveTextContent('downloaded')
@@ -52,8 +52,25 @@ describe('ShareDialog', () => {
   it('says still rendering before anything is ready', async () => {
     vi.mocked(renderArtboard).mockImplementation(() => new Promise(() => undefined))
     render(<ShareDialog haiku={haiku} style={style} shareUrl={() => 'https://x.test/?h=a'} onClose={vi.fn()} />)
-    await userEvent.click(screen.getByRole('button', { name: 'Download PNG' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Save image' }))
     expect(screen.getByRole('status')).toHaveTextContent('still rendering')
+  })
+
+  it('hides More… when the browser cannot share files', () => {
+    Object.defineProperty(navigator, 'canShare', { value: undefined, configurable: true })
+    render(<ShareDialog haiku={haiku} style={style} shareUrl={() => 'https://x.test/?h=a'} onClose={vi.fn()} />)
+    expect(screen.queryByRole('button', { name: 'More…' })).not.toBeInTheDocument()
+  })
+
+  it('opens the native share sheet from More… when supported', async () => {
+    const share = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'canShare', { value: () => true, configurable: true })
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true })
+    render(<ShareDialog haiku={haiku} style={style} shareUrl={() => 'https://x.test/?h=a'} onClose={vi.fn()} />)
+    await screen.findByRole('img', { name: 'Night' })
+    await userEvent.click(screen.getByRole('button', { name: 'More…' }))
+    expect(share).toHaveBeenCalledTimes(1)
+    Object.defineProperty(navigator, 'canShare', { value: undefined, configurable: true })
   })
 
   it('copies the share link and confirms', async () => {

@@ -16,6 +16,7 @@ import {
     renderArtboard,
     shareFileName,
 } from '../lib/shareImage'
+import { DownloadIcon, LinkIcon, MoreIcon } from './icons'
 import { FACES, type LineCssInput, lineCss } from '../lib/style'
 
 export interface ShareDialogProps {
@@ -256,14 +257,13 @@ export function ShareDialog({ haiku, style, shareUrl, onClose }: ShareDialogProp
         const r = renders[current]
         if (!r) return flash('still rendering')
         const file = new File([r.blob], shareFileName(current), { type: 'image/png' })
-        if (navigator.canShare?.({ files: [file] })) {
-            try {
-                await navigator.share({ files: [file] })
-            } catch {
-                /* cancelled */
-            }
-        } else download()
+        try {
+            await navigator.share({ files: [file] })
+        } catch {
+            /* cancelled */
+        }
     }
+    const canShareFiles = !!navigator.canShare?.({ files: [new File([], 'x.png', { type: 'image/png' })] })
 
     const copyLink = async () => {
         try {
@@ -321,15 +321,20 @@ export function ShareDialog({ haiku, style, shareUrl, onClose }: ShareDialogProp
                         ))}
                     </div>
                     <div className="share-actions">
-                        <button type="button" className="btn btn-primary" onClick={download}>
-                            Download PNG
+                        <button type="button" className="share-action" onClick={download}>
+                            <span className="share-action-icon"><DownloadIcon /></span>
+                            Save image
                         </button>
-                        <button type="button" className="btn" onClick={share}>
-                            Share…
-                        </button>
-                        <button type="button" className="btn" onClick={copyLink}>
+                        <button type="button" className="share-action" onClick={copyLink}>
+                            <span className="share-action-icon"><LinkIcon /></span>
                             Copy link
                         </button>
+                        {canShareFiles && (
+                            <button type="button" className="share-action" onClick={share}>
+                                <span className="share-action-icon"><MoreIcon /></span>
+                                More…
+                            </button>
+                        )}
                         <span className="status" role="status">
                             {status}
                         </span>

@@ -768,8 +768,45 @@ h2 {
     margin-top: auto;
     display: flex;
     flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 12px 24px;
+}
+
+.share-action {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    min-width: 72px;
+    padding: 0;
+    background: none;
+    border: 0;
+    color: #14140f;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.share-action-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #f1efe7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.share-action:hover .share-action-icon {
+    background: #e6e3d6;
+}
+
+.share-actions .status {
+    flex-basis: 100%;
+    text-align: center;
+    min-height: 1em;
 }
 
 @media (max-width: 700px) {
