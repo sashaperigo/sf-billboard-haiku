@@ -1,3 +1,4 @@
+import { SwapIcon } from './icons'
 import type { Haiku, Locks } from '../lib/haiku'
 import { type LineCssInput, plainCss } from '../lib/style'
 
@@ -11,6 +12,7 @@ export interface EditorPanelProps {
   onRerollFont: (i: number) => void
   onRoll: () => void
   onUndo: () => void
+  onSwap: () => void
   onShare: () => void
   onSave: () => void
 }
@@ -58,6 +60,15 @@ export function EditorPanel(p: EditorPanelProps) {
         </button>
         <button type="button" className="btn btn-secondary undo" disabled={!p.canUndo} onClick={p.onUndo}>
           Undo
+        </button>
+        <button
+          type="button"
+          className="btn btn-secondary swap"
+          aria-label="Swap lines 1 and 3"
+          title="Swap lines 1 and 3"
+          onClick={p.onSwap}
+        >
+          <SwapIcon /> Swap
         </button>
         <span className="status" role="status">
           {p.status}

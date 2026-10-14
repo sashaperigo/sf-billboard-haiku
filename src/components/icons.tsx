@@ -39,3 +39,12 @@ export const MoreIcon = () => (
     <circle cx="19" cy="12" r="2" />
   </svg>
 )
+
+export const SwapIcon = () => (
+  <svg {...svgProps}>
+    <path d="M8 4v16" />
+    <path d="M4 8l4-4 4 4" />
+    <path d="M16 20V4" />
+    <path d="M12 16l4 4 4-4" />
+  </svg>
+)

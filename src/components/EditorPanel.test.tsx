@@ -17,6 +17,7 @@ const setup = (over: Partial<EditorPanelProps> = {}) => {
     onRerollFont: vi.fn(),
     onRoll: vi.fn(),
     onUndo: vi.fn(),
+    onSwap: vi.fn(),
     onShare: vi.fn(),
     onSave: vi.fn(),
     ...over,

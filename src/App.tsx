@@ -169,6 +169,17 @@ export default function App() {
         bump([i])
         setStyle((s) => restyle(s.faces, s.inks, [i]))
     }
+    const swapOuter = () => {
+        setHistory((h) => [...h, { haiku, style }])
+        bump([0, 2])
+        setHaiku((h) => [h[2], h[1], h[0]])
+        setStyle((s) => ({
+            faces: [s.faces[2], s.faces[1], s.faces[0]],
+            inks: [s.inks[2], s.inks[1], s.inks[0]],
+        }))
+        setLocks((l) => [l[2], l[1], l[0]])
+        flash('swapped')
+    }
     const rerollEverything = () => {
         setHistory((h) => [...h, { haiku, style }])
         bump(LINES.filter((i) => !locks[i]))
@@ -245,6 +256,7 @@ export default function App() {
                             onRerollFont={rerollFont}
                             onRoll={rerollEverything}
                             onUndo={undo}
+                            onSwap={swapOuter}
                             onShare={() => setShareOpen(true)}
                             onSave={() => setSaveOpen(true)}
                         />
