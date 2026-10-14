@@ -67,7 +67,7 @@ export function GalleryPreview({ allPhrases, count, refreshKey }: GalleryPreview
           </div>
         )}
         <Link to="/gallery" className="btn btn-primary preview-cta">
-          View full gallery {count !== null && <span className="preview-cta-count">{count} </span>}→
+          View full gallery {count !== null && <span className="preview-cta-count">{count}</span>}
         </Link>
       </div>
     </section>

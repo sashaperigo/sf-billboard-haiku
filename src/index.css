@@ -112,7 +112,8 @@ h2 {
     font-size: 16px;
     line-height: 1.75;
     color: rgba(20, 19, 14, 0.72);
-    max-width: 540px;
+    max-width: none;
+    white-space: nowrap;
     margin: 0;
 }
 
@@ -983,6 +984,8 @@ h2 {
     .hero p {
         font-size: 15px;
         line-height: 1.65;
+        white-space: normal;
+        text-wrap: balance;
     }
 
     .steps {
