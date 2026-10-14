@@ -661,9 +661,9 @@ h2 {
     }
 
     .nav-link {
-        display: inline-flex;
-        align-items: center;
-        min-height: 44px;
+        display: inline-block;
+        line-height: 44px;
+        padding: 0;
     }
 
     .hero {
