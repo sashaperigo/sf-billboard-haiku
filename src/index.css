@@ -173,6 +173,13 @@ h2 {
     scroll-margin-top: 16px;
 }
 
+/* keep photo + editor inside one viewport on desktop */
+@media (min-width: 701px) {
+    .app {
+        max-width: min(1100px, calc((100svh - 380px) * 1.975 + 80px));
+    }
+}
+
 .frame {
     position: relative;
     container-type: inline-size;
@@ -182,8 +189,11 @@ h2 {
     width: 100%;
 }
 
+/* crop the photo to 1264×640 (drops the lower part of the car) */
 .stage {
     position: relative;
+    aspect-ratio: 1264 / 640;
+    overflow: hidden;
 }
 
 .stage>img {
@@ -196,9 +206,9 @@ h2 {
 .haiku {
     position: absolute;
     left: 9.3%;
-    top: 4.6%;
+    top: 6.05%;
     width: 85.9%;
-    height: 37.1%;
+    height: 48.81%;
     transform: rotate(-0.28deg);
     display: flex;
     flex-direction: column;
@@ -232,9 +242,9 @@ h2 {
 .surface {
     position: absolute;
     left: 9.3%;
-    top: 4.6%;
+    top: 6.05%;
     width: 85.9%;
-    height: 37.1%;
+    height: 48.81%;
     transform: rotate(-0.28deg);
     pointer-events: none;
 }

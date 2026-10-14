@@ -51,7 +51,7 @@ async function renderPng(stage: HTMLElement, lines: HTMLElement[]): Promise<Blob
     canvas.width = img.naturalWidth
     canvas.height = Math.round(stage.clientHeight * k)
     const ctx = canvas.getContext('2d')!
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+    ctx.drawImage(img, 0, 0)
     const px = ctx.getImageData(0, 0, canvas.width, canvas.height)
     const lut = Array.from({ length: 256 }, (_, v) => Math.round(255 * (v / 255) ** 0.65))
     for (let i = 0; i < px.data.length; i += 4) {
