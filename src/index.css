@@ -671,14 +671,18 @@ h2 {
 
     .editor-row {
         grid-template-columns: 1fr 1fr;
-        gap: 8px 10px;
-        padding: 14px 18px;
+        gap: 6px 10px;
+        padding: 10px 18px;
     }
 
     .editor-label {
         grid-column: 1 / -1;
         flex-direction: row;
         justify-content: space-between;
+    }
+
+    .pill {
+        padding: 6px 14px;
     }
 
     .editor-text {
@@ -692,8 +696,8 @@ h2 {
     .editor-actions {
         display: grid;
         grid-template-columns: 1fr auto;
-        gap: 10px;
-        padding: 16px 18px;
+        gap: 8px;
+        padding: 12px 18px;
     }
 
     .roll {
@@ -731,6 +735,27 @@ h2 {
         grid-column: 1 / -1;
         text-align: center;
         min-height: 1em;
+    }
+}
+
+/* wide enough that the billboard is taller than the editor's content:
+   make the editor exactly as tall as the billboard */
+@media (min-width: 1240px) {
+    .editor {
+        height: 0;
+        min-height: 100%;
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .editor-row {
+        flex: 1;
+        align-content: center;
+    }
+
+    .editor-actions {
+        align-content: center;
     }
 }
 
