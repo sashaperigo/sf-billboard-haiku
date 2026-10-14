@@ -286,6 +286,7 @@ export default function App() {
                     <Steps />
 
                     <section id="app" className="app">
+                        <div className="app-grid">
                         <div className="frame">
                             <div className="stage" ref={stageRef}>
                             <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true" focusable="false">
@@ -333,6 +334,7 @@ export default function App() {
                             onDownload={download}
                             onSave={save}
                         />
+                        </div>
                     </section>
 
                     <GalleryPreview allPhrases={all} count={count} refreshKey={previewKey} />

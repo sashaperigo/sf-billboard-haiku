@@ -173,8 +173,14 @@ h2 {
     scroll-margin-top: 16px;
 }
 
+.app-grid {
+    display: block;
+}
+
 .frame {
-    position: relative;
+    position: sticky;
+    top: 8px;
+    z-index: 2;
     container-type: inline-size;
     overflow: hidden;
     border-radius: 8px;
@@ -637,6 +643,95 @@ h2 {
     line-height: 1.8;
     color: rgba(20, 19, 14, 0.55);
     letter-spacing: 0.02em;
+}
+
+/* ---- desktop: billboard and editor side by side ---- */
+
+@media (min-width: 1001px) {
+    .app {
+        max-width: 1320px;
+    }
+
+    .app-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 380px;
+        gap: 24px;
+        align-items: start;
+    }
+
+    .frame {
+        top: 16px;
+        max-width: calc((100vh - 120px) * 1.5);
+        min-width: 0;
+    }
+
+    .editor {
+        margin-top: 0;
+    }
+
+    .editor-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 10px;
+        padding: 14px 18px;
+    }
+
+    .editor-label {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .editor-text {
+        grid-column: 1 / -1;
+    }
+
+    .pill {
+        min-width: 0;
+    }
+
+    .editor-actions {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        padding: 16px 18px;
+    }
+
+    .roll {
+        order: 1;
+    }
+
+    .undo {
+        order: 2;
+    }
+
+    .save {
+        order: 3;
+        grid-column: 1 / -1;
+        margin: 0;
+    }
+
+    .share {
+        order: 4;
+        grid-column: 1 / -1;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .share-label {
+        display: none;
+    }
+
+    .share .btn {
+        padding: 10px 6px;
+    }
+
+    .status {
+        order: 5;
+        grid-column: 1 / -1;
+        text-align: center;
+        min-height: 1em;
+    }
 }
 
 /* ---- mobile ---- */
