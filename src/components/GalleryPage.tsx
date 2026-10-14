@@ -25,7 +25,7 @@ export function GalleryPage({ allPhrases, count }: GalleryPageProps) {
   const [hasMore, setHasMore] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const { votedIds, upvote } = useVoting(setItems, setError)
+  const { votedIds, toggleVote } = useVoting(setItems, setError)
   const justSavedId = getJustSavedId()
   const latest = useRef(0)
 
@@ -102,7 +102,7 @@ export function GalleryPage({ allPhrases, count }: GalleryPageProps) {
               voted={votedIds.has(item.id)}
               yours={item.id === justSavedId}
               scale={isMobile ? 1 : 0.9}
-              onUpvote={upvote}
+              onToggleVote={toggleVote}
             />
           ))}
         </div>

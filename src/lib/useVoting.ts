@@ -1,5 +1,5 @@
 import { type Dispatch, type SetStateAction, useState } from 'react'
-import { type GalleryHaiku, upvoteHaiku } from './gallery'
+import { type GalleryHaiku, removeUpvote, upvoteHaiku } from './gallery'
 
 const VOTED_KEY = 'votedHaikuIds'
 
@@ -51,5 +51,19 @@ export function useVoting(
     }
   }
 
-  return { votedIds, upvote }
+  const unvote = async (id: string) => {
+    bump(id, -1)
+    setVoted(id, false)
+    try {
+      await removeUpvote(id)
+    } catch {
+      bump(id, 1)
+      setVoted(id, true)
+      onError('Removing upvote failed — try again.')
+    }
+  }
+
+  const toggleVote = (id: string) => (votedIds.has(id) ? unvote(id) : upvote(id))
+
+  return { votedIds, upvote, unvote, toggleVote }
 }

@@ -7,10 +7,10 @@ export interface GalleryCardProps {
   voted: boolean
   yours?: boolean
   scale?: number
-  onUpvote: (id: string) => void
+  onToggleVote: (id: string) => void
 }
 
-export function GalleryCard({ item, voted, yours, scale, onUpvote }: GalleryCardProps) {
+export function GalleryCard({ item, voted, yours, scale, onToggleVote }: GalleryCardProps) {
   return (
     <div className="gallery-card">
       {yours && <span className="yours-tag">Yours · just saved</span>}
@@ -18,10 +18,9 @@ export function GalleryCard({ item, voted, yours, scale, onUpvote }: GalleryCard
       <button
         type="button"
         className="upvote"
-        aria-label={voted ? 'Already upvoted' : 'Upvote this haiku'}
+        aria-label={voted ? 'Remove your upvote' : 'Upvote this haiku'}
         aria-pressed={voted}
-        disabled={voted}
-        onClick={() => onUpvote(item.id)}
+        onClick={() => onToggleVote(item.id)}
       >
         <UpvoteIcon />
         <span className="upvote-count">{item.upvotes}</span>

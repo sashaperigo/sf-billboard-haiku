@@ -2,12 +2,13 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { Phrase } from '../lib/haiku'
 import type { GalleryHaiku } from '../lib/gallery'
-import { fetchGalleryPage, upvoteHaiku } from '../lib/gallery'
+import { fetchGalleryPage, removeUpvote, upvoteHaiku } from '../lib/gallery'
 import { GalleryPage } from './GalleryPage'
 
 vi.mock('../lib/gallery', () => ({
   fetchGalleryPage: vi.fn(),
   upvoteHaiku: vi.fn(),
+  removeUpvote: vi.fn(),
 }))
 
 const phrase = (text: string, syllables: 5 | 7): Phrase => ({ id: text, text, syllables })
@@ -23,6 +24,7 @@ const entry = (id: string, upvotes: number): GalleryHaiku => ({
 beforeEach(() => {
   vi.mocked(fetchGalleryPage).mockReset()
   vi.mocked(upvoteHaiku).mockReset()
+  vi.mocked(removeUpvote).mockReset()
   localStorage.clear()
   sessionStorage.clear()
 })
@@ -65,7 +67,7 @@ describe('GalleryPage', () => {
     expect(screen.getByRole('link', { name: 'Make your own' })).toHaveAttribute('href', '/')
   })
 
-  it('upvotes a haiku, disables its button, and persists the vote', async () => {
+  it('upvotes a haiku, marks its button pressed, and persists the vote', async () => {
     vi.mocked(fetchGalleryPage).mockResolvedValue({ items: [entry('a', 5)], hasMore: false })
     vi.mocked(upvoteHaiku).mockResolvedValue(6)
     render(<GalleryPage allPhrases={allPhrases} count={1} />)
@@ -74,7 +76,7 @@ describe('GalleryPage', () => {
     const button = screen.getByRole('button', { name: /upvote/i })
     await userEvent.click(button)
 
-    await waitFor(() => expect(button).toBeDisabled())
+    await waitFor(() => expect(button).toHaveAttribute('aria-pressed', 'true'))
     expect(button).toHaveTextContent('6')
     expect(JSON.parse(localStorage.getItem('votedHaikuIds') ?? '[]')).toContain('a')
   })
@@ -92,11 +94,40 @@ describe('GalleryPage', () => {
     expect(screen.getByRole('button', { name: /upvote/i })).toHaveTextContent('5')
   })
 
-  it('pre-disables the upvote button for haikus already voted on from this browser', async () => {
+  it('shows the upvote button as pressed for haikus already voted on from this browser', async () => {
     localStorage.setItem('votedHaikuIds', JSON.stringify(['a']))
     vi.mocked(fetchGalleryPage).mockResolvedValue({ items: [entry('a', 5)], hasMore: false })
     render(<GalleryPage allPhrases={allPhrases} count={1} />)
-    await waitFor(() => expect(screen.getByRole('button', { name: /upvote/i })).toBeDisabled())
+    await waitFor(() => expect(screen.getByRole('button', { name: /upvote/i })).toHaveAttribute('aria-pressed', 'true'))
+  })
+
+  it('removes an existing upvote when clicked again', async () => {
+    localStorage.setItem('votedHaikuIds', JSON.stringify(['a']))
+    vi.mocked(fetchGalleryPage).mockResolvedValue({ items: [entry('a', 5)], hasMore: false })
+    vi.mocked(removeUpvote).mockResolvedValue(4)
+    render(<GalleryPage allPhrases={allPhrases} count={1} />)
+    const button = await screen.findByRole('button', { name: /upvote/i })
+
+    await userEvent.click(button)
+
+    await waitFor(() => expect(button).toHaveAttribute('aria-pressed', 'false'))
+    expect(button).toHaveTextContent('4')
+    expect(removeUpvote).toHaveBeenCalledWith('a')
+    expect(JSON.parse(localStorage.getItem('votedHaikuIds') ?? '[]')).not.toContain('a')
+  })
+
+  it('rolls back a failed upvote removal', async () => {
+    localStorage.setItem('votedHaikuIds', JSON.stringify(['a']))
+    vi.mocked(fetchGalleryPage).mockResolvedValue({ items: [entry('a', 5)], hasMore: false })
+    vi.mocked(removeUpvote).mockRejectedValue(new Error('boom'))
+    render(<GalleryPage allPhrases={allPhrases} count={1} />)
+    const button = await screen.findByRole('button', { name: /upvote/i })
+
+    await userEvent.click(button)
+
+    expect(await screen.findByText(/removing upvote failed/i)).toBeInTheDocument()
+    expect(button).toHaveAttribute('aria-pressed', 'true')
+    expect(button).toHaveTextContent('5')
   })
 
   it('tags the haiku saved this session', async () => {

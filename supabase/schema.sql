@@ -34,5 +34,23 @@ end;
 $$;
 
 grant execute on function public.increment_upvote(uuid) to anon;
+
+-- Lets a visitor retract their upvote. Never drops below zero.
+create or replace function public.decrement_upvote(haiku_id uuid)
+returns public.haikus
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare result public.haikus;
+begin
+  update public.haikus set upvotes = greatest(upvotes - 1, 0)
+  where id = haiku_id returning * into result;
+  if result.id is null then raise exception 'haiku not found'; end if;
+  return result;
+end;
+$$;
+
+grant execute on function public.decrement_upvote(uuid) to anon;
 revoke all on public.haikus from anon;
 grant select, insert on public.haikus to anon;

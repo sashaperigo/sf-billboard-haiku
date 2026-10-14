@@ -18,7 +18,7 @@ export function GalleryPreview({ allPhrases, count, refreshKey }: GalleryPreview
   const [items, setItems] = useState<GalleryHaiku[]>([])
   const [failed, setFailed] = useState(false)
   const [loaded, setLoaded] = useState(false)
-  const { votedIds, upvote } = useVoting(setItems, () => {})
+  const { votedIds, toggleVote } = useVoting(setItems, () => {})
 
   useEffect(() => {
     let live = true
@@ -62,7 +62,7 @@ export function GalleryPreview({ allPhrases, count, refreshKey }: GalleryPreview
         ) : (
           <div className="preview-grid">
             {items.map((item) => (
-              <GalleryCard key={item.id} item={item} voted={votedIds.has(item.id)} onUpvote={upvote} />
+              <GalleryCard key={item.id} item={item} voted={votedIds.has(item.id)} onToggleVote={toggleVote} />
             ))}
           </div>
         )}

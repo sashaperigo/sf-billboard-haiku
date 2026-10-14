@@ -456,11 +456,11 @@ h2 {
     font-weight: 700;
 }
 
-.upvote:hover:not(:disabled) {
+.upvote:hover {
     background: #f4f2ec;
 }
 
-.upvote:disabled {
+.upvote[aria-pressed='true'] {
     background: #ffe6bf;
     border-color: #f0c27a;
     color: #8a5507;

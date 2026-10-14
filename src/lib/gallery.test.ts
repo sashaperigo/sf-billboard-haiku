@@ -156,6 +156,18 @@ describe('saveHaikuToGallery', () => {
   })
 })
 
+describe('removeUpvote', () => {
+  it('calls the decrement_upvote rpc and returns the new count', async () => {
+    const client = fakeClient({ rpcResult: { data: { upvotes: 3 }, error: null } })
+    const api = createGalleryApi(client)
+
+    const count = await api.removeUpvote('row-1')
+
+    expect(client.rpc).toHaveBeenCalledWith('decrement_upvote', { haiku_id: 'row-1' })
+    expect(count).toBe(3)
+  })
+})
+
 describe('upvoteHaiku', () => {
   it('calls the increment_upvote rpc and returns the new count', async () => {
     const client = fakeClient({ rpcResult: { data: { upvotes: 7 }, error: null } })

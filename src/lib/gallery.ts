@@ -82,7 +82,13 @@ export function createGalleryApi(client: SupabaseClient) {
     return (data as { upvotes: number }).upvotes
   }
 
-  return { fetchGalleryPage, countHaikus, saveHaikuToGallery, upvoteHaiku }
+  async function removeUpvote(id: string): Promise<number> {
+    const { data, error } = await client.rpc('decrement_upvote', { haiku_id: id })
+    if (error) throw error
+    return (data as { upvotes: number }).upvotes
+  }
+
+  return { fetchGalleryPage, countHaikus, saveHaikuToGallery, upvoteHaiku, removeUpvote }
 }
 
 function requireClient(): SupabaseClient {
@@ -98,3 +104,5 @@ export const saveHaikuToGallery: ReturnType<typeof createGalleryApi>['saveHaikuT
   createGalleryApi(requireClient()).saveHaikuToGallery(...args)
 export const upvoteHaiku: ReturnType<typeof createGalleryApi>['upvoteHaiku'] = (...args) =>
   createGalleryApi(requireClient()).upvoteHaiku(...args)
+export const removeUpvote: ReturnType<typeof createGalleryApi>['removeUpvote'] = (...args) =>
+  createGalleryApi(requireClient()).removeUpvote(...args)
