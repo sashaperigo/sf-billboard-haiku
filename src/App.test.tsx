@@ -93,6 +93,20 @@ describe('App', () => {
     expect(undo).toBeDisabled()
   })
 
+  it('swap exchanges lines 1 and 3 and their locks, and undo restores the lines', async () => {
+    const [a, b] = phrases.filter((p) => p.syllables === 5)
+    const seven = phrases.find((p) => p.syllables === 7)!
+    window.history.pushState({}, '', `/?h=${a.id},${seven.id},${b.id}`)
+    render(<App />)
+    await userEvent.click(screen.getByRole('button', { name: 'Lock line 1' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Swap lines 1 and 3' }))
+    expect(lines()).toEqual([b.text, seven.text, a.text])
+    expect(screen.getByRole('button', { name: 'Lock line 1' })).toHaveAttribute('aria-pressed', 'false')
+    expect(screen.getByRole('button', { name: 'Lock line 3' })).toHaveAttribute('aria-pressed', 'true')
+    await userEvent.click(screen.getByRole('button', { name: 'Undo' }))
+    expect(lines()).toEqual([a.text, seven.text, b.text])
+  })
+
   it('disables Roll when every line is locked', async () => {
     render(<App />)
     for (const n of [1, 2, 3]) await userEvent.click(screen.getByRole('button', { name: `Lock line ${n}` }))
