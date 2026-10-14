@@ -258,7 +258,7 @@ export default function App() {
                     <section className="hero">
                         <h1>Tech Billboard Haiku Generator</h1>
                         <p>
-                            Click reroll to generate your very own 5-7-5 billboard haiku. All phrases have been taken from real AI ads displayed around the Bay Area.
+                            All phrases have been taken from real AI ads displayed around the Bay Area.
                         </p>
                     </section>
                     <Steps />
