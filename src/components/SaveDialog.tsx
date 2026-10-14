@@ -35,8 +35,8 @@ export function SaveDialog({ onSave, onClose }: SaveDialogProps) {
         onClick={(e) => e.stopPropagation()}
         onSubmit={submit}
       >
-        <h2 id="save-title">Save to the gallery</h2>
-        <p>Pick a nickname. Your haiku will be credited to it.</p>
+        <h2 id="save-title">Who generated this haiku?</h2>
+        <p>Enter a nickname. (Don't use your real name!)</p>
         <label htmlFor="nickname">Nickname</label>
         <input
           id="nickname"
