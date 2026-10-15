@@ -2,6 +2,11 @@
     box-sizing: border-box;
 }
 
+:root {
+    /* page content width: the photo/editor width that fits one viewport (set on desktop below) */
+    --content-max: 1080px;
+}
+
 body {
     margin: 0;
     background: #faf9f5;
@@ -114,7 +119,7 @@ h2 {
 
 .hero {
     width: 100%;
-    max-width: 1080px;
+    max-width: var(--content-max);
     padding: 56px 40px 36px;
     text-align: center;
     display: flex;
@@ -143,7 +148,7 @@ h2 {
     list-style: none;
     margin: 0;
     width: 100%;
-    max-width: 1080px;
+    max-width: var(--content-max);
     padding: 0 40px 40px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -191,22 +196,22 @@ h2 {
 
 .app {
     width: 100%;
-    max-width: 1080px; /* 1000px photo/editor + 40px padding each side */
+    max-width: var(--content-max); /* 1000px photo/editor + 40px padding each side at full size */
     padding: 0 40px;
     scroll-margin-top: 92px; /* clears the sticky nav */
 }
 
 /* keep photo + editor inside one viewport on desktop */
 @media (min-width: 701px) {
-    .app {
+    :root {
         /* 356px reserved: 280px for the editor when it wraps to a taller layout at narrower widths, plus the 76px sticky nav */
-        max-width: min(1080px, calc((100svh - 356px) * 2.257 + 80px));
+        --content-max: min(1080px, calc((100svh - 356px) * 2.257 + 80px));
     }
 }
 
 @media (min-width: 701px) and (min-height: 860px) {
-    .app {
-        max-width: min(1080px, calc((100svh - 306px) * 2.257 + 80px));
+    :root {
+        --content-max: min(1080px, calc((100svh - 306px) * 2.257 + 80px));
     }
 }
 
@@ -620,7 +625,7 @@ h2 {
 }
 
 .preview-inner {
-    max-width: 1080px;
+    max-width: var(--content-max);
     margin: 0 auto;
     padding: 56px 40px 64px;
     display: flex;
@@ -777,7 +782,7 @@ h2 {
 
 .footer {
     width: 100%;
-    max-width: 1080px;
+    max-width: var(--content-max);
     padding: 56px 24px 72px;
     display: flex;
     justify-content: center;
