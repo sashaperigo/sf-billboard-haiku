@@ -567,12 +567,11 @@ h2 {
 .haiku-lines {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 0;
 }
 
 .haiku-lines p {
     margin: 0;
-    line-height: 1.18;
     text-wrap: balance;
 }
 
