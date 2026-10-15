@@ -1137,28 +1137,6 @@ h2 {
         background: #f4f2ec;
     }
 
-    .icon-tip {
-        display: none;
-        position: absolute;
-        right: calc(100% + 2px);
-        top: 50%;
-        transform: translateY(-50%);
-        background: #14140f;
-        color: #fff;
-        font-size: 12px;
-        font-weight: 600;
-        border-radius: 6px;
-        padding: 5px 9px;
-        white-space: nowrap;
-        pointer-events: none;
-        z-index: 3;
-    }
-
-    .icon-wrap:hover .icon-tip,
-    .icon-wrap:has(.icon-btn:focus-visible) .icon-tip {
-        display: block;
-    }
-
     .editor-actions {
         display: grid;
         grid-template-columns: 1fr auto auto;

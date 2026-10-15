@@ -92,9 +92,6 @@ export function EditorPanel(p: EditorPanelProps) {
                     Aa
                   </span>
                 </button>
-                <span className="icon-tip" aria-hidden="true">
-                  Change font
-                </span>
               </span>
               <span className="icon-wrap">
                 <button
@@ -106,9 +103,6 @@ export function EditorPanel(p: EditorPanelProps) {
                 >
                   <LockIcon locked={p.locks[i]} />
                 </button>
-                <span className="icon-tip" aria-hidden="true">
-                  {p.locks[i] ? 'Unlock row' : 'Lock row'}
-                </span>
               </span>
             </div>
             <span className="editor-text" style={plainCss(p.style, i, 19)}>
