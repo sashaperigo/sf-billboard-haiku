@@ -3,7 +3,6 @@ import {
   type Haiku,
   type Rng,
   generateHaiku,
-  rerollLine,
   rerollAll,
   parseShareParam,
   formatShareParam,
@@ -44,26 +43,6 @@ describe('generateHaiku', () => {
 
   it('is deterministic given the rng', () => {
     expect(ids(generateHaiku(minimal, seq(0, 0, 0)))).toEqual(['f1', 's1', 'f2'])
-  })
-})
-
-describe('rerollLine', () => {
-  const current = generateHaiku(minimal, seq(0, 0, 0)) // f1 s1 f2
-
-  it('changes only the requested line to a different phrase', () => {
-    for (let seed = 1; seed <= 100; seed++) {
-      const next = rerollLine(minimal, current, 1, rand(seed))
-      expect(next[1].id).toBe('s2')
-      expect(next[0]).toBe(current[0])
-      expect(next[2]).toBe(current[2])
-    }
-  })
-
-  it('line 1 never matches current line 3 or itself', () => {
-    for (let seed = 1; seed <= 100; seed++) {
-      expect(ids(rerollLine(minimal, current, 0, rand(seed)))[0]).toBe('f3')
-      expect(ids(rerollLine(minimal, current, 2, rand(seed)))[2]).toBe('f3')
-    }
   })
 })
 

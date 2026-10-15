@@ -1,4 +1,4 @@
-export const svgProps = {
+const svgProps = {
   viewBox: '0 0 24 24',
   width: '1em',
   height: '1em',

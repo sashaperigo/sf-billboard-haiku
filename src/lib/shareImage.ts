@@ -37,7 +37,7 @@ const loadFont = (font: string) => bestEffort(document.fonts.load(font, 'Aa'), 1
 
 /* ---- quad warp ---- */
 
-export function homography(q: number[]) {
+function homography(q: number[]) {
     const [x0, y0, x1, y1, x2, y2, x3, y3] = q
     const dx1 = x1 - x2, dx2 = x3 - x2, dy1 = y1 - y2, dy2 = y3 - y2
     const sx = x0 - x1 + x2 - x3, sy = y0 - y1 + y2 - y3
@@ -87,7 +87,7 @@ function tri(ctx: CanvasRenderingContext2D, img: HTMLCanvasElement, s0: Pt, s1: 
     ctx.restore()
 }
 
-export function warp(ctx: CanvasRenderingContext2D, layer: HTMLCanvasElement, q: number[], n = 24) {
+function warp(ctx: CanvasRenderingContext2D, layer: HTMLCanvasElement, q: number[], n = 24) {
     const { a, b, d, e, g, h, x0, y0 } = homography(q)
     const map = (u: number, v: number): Pt => {
         const w = g * u + h * v + 1

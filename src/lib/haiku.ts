@@ -27,14 +27,6 @@ export function generateHaiku(phrases: Phrase[], rng: Rng): Haiku {
 
 const otherFiveLine = (line: number) => (line === 0 ? 2 : 0)
 
-export function rerollLine(phrases: Phrase[], current: Haiku, line: 0 | 1 | 2, rng: Rng): Haiku {
-  const exclude = [current[line].id]
-  if (line !== 1) exclude.push(current[otherFiveLine(line)].id)
-  const next = [...current] as Haiku
-  next[line] = pick(poolFor(phrases, line), exclude, rng)
-  return next
-}
-
 export function rerollAll(phrases: Phrase[], current: Haiku, locks: Locks, rng: Rng): Haiku {
   const next = [...current] as Haiku
   for (const line of [0, 1, 2] as const) {
