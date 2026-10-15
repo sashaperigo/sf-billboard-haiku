@@ -1,18 +1,13 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { type Haiku, type Phrase, formatShareParam, parseShareParam } from './haiku'
-import { type Trio, formatStyleParam, parseStyleParam } from './style'
+import { type Style, formatStyleParam, parseStyleParam } from './style'
 import { DEFAULT_CREATOR, MAX_CREATOR_LENGTH } from './creator'
 import { supabase } from './supabaseClient'
-
-export interface GalleryStyle {
-  faces: Trio
-  inks: Trio
-}
 
 export interface GalleryHaiku {
   id: string
   haiku: Haiku
-  style: GalleryStyle
+  style: Style
   upvotes: number
   creator: string
 }
@@ -66,7 +61,7 @@ export function createGalleryApi(client: SupabaseClient) {
     return count ?? 0
   }
 
-  async function saveHaikuToGallery(haiku: Haiku, style: GalleryStyle, creator: string): Promise<string> {
+  async function saveHaikuToGallery(haiku: Haiku, style: Style, creator: string): Promise<string> {
     const { data, error } = await client
       .from('haikus')
       .insert({
@@ -95,18 +90,17 @@ export function createGalleryApi(client: SupabaseClient) {
   return { fetchGalleryPage, countHaikus, saveHaikuToGallery, upvoteHaiku, removeUpvote }
 }
 
+type GalleryApi = ReturnType<typeof createGalleryApi>
+
 function requireClient(): SupabaseClient {
   if (!supabase) throw new Error('Supabase is not configured (missing VITE_SUPABASE_URL/VITE_SUPABASE_ANON_KEY)')
   return supabase
 }
 
-export const fetchGalleryPage: ReturnType<typeof createGalleryApi>['fetchGalleryPage'] = (...args) =>
-  createGalleryApi(requireClient()).fetchGalleryPage(...args)
-export const countHaikus: ReturnType<typeof createGalleryApi>['countHaikus'] = (...args) =>
-  createGalleryApi(requireClient()).countHaikus(...args)
-export const saveHaikuToGallery: ReturnType<typeof createGalleryApi>['saveHaikuToGallery'] = (...args) =>
-  createGalleryApi(requireClient()).saveHaikuToGallery(...args)
-export const upvoteHaiku: ReturnType<typeof createGalleryApi>['upvoteHaiku'] = (...args) =>
-  createGalleryApi(requireClient()).upvoteHaiku(...args)
-export const removeUpvote: ReturnType<typeof createGalleryApi>['removeUpvote'] = (...args) =>
-  createGalleryApi(requireClient()).removeUpvote(...args)
+const api = () => createGalleryApi(requireClient())
+
+export const fetchGalleryPage = (...args: Parameters<GalleryApi['fetchGalleryPage']>) => api().fetchGalleryPage(...args)
+export const countHaikus = () => api().countHaikus()
+export const saveHaikuToGallery = (...args: Parameters<GalleryApi['saveHaikuToGallery']>) => api().saveHaikuToGallery(...args)
+export const upvoteHaiku = (id: string) => api().upvoteHaiku(id)
+export const removeUpvote = (id: string) => api().removeUpvote(id)

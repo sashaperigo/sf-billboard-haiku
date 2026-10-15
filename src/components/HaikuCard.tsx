@@ -1,9 +1,9 @@
 import type { Haiku } from '../lib/haiku'
-import { type LineCssInput, plainCss } from '../lib/style'
+import { type Style, plainCss } from '../lib/style'
 
 export interface HaikuCardProps {
   haiku: Haiku
-  style: LineCssInput
+  style: Style
   /** Multiplier on the base type size (the gallery page uses a slightly smaller one). */
   scale?: number
 }

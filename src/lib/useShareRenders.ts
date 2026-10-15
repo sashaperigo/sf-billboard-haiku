@@ -1,7 +1,7 @@
 import { type RefObject, useCallback, useEffect, useRef, useState } from 'react'
 import type { Haiku } from './haiku'
 import { SHARE_OPTIONS, type ShareId, renderArtboard } from './shareImage'
-import type { LineCssInput } from './style'
+import type { Style } from './style'
 
 export interface ShareRender {
     blob: Blob
@@ -17,7 +17,7 @@ export type ShareRenders = Partial<Record<ShareId, ShareRender>>
 export function useShareRenders(
     rootRef: RefObject<HTMLElement | null>,
     haiku: Haiku,
-    style: LineCssInput,
+    style: Style,
     enabled: boolean,
 ): ShareRenders {
     const [renders, setRenders] = useState<ShareRenders>({})

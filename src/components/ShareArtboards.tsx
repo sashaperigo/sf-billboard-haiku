@@ -4,10 +4,10 @@ import nightBillboard from '../assets/night-billboard.jpg'
 import sutroBlank from '../assets/sutro-blank.jpeg'
 import type { Haiku } from '../lib/haiku'
 import { PAPER_H, PAPER_W, QUADS, SHARE_H, SHARE_W, quadMatrix } from '../lib/shareImage'
-import { FACES, type LineCssInput, lineCss } from '../lib/style'
+import { FACES, type Style, lineCss } from '../lib/style'
 
 const BASE = [1, 0.875, 1]
-const lineStyle = (style: LineCssInput, i: number): React.CSSProperties => ({
+const lineStyle = (style: Style, i: number): React.CSSProperties => ({
     ...lineCss(style, i),
     fontSize: `${BASE[i] * FACES[style.faces[i]].size}em`,
     whiteSpace: 'nowrap',
@@ -59,7 +59,7 @@ const photoStyle = (top: number, height: number, width: number, left = 0): React
     maxWidth: 'none',
 })
 
-export function Artboards({ haiku, style }: { haiku: Haiku; style: LineCssInput }) {
+export function Artboards({ haiku, style }: { haiku: Haiku; style: Style }) {
     const box = (
         <div data-box="" style={boxStyle}>
             {[0, 1, 2].map((i) => (

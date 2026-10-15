@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { computeLayout } from './lib/layout'
+import { fitLines } from './lib/fit'
 import phrases from './data/phrases.json'
 import billboard from './assets/billboard.png'
 import {
@@ -12,6 +12,7 @@ import {
     rerollAll,
 } from './lib/haiku'
 import {
+    type Style,
     formatStyleParam,
     lineCss,
     parseStyleParam,
@@ -36,8 +37,7 @@ import { ShareDialog } from './components/ShareDialog'
 import { Steps } from './components/Steps'
 
 const all = phrases as Phrase[]
-const LINES = [0, 1, 2] as
-const
+const LINES = [0, 1, 2] as const
 
 const HELP_KEY = 'bh-help-dismissed'
 const readHelpDismissed = () => {
@@ -48,31 +48,21 @@ const readHelpDismissed = () => {
     }
 }
 
-const measureCtx = document.createElement('canvas').getContext('2d') !
-    function inkBox(el: HTMLElement, lineH: number) {
-        const st = getComputedStyle(el)
-        measureCtx.font = `${st.fontStyle} ${st.fontWeight} ${st.fontSize} ${st.fontFamily}`
-        const raw = el.textContent ?? ''
-        const m = measureCtx.measureText(st.textTransform === 'uppercase' ? raw.toUpperCase() : raw)
-        const base = (lineH - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2 + m.fontBoundingBoxAscent
-        return { top: base - m.actualBoundingBoxAscent, bottom: base + m.actualBoundingBoxDescent }
-    }
-
 export default function App() {
-    const [haiku, setHaiku] = useState < Haiku > (
+    const [haiku, setHaiku] = useState<Haiku>(
         () =>
-        parseShareParam(all, new URLSearchParams(window.location.search).get('h')) ??
+            parseShareParam(all, new URLSearchParams(window.location.search).get('h')) ??
         generateHaiku(all, Math.random),
     )
-    const [locks, setLocks] = useState < Locks > ([false, false, false])
+    const [locks, setLocks] = useState<Locks>([false, false, false])
     const [style, setStyle] = useState(
         () =>
             parseStyleParam(new URLSearchParams(window.location.search).get('s')) ??
             restyle([0, 0, 0], [0, 0, 0], [0, 1, 2]),
     )
-    const [rolls, setRolls] = useState < { n: number;delay: number } [] > ([0, 1, 2].map(() => ({ n: 0, delay: 0 })))
+    const [rolls, setRolls] = useState<{ n: number; delay: number }[]>([0, 1, 2].map(() => ({ n: 0, delay: 0 })))
     const [saveResult, setSaveResult] = useState<{ ok: boolean; n: number } | null>(null)
-    const [history, setHistory] = useState<{ haiku: Haiku; style: typeof style }[]>([])
+    const [history, setHistory] = useState<{ haiku: Haiku; style: Style }[]>([])
     const route = useRoute()
     const [count, setCount] = useState<number | null>(null)
     const [previewKey, setPreviewKey] = useState(0)
@@ -121,37 +111,12 @@ export default function App() {
     }, [])
     useEffect(refreshCount, [refreshCount])
 
-    const boxRef = useRef < HTMLDivElement > (null)
-    const lineRefs = useRef < (HTMLSpanElement | null)[] > ([])
+    const boxRef = useRef<HTMLDivElement>(null)
+    const lineRefs = useRef<(HTMLSpanElement | null)[]>([])
 
     const fit = useCallback(() => {
-        const box = boxRef.current
         const els = lineRefs.current
-        if (!box || els.some((e) => !e)) return
-        const cs = getComputedStyle(box)
-        const availW = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
-        const availH = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)
-        const gap = parseFloat(cs.rowGap) || 0
-        if (availW <= 0 || availH <= 0) return
-        const w: number[] = []
-        const h: number[] = []
-        const ih: number[] = []
-        const dy: number[] = []
-        for (const el of els) {
-            el!.style.transform = 'scale(1)'
-            el!.style.margin = '0'
-            w.push(el!.offsetWidth)
-            h.push(el!.offsetHeight)
-            const ink = inkBox(el!, el!.offsetHeight)
-            ih.push(Math.max(ink.bottom - ink.top, 1))
-            dy.push((ink.top + ink.bottom) / 2 - el!.offsetHeight / 2)
-        }
-        if (w.some((x) => x === 0)) return
-        const { s, lead } = computeLayout({ availW, availH, gap, w, ih })
-        els.forEach((el, i) => {
-            el!.style.transform = `translateY(${-s[i] * dy[i]}px) scale(${s[i]})`
-            el!.style.margin = `${(s[i] * ih[i] - h[i]) / 2 + lead / 2}px 0`
-        })
+        if (boxRef.current && els.every(Boolean)) fitLines(boxRef.current, els as HTMLElement[])
     }, [])
 
     useLayoutEffect(fit)
@@ -165,7 +130,7 @@ export default function App() {
     }, [fit, haiku, style, route])
     useEffect(() => {
         window.addEventListener('resize', fit)
-        document.fonts ?.ready.then(fit)
+        document.fonts?.ready.then(fit)
         return () => window.removeEventListener('resize', fit)
     }, [fit])
 

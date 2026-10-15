@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react'
 import { ShareIcon, SwapIcon, UndoIcon } from './icons'
 import type { Haiku, Locks } from '../lib/haiku'
 import { Link } from '../lib/route'
-import { type LineCssInput, plainCss } from '../lib/style'
+import { type Style, plainCss } from '../lib/style'
 import { useMediaQuery } from '../lib/useMediaQuery'
 
 export interface EditorPanelProps {
   haiku: Haiku
-  style: LineCssInput
+  style: Style
   locks: Locks
   canUndo: boolean
   /** Outcome of the last save; `n` changes on every attempt so the tag re-appears. */

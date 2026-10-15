@@ -1,5 +1,11 @@
 export type Trio = [number, number, number]
 
+/** A font face and ink color index for each of the three lines. */
+export interface Style {
+  faces: Trio
+  inks: Trio
+}
+
 const LINES = [0, 1, 2] as const
 
 export interface Face {
@@ -68,7 +74,7 @@ const pick = (n: number) => Math.floor(Math.random() * n)
 
 export const colorOf = (face: number, ink: number) => FACES[face].ink ?? INKS[ink]
 
-export function restyle(faces: Trio, inks: Trio, indices: number[]): { faces: Trio; inks: Trio } {
+export function restyle(faces: Trio, inks: Trio, indices: number[]): Style {
   const f = [...faces] as Trio
   const c = [...inks] as Trio
   for (const i of indices) {
@@ -91,10 +97,10 @@ export function restyle(faces: Trio, inks: Trio, indices: number[]): { faces: Tr
   return { faces: f, inks: c }
 }
 
-export const formatStyleParam = (st: { faces: Trio; inks: Trio }) =>
+export const formatStyleParam = (st: Style) =>
   LINES.map((i) => `${st.faces[i]}.${st.inks[i]}`).join(',')
 
-export function parseStyleParam(value: string | null): { faces: Trio; inks: Trio } | null {
+export function parseStyleParam(value: string | null): Style | null {
   const parts = value?.split(',')
   if (parts?.length !== 3) return null
   const faces: number[] = []
@@ -108,14 +114,9 @@ export function parseStyleParam(value: string | null): { faces: Trio; inks: Trio
   return { faces: faces as Trio, inks: inks as Trio }
 }
 
-export interface LineCssInput {
-  faces: Trio
-  inks: Trio
-}
-
 const BASE_SIZE = ['4.8cqw', '4.2cqw', '4.8cqw']
 
-export function lineCss(style: LineCssInput, i: number): React.CSSProperties {
+export function lineCss(style: Style, i: number): React.CSSProperties {
   const face = FACES[style.faces[i]]
   return {
     fontFamily: `'${face.family}', ${face.fallback}`,
@@ -130,6 +131,6 @@ export function lineCss(style: LineCssInput, i: number): React.CSSProperties {
 }
 
 /** Like lineCss but sized in px, for text outside the billboard (editor rows, gallery cards). */
-export function plainCss(style: LineCssInput, i: number, basePx: number): React.CSSProperties {
+export function plainCss(style: Style, i: number, basePx: number): React.CSSProperties {
   return { ...lineCss(style, i), fontSize: `calc(${basePx}px * ${FACES[style.faces[i]].size})` }
 }

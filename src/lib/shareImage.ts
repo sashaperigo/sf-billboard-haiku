@@ -1,4 +1,4 @@
-import { computeLayout } from './layout'
+import { fitLines } from './fit'
 
 export type ShareId = '1a' | '1b' | '1c' | '1d'
 
@@ -105,45 +105,14 @@ export function warp(ctx: CanvasRenderingContext2D, layer: HTMLCanvasElement, q:
     }
 }
 
-/* ---- fitting the haiku inside a board (same logic as App's fit) ---- */
-
-const measureCtx = document.createElement('canvas').getContext('2d')
-
-function inkBox(el: HTMLElement, lineH: number) {
-    const st = getComputedStyle(el)
-    measureCtx!.font = `${st.fontStyle} ${st.fontWeight} ${st.fontSize} ${st.fontFamily}`
-    const raw = el.textContent ?? ''
-    const m = measureCtx!.measureText(st.textTransform === 'uppercase' ? raw.toUpperCase() : raw)
-    const base = (lineH - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2 + m.fontBoundingBoxAscent
-    return { top: base - m.actualBoundingBoxAscent, bottom: base + m.actualBoundingBoxDescent }
-}
+/* ---- fitting the haiku inside a board ---- */
 
 const fitted = new WeakMap<HTMLElement, { s: number; dy: number }>()
 
 function fitBox(box: HTMLElement) {
     const els = [...box.querySelectorAll<HTMLElement>('[data-line]')]
     if (els.length !== 3) return
-    const cs = getComputedStyle(box)
-    const availW = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
-    const availH = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)
-    const gap = parseFloat(cs.rowGap) || 0
-    const w: number[] = [], h: number[] = [], ih: number[] = [], dy: number[] = []
-    for (const el of els) {
-        el.style.transform = 'scale(1)'
-        el.style.margin = '0'
-        w.push(el.offsetWidth)
-        h.push(el.offsetHeight)
-        const ink = inkBox(el, el.offsetHeight)
-        ih.push(Math.max(ink.bottom - ink.top, 1))
-        dy.push((ink.top + ink.bottom) / 2 - el.offsetHeight / 2)
-    }
-    if (w.some((x) => x === 0)) return
-    const { s, lead } = computeLayout({ availW, availH, gap, w, ih })
-    els.forEach((el, i) => {
-        fitted.set(el, { s: s[i], dy: dy[i] })
-        el.style.transform = `translateY(${-s[i] * dy[i]}px) scale(${s[i]})`
-        el.style.margin = `${(s[i] * ih[i] - h[i]) / 2 + lead / 2}px 0`
-    })
+    fitLines(box, els)?.forEach((f, i) => fitted.set(els[i], f))
 }
 
 const fontOf = (st: CSSStyleDeclaration, scale = 1) =>
