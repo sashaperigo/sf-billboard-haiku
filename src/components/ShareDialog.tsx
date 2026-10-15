@@ -31,15 +31,9 @@ export function ShareDialog({ renders, initialSelected, shareUrl, onClose }: Sha
         clearTimeout(statusTimer.current)
         statusTimer.current = setTimeout(() => setStatus(''), 2000)
     }
-    const download = () => {
-        const r = renders[current]
-        if (!r) return flash('still rendering')
-        const a = document.createElement('a')
-        a.href = r.url
-        a.download = shareFileName(current)
-        a.click()
-        flash('downloaded')
-    }
+    const canShareFiles = !!navigator.canShare?.({ files: [new File([], 'x.png', { type: 'image/png' })] })
+    // iOS Safari files `<a download>` into the Files app; only the share sheet offers "Save Image" to Photos.
+    const isTouch = !!window.matchMedia?.('(pointer: coarse)').matches
     const share = async () => {
         const r = renders[current]
         if (!r) return flash('still rendering')
@@ -50,7 +44,16 @@ export function ShareDialog({ renders, initialSelected, shareUrl, onClose }: Sha
             /* cancelled */
         }
     }
-    const canShareFiles = !!navigator.canShare?.({ files: [new File([], 'x.png', { type: 'image/png' })] })
+    const download = () => {
+        if (canShareFiles && isTouch) return share()
+        const r = renders[current]
+        if (!r) return flash('still rendering')
+        const a = document.createElement('a')
+        a.href = r.url
+        a.download = shareFileName(current)
+        a.click()
+        flash('downloaded')
+    }
 
     const copyLink = async () => {
         try {

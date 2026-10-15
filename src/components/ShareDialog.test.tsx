@@ -96,6 +96,39 @@ describe('ShareDialog', () => {
     Object.defineProperty(navigator, 'canShare', { value: undefined, configurable: true })
   })
 
+  it('routes Save image through the share sheet on touch devices so it can reach Photos', async () => {
+    const share = vi.fn().mockResolvedValue(undefined)
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined)
+    Object.defineProperty(navigator, 'canShare', { value: () => true, configurable: true })
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true })
+    window.matchMedia = vi.fn().mockReturnValue({ matches: true }) as unknown as typeof window.matchMedia
+    render(<Harness />)
+    await screen.findByRole('img', { name: 'Night' })
+    await userEvent.click(screen.getByRole('button', { name: 'Save image' }))
+    expect(share).toHaveBeenCalledTimes(1)
+    expect(share.mock.calls[0][0].files[0]).toHaveProperty('type', 'image/png')
+    expect(click).not.toHaveBeenCalled()
+    click.mockRestore()
+    Object.defineProperty(navigator, 'canShare', { value: undefined, configurable: true })
+    window.matchMedia = undefined as unknown as typeof window.matchMedia
+  })
+
+  it('still downloads directly on desktop even when file sharing is supported', async () => {
+    const share = vi.fn()
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined)
+    Object.defineProperty(navigator, 'canShare', { value: () => true, configurable: true })
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true })
+    window.matchMedia = vi.fn().mockReturnValue({ matches: false }) as unknown as typeof window.matchMedia
+    render(<Harness />)
+    await screen.findByRole('img', { name: 'Night' })
+    await userEvent.click(screen.getByRole('button', { name: 'Save image' }))
+    expect(click).toHaveBeenCalledTimes(1)
+    expect(share).not.toHaveBeenCalled()
+    click.mockRestore()
+    Object.defineProperty(navigator, 'canShare', { value: undefined, configurable: true })
+    window.matchMedia = undefined as unknown as typeof window.matchMedia
+  })
+
   it('copies the share link and confirms', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
