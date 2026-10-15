@@ -5,12 +5,22 @@ import { Nav } from './Nav'
 describe('Nav', () => {
   it('links to the gallery with the count, and to the editor anchor on home', () => {
     render(<Nav active="home" count={312} />)
-    expect(screen.getByRole('link', { name: 'Billboard Haiku' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: 'Tech Billboard Haiku Generator' })).toHaveAttribute('href', '/')
     expect(screen.getByRole('link', { name: 'Make a haiku' })).toHaveAttribute('href', '#app')
     const gallery = screen.getByRole('link', { name: /^Gallery/ })
     expect(gallery).toHaveAttribute('href', '/gallery')
     expect(gallery).toHaveTextContent('Gallery 312')
     expect(gallery).not.toHaveAttribute('aria-current')
+  })
+
+  it('hides the wordmark from assistive tech and focus while the hero title is showing', () => {
+    render(<Nav active="home" count={1} showWordmark={false} />)
+    expect(screen.queryByRole('link', { name: 'Tech Billboard Haiku Generator' })).toBeNull()
+    const hidden = screen.getByRole('link', { hidden: true, name: '' })
+    expect(hidden).toHaveAttribute('href', '/')
+    expect(hidden).toHaveAttribute('aria-hidden', 'true')
+    expect(hidden).toHaveAttribute('tabindex', '-1')
+    expect(hidden).toHaveAttribute('data-hidden')
   })
 
   it('omits the count while it is unknown', () => {

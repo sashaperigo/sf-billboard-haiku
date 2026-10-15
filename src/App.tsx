@@ -25,6 +25,7 @@ import type { ShareId } from './lib/shareImage'
 import { useMediaQuery } from './lib/useMediaQuery'
 import { useShareRenders } from './lib/useShareRenders'
 import { useRoute } from './lib/route'
+import { useHeroVisible } from './lib/title'
 import { PostcardCard } from './components/PostcardCard'
 import { EditorPanel } from './components/EditorPanel'
 import { GalleryPage } from './components/GalleryPage'
@@ -35,6 +36,7 @@ import { SaveDialog } from './components/SaveDialog'
 import { Artboards } from './components/ShareArtboards'
 import { ShareDialog } from './components/ShareDialog'
 import { Steps } from './components/Steps'
+import { TitleLine } from './components/Title'
 
 const all = phrases as Phrase[]
 const LINES = [0, 1, 2] as const
@@ -64,6 +66,7 @@ export default function App() {
     const [saveResult, setSaveResult] = useState<{ ok: boolean; n: number } | null>(null)
     const [history, setHistory] = useState<{ haiku: Haiku; style: Style }[]>([])
     const route = useRoute()
+    const heroRef = useRef<HTMLElement>(null)
     const [count, setCount] = useState<number | null>(null)
     const [previewKey, setPreviewKey] = useState(0)
     const [shareOpen, setShareOpen] = useState(false)
@@ -75,6 +78,7 @@ export default function App() {
     const isMobile = useMediaQuery('(max-width: 700px)')
     const closeShare = useCallback(() => setShareOpen(false), [])
     const closeHelp = useCallback(() => setHelpOpen(false), [])
+    const heroVisible = useHeroVisible(heroRef, isMobile ? 64 : 76, route !== 'gallery')
     const artboardsRef = useRef<HTMLDivElement>(null)
     const artboardsOn = route !== 'gallery' && (rendersIdle || shareOpen)
     const renders = useShareRenders(artboardsRef, haiku, style, artboardsOn)
@@ -218,13 +222,28 @@ export default function App() {
 
     return (
         <div className="page">
-            <Nav active={route} count={count} onHelp={openHelp} helpOpen={helpOpen} />
+            <Nav
+                active={route}
+                count={count}
+                onHelp={openHelp}
+                helpOpen={helpOpen}
+                showWordmark={route === 'gallery' || !heroVisible}
+            />
             {route === 'gallery' ? (
                 <GalleryPage allPhrases={all} count={count} />
             ) : (
                 <>
-                    <section className="hero">
-                        <h1>Tech Billboard Haiku Generator</h1>
+                    <section ref={heroRef} className="hero">
+                        <h1 aria-label="Tech Billboard Haiku Generator">
+                            {isMobile ? (
+                                <>
+                                    <TitleLine words={[0, 1]} fit="fill" />
+                                    <TitleLine words={[2, 3]} fit="fill" />
+                                </>
+                            ) : (
+                                <TitleLine words={[0, 1, 2, 3]} fit="shrink" />
+                            )}
+                        </h1>
                         <p>
                             All phrases have been taken from real AI ads displayed around the Bay Area.
                         </p>

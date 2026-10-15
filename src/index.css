@@ -47,20 +47,41 @@ h2 {
 /* ---- nav ---- */
 
 .nav {
+    position: sticky;
+    top: 0;
+    z-index: 40;
     width: 100%;
+    height: 76px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 40px;
+    padding: 0 40px;
+    background: rgba(250, 249, 245, 0.95);
     border-bottom: 1px solid rgba(20, 19, 14, 0.08);
 }
 
+.title-line {
+    display: flex;
+    flex: none;
+    width: max-content;
+    align-items: baseline;
+    column-gap: 0.3em;
+    white-space: nowrap;
+}
+
 .wordmark {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    font-size: 17px;
+    font-size: 30px;
+    line-height: 1;
     text-decoration: none;
-    color: #14140f;
+    transition:
+        opacity 0.25s,
+        transform 0.25s;
+}
+
+.wordmark[data-hidden] {
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
 }
 
 .nav-links {
@@ -93,8 +114,8 @@ h2 {
 
 .hero {
     width: 100%;
-    max-width: 760px;
-    padding: 56px 24px 36px;
+    max-width: 1080px;
+    padding: 56px 40px 36px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -103,9 +124,10 @@ h2 {
 }
 
 .hero h1 {
-    font-size: clamp(2.2rem, 5vw, 3.4rem);
-    white-space: nowrap;
-    line-height: 1.05;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    line-height: 1.15;
 }
 
 .hero p {
@@ -171,7 +193,7 @@ h2 {
     width: 100%;
     max-width: 1080px; /* 1000px photo/editor + 40px padding each side */
     padding: 0 40px;
-    scroll-margin-top: 16px;
+    scroll-margin-top: 92px; /* clears the sticky nav */
 }
 
 /* keep photo + editor inside one viewport on desktop */
@@ -1104,11 +1126,14 @@ h2 {
 
 @media (max-width: 700px) {
     .nav {
-        padding: 16px 20px;
+        height: auto;
+        min-height: 64px;
+        padding: 8px 16px 8px 20px;
+        gap: 12px;
     }
 
     .wordmark {
-        font-size: 15px;
+        font-size: 24px;
     }
 
     .nav-link {
@@ -1118,19 +1143,24 @@ h2 {
     }
 
     .hero {
-        padding: 32px 20px 24px;
+        max-width: none;
+        padding: 36px 20px 32px;
+        gap: 16px;
+        background: #f1efe7;
+        border-bottom: 1px solid rgba(20, 19, 14, 0.1);
     }
 
     .hero h1 {
-        font-size: 32px;
-        white-space: normal;
-        text-wrap: balance;
-        overflow-wrap: break-word;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        line-height: 1.02;
     }
 
     .hero p {
         font-size: 15px;
         line-height: 1.65;
+        max-width: 320px;
         white-space: normal;
         text-wrap: balance;
     }
@@ -1158,7 +1188,7 @@ h2 {
     }
 
     .app {
-        padding: 0 16px;
+        padding: 44px 16px 0;
     }
 
     .editor-row {
@@ -1226,11 +1256,6 @@ h2 {
 
     .save-tag-link {
         padding: 12px 0 12px 8px;
-    }
-
-    .nav {
-        padding-top: 10px;
-        padding-bottom: 10px;
     }
 
     .nav-links {
@@ -1355,7 +1380,7 @@ h2 {
         flex-direction: column;
         align-items: stretch;
         gap: 14px;
-        margin-top: 24px;
+        margin-top: 44px;
         padding: 18px;
     }
 
@@ -1395,7 +1420,7 @@ h2 {
     }
 
     .preview {
-        margin-top: 40px;
+        margin-top: 44px;
     }
 
     .preview-inner {

@@ -1,6 +1,7 @@
 import type { Route } from '../lib/route'
 import { Link } from '../lib/route'
 import { useMediaQuery } from '../lib/useMediaQuery'
+import { TitleLine } from './Title'
 
 export interface NavProps {
   active: Route
@@ -9,14 +10,23 @@ export interface NavProps {
   /** Opens the mobile help sheet; the ? button shows on mobile home only. */
   onHelp?: () => void
   helpOpen?: boolean
+  /** False while the hero title is on screen (home only), so the name shows once. */
+  showWordmark?: boolean
 }
 
-export function Nav({ active, count, onHelp, helpOpen = false }: NavProps) {
+export function Nav({ active, count, onHelp, helpOpen = false, showWordmark = true }: NavProps) {
   const isMobile = useMediaQuery('(max-width: 700px)')
   const onGallery = active === 'gallery'
   const wordmark = (
-    <Link to="/" className="wordmark">
-      Billboard Haiku
+    <Link
+      to="/"
+      className="wordmark"
+      aria-label={isMobile ? 'Billboard Haiku' : 'Tech Billboard Haiku Generator'}
+      data-hidden={!showWordmark || undefined}
+      aria-hidden={!showWordmark || undefined}
+      tabIndex={showWordmark ? undefined : -1}
+    >
+      <TitleLine words={isMobile ? [1, 2] : [0, 1, 2, 3]} />
     </Link>
   )
   const gallery = (
