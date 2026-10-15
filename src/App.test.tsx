@@ -29,11 +29,13 @@ let writeText: ReturnType<typeof vi.fn>
 beforeEach(() => {
   window.history.pushState({}, '', '/')
   sessionStorage.clear()
+  localStorage.clear()
   writeText = vi.fn().mockResolvedValue(undefined)
   Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
   vi.mocked(fetchGalleryPage).mockReset().mockResolvedValue({ items: [], hasMore: false })
   vi.mocked(countHaikus).mockReset().mockResolvedValue(312)
   vi.mocked(saveHaikuToGallery).mockReset().mockResolvedValue('new-id')
+  vi.mocked(upvoteHaiku).mockReset().mockResolvedValue(1)
 })
 
 describe('App', () => {
