@@ -2,7 +2,7 @@ import { cleanup, render, screen, waitFor, within } from '@testing-library/react
 import userEvent from '@testing-library/user-event'
 import App from './App'
 import phrases from './data/phrases.json'
-import { countHaikus, fetchGalleryPage, saveHaikuToGallery } from './lib/gallery'
+import { countHaikus, fetchGalleryPage, saveHaikuToGallery, upvoteHaiku } from './lib/gallery'
 
 vi.mock('./lib/shareImage', async (orig) => ({
   ...(await orig<typeof import('./lib/shareImage')>()),
@@ -225,6 +225,29 @@ describe('App', () => {
     expect(sessionStorage.getItem('justSavedHaikuId')).toBe('abc')
     await waitFor(() => expect(fetchGalleryPage).toHaveBeenCalledTimes(2))
     expect(countHaikus).toHaveBeenCalledTimes(2)
+  })
+
+  it('auto-upvotes the saved haiku and remembers the vote in this browser', async () => {
+    vi.mocked(saveHaikuToGallery).mockResolvedValue('abc')
+    vi.mocked(upvoteHaiku).mockResolvedValue(1)
+    render(<App />)
+    await userEvent.click(screen.getByRole('button', { name: 'Save to gallery' }))
+    await userEvent.type(screen.getByLabelText('Nickname'), 'Sasha')
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }))
+    await screen.findByText('Saved to gallery')
+    expect(upvoteHaiku).toHaveBeenCalledWith('abc')
+    expect(JSON.parse(localStorage.getItem('votedHaikuIds')!)).toContain('abc')
+  })
+
+  it('still reports success when the auto-upvote fails, without remembering a vote', async () => {
+    vi.mocked(saveHaikuToGallery).mockResolvedValue('abc')
+    vi.mocked(upvoteHaiku).mockRejectedValue(new Error('boom'))
+    render(<App />)
+    await userEvent.click(screen.getByRole('button', { name: 'Save to gallery' }))
+    await userEvent.type(screen.getByLabelText('Nickname'), 'Sasha')
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }))
+    expect(await screen.findByText('Saved to gallery')).toBeInTheDocument()
+    expect(localStorage.getItem('votedHaikuIds')).toBeNull()
   })
 
   it('shows a failure message when saving to the gallery fails', async () => {

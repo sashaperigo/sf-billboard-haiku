@@ -21,6 +21,11 @@ function saveVotedIds(ids: Set<string>) {
   }
 }
 
+/** Records a vote made outside the hook (e.g. the auto-upvote when saving) so cards show it as voted. */
+export function rememberVote(id: string) {
+  saveVotedIds(loadVotedIds().add(id))
+}
+
 /** Optimistic upvoting over a list of gallery items, remembering votes in localStorage. */
 export function useVoting(
   setItems: Dispatch<SetStateAction<GalleryHaiku[]>>,

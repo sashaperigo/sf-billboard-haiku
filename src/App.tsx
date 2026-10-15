@@ -17,8 +17,9 @@ import {
     parseStyleParam,
     restyle,
 } from './lib/style'
-import { countHaikus, saveHaikuToGallery } from './lib/gallery'
+import { countHaikus, saveHaikuToGallery, upvoteHaiku } from './lib/gallery'
 import { setJustSavedId } from './lib/justSaved'
+import { rememberVote } from './lib/useVoting'
 import type { ShareId } from './lib/shareImage'
 import { useMediaQuery } from './lib/useMediaQuery'
 import { useShareRenders } from './lib/useShareRenders'
@@ -172,7 +173,15 @@ export default function App() {
     const save = async (creator: string) => {
         setSaveOpen(false)
         try {
-            setJustSavedId(await saveHaikuToGallery(haiku, style, creator))
+            const id = await saveHaikuToGallery(haiku, style, creator)
+            setJustSavedId(id)
+            // Authors upvote their own haiku. The insert policy requires upvotes = 0, so this is a second call.
+            try {
+                await upvoteHaiku(id)
+                rememberVote(id)
+            } catch {
+                /* the save itself succeeded; the vote can be cast by hand */
+            }
             reportSave(true)
             refreshCount()
             setPreviewKey((k) => k + 1)
