@@ -6,25 +6,26 @@ import { EditorPanel, type EditorPanelProps } from './EditorPanel'
 const phrase = (text: string, syllables: 5 | 7): Phrase => ({ id: text, text, syllables })
 const haiku: Haiku = [phrase('one', 5), phrase('two', 7), phrase('three', 5)]
 
-const setup = (over: Partial<EditorPanelProps> = {}) => {
-  const props: EditorPanelProps = {
+const baseProps: EditorPanelProps = {
     haiku,
     style: { faces: [0, 1, 2], inks: [0, 1, 2] },
     locks: [false, false, false],
     canUndo: false,
-    status: '',
+    saveResult: null,
     onToggleLock: vi.fn(),
     onRerollFont: vi.fn(),
     onRoll: vi.fn(),
     onUndo: vi.fn(),
     onSwap: vi.fn(),
     onShare: vi.fn(),
-    onShareImage: vi.fn(),
-    thumbs: {},
     onSave: vi.fn(),
-    ...over,
-  }
-  render(<EditorPanel {...props} />)
+}
+
+const setup = (over: Partial<EditorPanelProps> = {}) => {
+  const props: EditorPanelProps = { ...baseProps, ...over }
+  render(
+    <EditorPanel {...props} />,
+  )
   return props
 }
 
@@ -59,8 +60,8 @@ describe('EditorPanel', () => {
     expect(screen.getByRole('button', { name: 'Undo' })).toBeDisabled()
   })
 
-  it('fires the action handlers and shows the status', async () => {
-    const p = setup({ canUndo: true, status: 'link copied' })
+  it('fires the action handlers', async () => {
+    const p = setup({ canUndo: true })
     await userEvent.click(screen.getByRole('button', { name: 'Roll unlocked lines' }))
     await userEvent.click(screen.getByRole('button', { name: 'Undo' }))
     await userEvent.click(screen.getByRole('button', { name: 'Swap lines 1 and 3' }))
@@ -68,15 +69,19 @@ describe('EditorPanel', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Save to gallery' }))
     for (const fn of [p.onRoll, p.onUndo, p.onSwap, p.onShare, p.onSave])
       expect(fn).toHaveBeenCalledTimes(1)
-    expect(screen.getByRole('status')).toHaveTextContent('link copied')
   })
 
-  it('opens the share dialog from the postcard strip, optionally on one backdrop', async () => {
-    const p = setup({ thumbs: { '1d': 'blob:night' } })
-    await userEvent.click(screen.getByRole('button', { name: 'Get images' }))
-    expect(p.onShareImage).toHaveBeenLastCalledWith()
-    await userEvent.click(screen.getByRole('button', { name: 'Download Night image' }))
-    expect(p.onShareImage).toHaveBeenLastCalledWith('1d')
-    expect(screen.getByRole('button', { name: 'Download Night image' })).toHaveStyle({ background: 'url(blob:night) center/cover' })
+  it('shows a Saved to gallery tag with a link, or Save failed', () => {
+    const { unmount } = render(
+      <EditorPanel {...baseProps} saveResult={{ ok: true, n: 1 }} />,
+    )
+    expect(screen.getByRole('status')).toHaveTextContent('Saved to gallery')
+    expect(screen.getByRole('link', { name: /View/ })).toHaveAttribute('href', '/gallery')
+    unmount()
+    render(
+      <EditorPanel {...baseProps} saveResult={{ ok: false, n: 1 }} />,
+    )
+    expect(screen.getByRole('status')).toHaveTextContent('Save failed')
+    expect(screen.queryByRole('link', { name: /View/ })).toBeNull()
   })
 })

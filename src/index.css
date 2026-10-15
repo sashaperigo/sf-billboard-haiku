@@ -177,14 +177,14 @@ h2 {
 /* keep photo + editor inside one viewport on desktop */
 @media (min-width: 701px) {
     .app {
-        /* 380px reserved for the editor when it wraps to a taller layout at narrower widths */
-        max-width: min(1400px, calc((100svh - 380px) * 1.975 + 80px));
+        /* 280px reserved for the editor when it wraps to a taller layout at narrower widths */
+        max-width: min(1400px, calc((100svh - 280px) * 2.257 + 80px));
     }
 }
 
 @media (min-width: 701px) and (min-height: 860px) {
     .app {
-        max-width: min(1400px, calc((100svh - 330px) * 1.975 + 80px));
+        max-width: min(1400px, calc((100svh - 230px) * 2.257 + 80px));
     }
 }
 
@@ -197,10 +197,10 @@ h2 {
     width: 100%;
 }
 
-/* crop the photo to 1264×640 (drops the lower part of the car) */
+/* crop the photo to 1264×560 (drops the lower part of the car) */
 .stage {
     position: relative;
-    aspect-ratio: 1264 / 640;
+    aspect-ratio: 1264 / 560;
     overflow: hidden;
 }
 
@@ -214,9 +214,9 @@ h2 {
 .haiku {
     position: absolute;
     left: 9.3%;
-    top: 6.05%;
+    top: 6.91%;
     width: 85.9%;
-    height: 48.81%;
+    height: 55.78%;
     transform: rotate(-0.28deg);
     display: flex;
     flex-direction: column;
@@ -250,9 +250,9 @@ h2 {
 .surface {
     position: absolute;
     left: 9.3%;
-    top: 6.05%;
+    top: 6.91%;
     width: 85.9%;
-    height: 48.81%;
+    height: 55.78%;
     transform: rotate(-0.28deg);
     pointer-events: none;
 }
@@ -345,7 +345,7 @@ h2 {
     grid-template-columns: 110px minmax(0, 1fr) auto auto;
     align-items: center;
     gap: 14px;
-    padding: 14px 22px;
+    padding: 10px 18px;
     border-bottom: 1px solid rgba(20, 19, 14, 0.08);
 }
 
@@ -391,15 +391,47 @@ h2 {
     flex-wrap: wrap;
     align-items: center;
     gap: 10px;
-    padding: 16px 22px;
+    padding: 12px 18px;
+    position: relative;
 }
 
-.status {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #b5730a;
+.save-tag {
+    position: absolute;
+    right: 18px;
+    bottom: calc(100% - 4px);
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #14140f;
+    color: #fff;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(20, 19, 14, 0.2);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+.save-tag:empty {
+    display: none;
+}
+
+.save-tag[data-visible] {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.save-tag-check,
+.save-tag-link {
+    color: #ffe6bf;
+}
+
+.save-tag-link {
     font-weight: 700;
+    text-decoration: none;
 }
 
 .share {
@@ -649,15 +681,17 @@ h2 {
     letter-spacing: 0.02em;
 }
 
-/* ---- postcard strip ---- */
+/* ---- postcard card ---- */
 
 .postcard {
+    margin-top: 40px;
     display: flex;
     align-items: center;
-    gap: 20px;
-    padding: 14px 22px;
+    gap: 32px;
+    padding: 24px 28px;
     background: #f1efe7;
-    border-top: 1px solid rgba(20, 19, 14, 0.08);
+    border: 1px solid rgba(20, 19, 14, 0.14);
+    border-radius: 14px;
 }
 
 .postcard-text {
@@ -665,28 +699,52 @@ h2 {
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    align-items: flex-start;
+    gap: 16px;
 }
 
-.postcard-text strong {
-    font-size: 14px;
-    font-weight: 700;
+.postcard-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.postcard-heading h2 {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
     color: #14140f;
 }
 
-.postcard-text span {
-    font-size: 13px;
+.postcard-heading p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.55;
     color: rgba(20, 19, 14, 0.65);
 }
 
 .postcard-thumbs {
     display: flex;
-    gap: 8px;
+    gap: 12px;
+}
+
+.postcard-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.postcard-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(20, 19, 14, 0.7);
 }
 
 .postcard-thumb {
-    width: 48px;
-    height: 60px;
+    width: 96px;
+    aspect-ratio: 4 / 5;
     padding: 0;
     border: 2px solid #fff;
     border-radius: 6px;
@@ -721,8 +779,10 @@ h2 {
     border-color: #14140f;
     color: #fff;
     font-weight: 700;
-    font-size: 13px;
-    padding: 10px 16px;
+    font-size: 14px;
+    padding: 12px 20px;
+    gap: 8px;
+    border-radius: 999px;
 }
 
 .postcard-get:hover:not(:disabled) {
@@ -1015,26 +1075,88 @@ h2 {
     }
 
     .editor-row {
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 2px;
+        padding: 6px 8px 12px 14px;
+    }
+
+    .editor-head {
+        display: flex;
+        align-items: center;
+        gap: 4px;
     }
 
     .editor-label {
-        grid-column: 1 / -1;
+        flex: 1;
         flex-direction: row;
-        justify-content: space-between;
         font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .editor-syl {
+        font-weight: 400;
+        white-space: pre;
     }
 
     .editor-text {
-        grid-column: 1 / -1;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        text-wrap: balance;
+        line-height: 1.25;
+        padding-right: 6px;
     }
 
-    .pill {
+    .icon-wrap {
+        position: relative;
+        display: flex;
+    }
+
+    .icon-btn {
+        width: 44px;
         height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: 0;
+        background: none;
         border-radius: 10px;
-        min-width: 0;
+        cursor: pointer;
+        color: #14140f;
+    }
+
+    .icon-btn .aa {
+        font-size: 14px;
+    }
+
+    .icon-btn:hover,
+    .icon-btn:active {
+        background: #f4f2ec;
+    }
+
+    .icon-tip {
+        display: none;
+        position: absolute;
+        right: calc(100% + 2px);
+        top: 50%;
+        transform: translateY(-50%);
+        background: #14140f;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 6px;
+        padding: 5px 9px;
+        white-space: nowrap;
+        pointer-events: none;
+        z-index: 3;
+    }
+
+    .icon-wrap:hover .icon-tip,
+    .icon-wrap:has(.icon-btn:focus-visible) .icon-tip {
+        display: block;
     }
 
     .editor-actions {
@@ -1048,6 +1170,11 @@ h2 {
         order: 1;
         height: 48px;
         border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        white-space: nowrap;
     }
 
     .undo {
@@ -1078,11 +1205,24 @@ h2 {
         border-radius: 12px;
     }
 
-    .status {
-        order: 5;
-        grid-column: 1 / -1;
-        text-align: center;
-        min-height: 1em;
+    .save-tag {
+        position: fixed;
+        left: 16px;
+        right: 16px;
+        bottom: calc(28px + env(safe-area-inset-bottom));
+        min-height: 48px;
+        border-radius: 12px;
+        padding: 0 16px;
+        font-size: 14px;
+        box-shadow: 0 6px 20px rgba(20, 19, 14, 0.3);
+    }
+
+    .save-tag-msg {
+        flex: 1;
+    }
+
+    .save-tag-link {
+        padding: 12px 0 12px 8px;
     }
 
     .nav {
@@ -1212,23 +1352,25 @@ h2 {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
-        padding: 14px;
+        margin-top: 24px;
+        padding: 18px;
     }
 
-    .postcard-text span {
-        line-height: 1.5;
+    .postcard-text {
+        align-items: stretch;
     }
 
     .postcard-thumbs {
         width: 100%;
     }
 
-    .postcard-thumb {
+    .postcard-item {
         flex: 1;
         min-width: 0;
-        width: auto;
-        height: auto;
-        aspect-ratio: 4 / 5;
+    }
+
+    .postcard-thumb {
+        width: 100%;
     }
 
     .postcard-thumb[data-id='1a'] {

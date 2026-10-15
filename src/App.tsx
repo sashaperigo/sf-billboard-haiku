@@ -23,6 +23,7 @@ import type { ShareId } from './lib/shareImage'
 import { useMediaQuery } from './lib/useMediaQuery'
 import { useShareRenders } from './lib/useShareRenders'
 import { useRoute } from './lib/route'
+import { PostcardCard } from './components/PostcardCard'
 import { EditorPanel } from './components/EditorPanel'
 import { GalleryPage } from './components/GalleryPage'
 import { GalleryPreview } from './components/GalleryPreview'
@@ -69,7 +70,7 @@ export default function App() {
             restyle([0, 0, 0], [0, 0, 0], [0, 1, 2]),
     )
     const [rolls, setRolls] = useState < { n: number;delay: number } [] > ([0, 1, 2].map(() => ({ n: 0, delay: 0 })))
-    const [status, setStatus] = useState('')
+    const [saveResult, setSaveResult] = useState<{ ok: boolean; n: number } | null>(null)
     const [history, setHistory] = useState<{ haiku: Haiku; style: typeof style }[]>([])
     const route = useRoute()
     const [count, setCount] = useState<number | null>(null)
@@ -121,7 +122,6 @@ export default function App() {
 
     const boxRef = useRef < HTMLDivElement > (null)
     const lineRefs = useRef < (HTMLSpanElement | null)[] > ([])
-    const statusTimer = useRef < ReturnType < typeof setTimeout >> (undefined)
 
     const fit = useCallback(() => {
         const box = boxRef.current
@@ -167,22 +167,17 @@ export default function App() {
         document.fonts ?.ready.then(fit)
         return () => window.removeEventListener('resize', fit)
     }, [fit])
-    useEffect(() => () => clearTimeout(statusTimer.current), [])
 
-    const flash = (msg: string) => {
-        setStatus(msg)
-        clearTimeout(statusTimer.current)
-        statusTimer.current = setTimeout(() => setStatus(''), 2000)
-    }
+    const reportSave = (ok: boolean) => setSaveResult((r) => ({ ok, n: (r?.n ?? 0) + 1 }))
     const save = async (creator: string) => {
         setSaveOpen(false)
         try {
             setJustSavedId(await saveHaikuToGallery(haiku, style, creator))
-            flash('saved to gallery')
+            reportSave(true)
             refreshCount()
             setPreviewKey((k) => k + 1)
         } catch {
-            flash('save failed')
+            reportSave(false)
         }
     }
 
@@ -228,7 +223,6 @@ export default function App() {
             inks: [s.inks[2], s.inks[1], s.inks[0]],
         }))
         setLocks((l) => [l[2], l[1], l[0]])
-        flash('swapped')
     }
     const rerollEverything = () => {
         setHistory((h) => [...h, { haiku, style }])
@@ -302,13 +296,16 @@ export default function App() {
                             style={style}
                             locks={locks}
                             canUndo={history.length > 0}
-                            status={status}
+                            saveResult={saveResult}
                             onToggleLock={toggleLock}
                             onRerollFont={rerollFont}
                             onRoll={rerollEverything}
                             onUndo={undo}
                             onSwap={swapOuter}
                             onShare={() => openShare()}
+                            onSave={() => setSaveOpen(true)}
+                        />
+                        <PostcardCard
                             onShareImage={openShare}
                             thumbs={{
                                 '1a': renders['1a']?.url,
@@ -316,7 +313,6 @@ export default function App() {
                                 '1c': renders['1c']?.url,
                                 '1d': renders['1d']?.url,
                             }}
-                            onSave={() => setSaveOpen(true)}
                         />
                     </section>
 
