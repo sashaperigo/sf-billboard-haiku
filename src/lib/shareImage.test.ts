@@ -169,4 +169,46 @@ describe('renderArtboard', () => {
             expect((await renderLog(id)).filter((l) => l.startsWith('toBlob'))).toHaveLength(1)
         }
     })
+
+    const mount = (id: ShareId) => {
+        const { container, unmount } = render(createElement(Artboards, { haiku, style }))
+        return { ab: container.querySelector<HTMLElement>(`[data-artboard="${id}"]`)!, unmount }
+    }
+
+    it('rejects when the browser cannot encode the PNG', async () => {
+        vi.mocked(HTMLCanvasElement.prototype.toBlob).mockImplementationOnce(((cb: BlobCallback) => cb(null)) as never)
+        const { ab, unmount } = mount('1a')
+        await expect(renderArtboard(ab)).rejects.toThrow('toBlob failed')
+        unmount()
+    })
+
+    it('still renders when image decoding never settles (decode is best-effort)', async () => {
+        vi.useFakeTimers()
+        const decode = HTMLImageElement.prototype.decode
+        HTMLImageElement.prototype.decode = () => new Promise(() => {})
+        try {
+            const { ab, unmount } = mount('1a')
+            const p = renderArtboard(ab)
+            await vi.advanceTimersByTimeAsync(2500)
+            expect((await p).type).toBe('image/png')
+            unmount()
+        } finally {
+            HTMLImageElement.prototype.decode = decode
+            vi.useRealTimers()
+        }
+    })
+
+    it('times out after 10s if encoding never completes', async () => {
+        vi.useFakeTimers()
+        vi.mocked(HTMLCanvasElement.prototype.toBlob).mockImplementationOnce((() => {}) as never)
+        try {
+            const { ab, unmount } = mount('1a')
+            const assertion = expect(renderArtboard(ab)).rejects.toThrow('render timeout')
+            await vi.advanceTimersByTimeAsync(10_001)
+            await assertion
+            unmount()
+        } finally {
+            vi.useRealTimers()
+        }
+    })
 })
