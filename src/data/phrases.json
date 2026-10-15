@@ -576,8 +576,8 @@
 },
 {
     "id": "p131",
-    "text": "AI everywhere",
-    "syllables": 5
+    "text": "AI is in everything",
+    "syllables": 7
 },
 {
     "id": "p132",
@@ -1298,4 +1298,9 @@
     "id": "p278",
     "text": "Video generation",
     "syllables": 7
+},
+{
+    "id": "p279",
+    "text": "AI everywhere",
+    "syllables": 5
 }]

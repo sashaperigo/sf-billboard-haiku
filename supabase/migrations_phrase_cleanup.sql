@@ -6,17 +6,18 @@
 --   p024 removed as a dupe of p036      -> remap to p036
 --   p231 removed as a dupe of p170      -> remap to p170
 --   p160 removed                        -> delete haikus using it
---   p131, p215, p219 relabeled 7 -> 5   -> they can no longer be the middle line, delete haikus using them
+--   p215, p219 relabeled 7 -> 5         -> they can no longer be the middle line, delete haikus using them
+--   p131 reworded to "AI is in everything" (still 7) -> nothing to do; new 5-syllable "AI everywhere" is p279
 --   line 1 == line 3 after remapping    -> delete (parseShareParam rejects these)
 
 -- 1. Preview what will change.
 select id, haiku_param, upvotes, creator_name,
   case
-    when string_to_array(haiku_param, ',') && array['p160','p131','p215','p219'] then 'DELETE'
+    when string_to_array(haiku_param, ',') && array['p160','p215','p219'] then 'DELETE'
     else 'REMAP'
   end as action
 from public.haikus
-where string_to_array(haiku_param, ',') && array['p024','p231','p160','p131','p215','p219']
+where string_to_array(haiku_param, ',') && array['p024','p231','p160','p215','p219']
 order by action, created_at;
 
 begin;
@@ -26,7 +27,7 @@ create table if not exists public.haikus_backup_phrase_cleanup (like public.haik
 alter table public.haikus_backup_phrase_cleanup enable row level security;
 insert into public.haikus_backup_phrase_cleanup
 select * from public.haikus h
-where string_to_array(h.haiku_param, ',') && array['p024','p231','p160','p131','p215','p219']
+where string_to_array(h.haiku_param, ',') && array['p024','p231','p160','p215','p219']
   and not exists (select 1 from public.haikus_backup_phrase_cleanup b where b.id = h.id);
 
 -- 3. Remap duplicates to their surviving ids, keeping line order.
@@ -40,7 +41,7 @@ where string_to_array(haiku_param, ',') && array['p024','p231'];
 -- 4. Delete haikus whose phrases were eliminated or can no longer fill their line,
 --    plus any that now repeat the same phrase on lines 1 and 3.
 delete from public.haikus
-where string_to_array(haiku_param, ',') && array['p160','p131','p215','p219']
+where string_to_array(haiku_param, ',') && array['p160','p215','p219']
    or split_part(haiku_param, ',', 1) = split_part(haiku_param, ',', 3);
 
 commit;
