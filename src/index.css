@@ -567,12 +567,14 @@ h2 {
 .haiku-lines {
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: 10px;
 }
 
 .haiku-lines p {
     margin: 0;
     text-wrap: balance;
+    /* trim each line's box to cap height / baseline so the gap between lines is the same in every face */
+    text-box: trim-both cap alphabetic;
 }
 
 .yours-tag {
