@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { SwapIcon } from './icons'
+import { ShareIcon, SwapIcon, UndoIcon } from './icons'
 import type { Haiku, Locks } from '../lib/haiku'
 import { Link } from '../lib/route'
 import { type LineCssInput, plainCss } from '../lib/style'
@@ -62,10 +62,12 @@ function SaveTag({ result }: { result: EditorPanelProps['saveResult'] }) {
   )
 }
 
+const MUTED = 'rgba(20,19,14,0.45)'
+
 const LockIcon = ({ locked }: { locked: boolean }) => (
-  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <rect x="5" y="11" width="14" height="10" rx="2" stroke={locked ? '#8a5507' : '#14140f'} fill={locked ? '#ffe6bf' : 'none'} />
-    <path d={locked ? 'M8 11V7a4 4 0 0 1 8 0v4' : 'M8 11V7a4 4 0 0 1 7.5-2'} stroke={locked ? '#8a5507' : '#14140f'} />
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="5" y="11" width="14" height="10" rx="2" stroke={locked ? '#8a5507' : MUTED} fill={locked ? '#ffe6bf' : 'none'} />
+    <path d={locked ? 'M8 11V7a4 4 0 0 1 8 0v4' : 'M8 11V7a4 4 0 0 1 7.5-2'} stroke={locked ? '#8a5507' : MUTED} />
   </svg>
 )
 
@@ -73,74 +75,51 @@ export function EditorPanel(p: EditorPanelProps) {
   const isMobile = useMediaQuery('(max-width: 700px)')
   return (
     <div className="editor">
-      {LINES.map((i) =>
-        isMobile ? (
-          <div className="editor-row" key={i}>
-            <div className="editor-head">
-              <div className="editor-label">
-                <span className="editor-line">Line {i + 1}</span>
-                <span className="editor-syl"> · {SYLLABLES[i]} syllables</span>
-              </div>
-              <span className="icon-wrap">
-                <button
-                  type="button"
-                  className="icon-btn"
-                  aria-label={`New font for line ${i + 1}`}
-                  onClick={() => p.onRerollFont(i)}
-                >
-                  <span className="aa" aria-hidden="true">
-                    Aa
-                  </span>
-                </button>
-              </span>
-              <span className="icon-wrap">
-                <button
-                  type="button"
-                  className="icon-btn"
-                  aria-label={`Lock line ${i + 1}`}
-                  aria-pressed={p.locks[i]}
-                  onClick={() => p.onToggleLock(i)}
-                >
-                  <LockIcon locked={p.locks[i]} />
-                </button>
+      {LINES.map((i) => (
+        <div className="editor-row" key={i}>
+          <div className="editor-head">
+            <div className="editor-label">
+              <span className="editor-line">Line {i + 1}</span>
+              <span className="editor-syl">
+                {isMobile ? ' · ' : ''}
+                {SYLLABLES[i]} syllables
               </span>
             </div>
-            <span className="editor-text" style={plainCss(p.style, i, 19)}>
-              {p.haiku[i].text}
+            <span className="icon-wrap">
+              <button
+                type="button"
+                className="icon-btn"
+                aria-label={`New font for line ${i + 1}`}
+                onClick={() => p.onRerollFont(i)}
+              >
+                <span className="aa" aria-hidden="true">
+                  Aa
+                </span>
+              </button>
+              <span className="icon-tip" aria-hidden="true">
+                Change font
+              </span>
             </span>
-          </div>
-        ) : (
-        <div className="editor-row" key={i}>
-          <div className="editor-label">
-            <span className="editor-line">Line {i + 1}</span>
-            <span className="editor-syl">{SYLLABLES[i]} syllables</span>
+            <span className="icon-wrap">
+              <button
+                type="button"
+                className="icon-btn"
+                aria-label={`Lock line ${i + 1}`}
+                aria-pressed={p.locks[i]}
+                onClick={() => p.onToggleLock(i)}
+              >
+                <LockIcon locked={p.locks[i]} />
+              </button>
+              <span className="icon-tip" aria-hidden="true">
+                {p.locks[i] ? 'Unlock row' : 'Lock row'}
+              </span>
+            </span>
           </div>
           <span className="editor-text" style={plainCss(p.style, i, 19)}>
             {p.haiku[i].text}
           </span>
-          <button
-            type="button"
-            className="pill pill-font"
-            aria-label={`New font for line ${i + 1}`}
-            onClick={() => p.onRerollFont(i)}
-          >
-            <span className="aa" aria-hidden="true">
-              Aa
-            </span>{' '}
-            New font
-          </button>
-          <button
-            type="button"
-            className="pill pill-lock"
-            aria-label={`Lock line ${i + 1}`}
-            aria-pressed={p.locks[i]}
-            onClick={() => p.onToggleLock(i)}
-          >
-            {p.locks[i] ? 'Locked' : 'Lock'}
-          </button>
         </div>
-        ),
-      )}
+      ))}
       <div className="editor-actions">
         <SaveTag result={p.saveResult} />
         <button
@@ -150,30 +129,33 @@ export function EditorPanel(p: EditorPanelProps) {
           disabled={p.locks.every(Boolean)}
           onClick={p.onRoll}
         >
-          {isMobile ? (
-            <>
-              <span aria-hidden="true">🎲</span>
-              <span aria-hidden="true">Reroll</span>
-            </>
-          ) : (
-            'Roll unlocked lines'
-          )}
+          <span aria-hidden="true">🎲</span>
+          <span aria-hidden="true">Reroll</span>
         </button>
-        <button type="button" className="btn btn-secondary undo" disabled={!p.canUndo} onClick={p.onUndo}>
-          Undo
-        </button>
-        <button
-          type="button"
-          className="btn btn-secondary swap"
-          aria-label="Swap lines 1 and 3"
-          title="Swap lines 1 and 3"
-          onClick={p.onSwap}
-        >
-          <SwapIcon /> Swap
-        </button>
-        <button type="button" className="btn btn-secondary share" onClick={p.onShare}>
-          Share
-        </button>
+        <span className="icon-wrap">
+          <button type="button" className="btn btn-tint undo" aria-label="Undo" disabled={!p.canUndo} onClick={p.onUndo}>
+            <UndoIcon />
+          </button>
+          <span className="icon-tip icon-tip-up" aria-hidden="true">
+            Undo
+          </span>
+        </span>
+        <span className="icon-wrap">
+          <button type="button" className="btn btn-tint swap" aria-label="Swap lines 1 and 3" onClick={p.onSwap}>
+            <SwapIcon />
+          </button>
+          <span className="icon-tip icon-tip-up" aria-hidden="true">
+            Swap lines 1 and 3
+          </span>
+        </span>
+        <span className="icon-wrap share">
+          <button type="button" className="btn btn-tint" aria-label="Share" onClick={p.onShare}>
+            <ShareIcon />
+          </button>
+          <span className="icon-tip icon-tip-up" aria-hidden="true">
+            Share
+          </span>
+        </span>
         <button type="button" className="btn btn-amber save" onClick={p.onSave}>
           Save to gallery
         </button>

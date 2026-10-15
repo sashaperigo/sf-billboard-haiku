@@ -46,12 +46,13 @@ describe('EditorPanel', () => {
     expect(p.onToggleLock).toHaveBeenCalledWith(2)
   })
 
-  it('shows Locked with aria-pressed for locked lines', () => {
+  it('exposes lock state via aria-pressed and the tooltip text', () => {
     setup({ locks: [true, false, false] })
     const lock = screen.getByRole('button', { name: 'Lock line 1' })
     expect(lock).toHaveAttribute('aria-pressed', 'true')
-    expect(lock).toHaveTextContent('Locked')
-    expect(screen.getByRole('button', { name: 'Lock line 2' })).toHaveTextContent(/^Lock$/)
+    expect(screen.getByRole('button', { name: 'Lock line 2' })).toHaveAttribute('aria-pressed', 'false')
+    expect(screen.getByText('Unlock row')).toBeInTheDocument()
+    expect(screen.getAllByText('Lock row')).toHaveLength(2)
   })
 
   it('disables Roll when everything is locked and Undo when there is no history', () => {

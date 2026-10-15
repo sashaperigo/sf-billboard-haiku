@@ -48,3 +48,17 @@ export const SwapIcon = () => (
     <path d="M12 16l4 4 4-4" />
   </svg>
 )
+
+export const UndoIcon = () => (
+  <svg {...svgProps}>
+    <path d="M9 14L4 9l5-5" />
+    <path d="M4 9h10a6 6 0 0 1 0 12h-3" />
+  </svg>
+)
+
+export const ShareIcon = () => (
+  <svg {...svgProps}>
+    <path d="M22 2L11 13" />
+    <path d="M22 2l-7 20-4-9-9-4 20-7z" />
+  </svg>
+)
