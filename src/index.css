@@ -169,7 +169,7 @@ h2 {
 
 .app {
     width: 100%;
-    max-width: 980px; /* 900px photo/editor + 40px padding each side */
+    max-width: 1080px; /* 1000px photo/editor + 40px padding each side */
     padding: 0 40px;
     scroll-margin-top: 16px;
 }
@@ -178,13 +178,13 @@ h2 {
 @media (min-width: 701px) {
     .app {
         /* 280px reserved for the editor when it wraps to a taller layout at narrower widths */
-        max-width: min(980px, calc((100svh - 280px) * 2.257 + 80px));
+        max-width: min(1080px, calc((100svh - 280px) * 2.257 + 80px));
     }
 }
 
 @media (min-width: 701px) and (min-height: 860px) {
     .app {
-        max-width: min(980px, calc((100svh - 230px) * 2.257 + 80px));
+        max-width: min(1080px, calc((100svh - 230px) * 2.257 + 80px));
     }
 }
 
