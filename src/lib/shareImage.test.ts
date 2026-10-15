@@ -23,7 +23,7 @@ let nextGradient = 0
 const canvasIds = new WeakMap<object, number>()
 const contexts = new WeakMap<object, unknown>()
 
-const round = (n: number) => Math.round(n * 1000) / 1000
+const round = (n: number) => Math.round(n * 1e6) / 1e6
 function fmt(v: unknown): string {
     if (typeof v === 'number') return String(round(v))
     if (v instanceof HTMLCanvasElement) return `canvas#${canvasIds.get(v)}(${v.width}x${v.height})`
@@ -143,7 +143,7 @@ describe('renderArtboard', () => {
     it('1a (photo): clips the photo, rotates the board over it, and centers the text below', async () => {
         const calls = (await renderLog('1a')).join('\n')
         expect(calls).toContain('clip()')
-        expect(calls).toContain('rotate(-0.005)')
+        expect(calls).toContain('rotate(-0.004887)')
         expect(calls).toContain('globalCompositeOperation = "multiply"')
         expect(calls).toContain('textAlign = "center"')
         expect(calls).not.toContain('textAlign = "right"')
