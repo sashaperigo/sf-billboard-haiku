@@ -237,6 +237,75 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
     else ctx.rect(x, y, w, h)
 }
 
+/** Apply the same shadow-lifting gamma as the on-page `lift-shadows` filter to a photo. */
+function liftedPhoto(img: HTMLImageElement, w: number, h: number) {
+    const c = document.createElement('canvas')
+    c.width = w * 2
+    c.height = h * 2
+    const cc = c.getContext('2d')!
+    cc.drawImage(img, 0, 0, c.width, c.height)
+    const d = cc.getImageData(0, 0, c.width, c.height)
+    for (let i = 0; i < d.data.length; i += 4) {
+        d.data[i] = LUT[d.data[i]]
+        d.data[i + 1] = LUT[d.data[i + 1]]
+        d.data[i + 2] = LUT[d.data[i + 2]]
+    }
+    cc.putImageData(d, 0, 0)
+    return c
+}
+
+/** Classic layout: the lifted photo with the haiku board sitting on it, captions centered below. */
+function drawPhotoArtboard(ctx: CanvasRenderingContext2D, photoBox: HTMLElement, board: HTMLElement, texts: HTMLElement[]) {
+    const px = photoBox.offsetLeft, py = photoBox.offsetTop, pw = photoBox.offsetWidth, ph = photoBox.offsetHeight
+    const photo = liftedPhoto(photoBox.querySelector('img')!, pw, ph)
+    ctx.save()
+    ctx.beginPath()
+    roundRect(ctx, px, py, pw, ph, 12)
+    ctx.clip()
+    ctx.drawImage(photo, px, py, pw, ph)
+    const layer = boardLayer(board)
+    // The board is tilted slightly (see the data-board style in ShareArtboards), so rotate about its center.
+    ctx.translate(px + board.offsetLeft + board.offsetWidth / 2, py + board.offsetTop + board.offsetHeight / 2)
+    ctx.rotate((-0.28 * Math.PI) / 180)
+    ctx.translate(-board.offsetWidth / 2, -board.offsetHeight / 2)
+    ctx.globalCompositeOperation = 'multiply'
+    ctx.drawImage(layer, 0, 0)
+    ctx.globalCompositeOperation = 'source-over'
+    sheen(ctx, board.offsetWidth, board.offsetHeight)
+    edgeShade(ctx, board.offsetWidth, board.offsetHeight, 50, 'rgba(40,48,60,0.10)')
+    ctx.restore()
+    texts.forEach((el) => drawText(ctx, el, 'center'))
+}
+
+/** Fill the quad with a soft pink glow, as if the night billboard were lit from within. */
+function glowQuad(ctx: CanvasRenderingContext2D, q: number[]) {
+    ctx.save()
+    ctx.shadowColor = 'rgba(255,170,190,0.35)'
+    ctx.shadowBlur = 60
+    ctx.fillStyle = '#f2dcdd'
+    ctx.beginPath()
+    ctx.moveTo(q[0], q[1])
+    ctx.lineTo(q[2], q[3])
+    ctx.lineTo(q[4], q[5])
+    ctx.lineTo(q[6], q[7])
+    ctx.closePath()
+    ctx.fill()
+    ctx.restore()
+}
+
+/** Full-bleed photo layouts: the board is flat on the photo (sutro) or warped onto a quad (day, night). */
+function drawBillboardArtboard(ctx: CanvasRenderingContext2D, ab: HTMLElement, board: HTMLElement, texts: HTMLElement[]) {
+    const img = ab.querySelector('img')!
+    ctx.drawImage(img, img.offsetLeft, img.offsetTop, img.offsetWidth, img.offsetHeight)
+    const layer = boardLayer(board)
+    const q = board.dataset.quad?.split(',').map(Number)
+    if (q) {
+        if (board.dataset.board === 'night') glowQuad(ctx, q)
+        warp(ctx, layer, q)
+    } else ctx.drawImage(layer, board.offsetLeft, board.offsetTop)
+    texts.forEach((el) => drawText(ctx, el, 'right'))
+}
+
 async function drawArtboard(ab: HTMLElement): Promise<Blob> {
     const c = document.createElement('canvas')
     c.width = SHARE_W
@@ -249,61 +318,8 @@ async function drawArtboard(ab: HTMLElement): Promise<Blob> {
     const board = ab.querySelector<HTMLElement>('[data-board]')!
     const texts = [...ab.querySelectorAll<HTMLElement>('[data-k="text"],[data-k="caption"]')]
     const photoBox = ab.querySelector<HTMLElement>('[data-k="photo"]')
-    if (photoBox) {
-        const img = photoBox.querySelector('img')!
-        const px = photoBox.offsetLeft, py = photoBox.offsetTop, pw = photoBox.offsetWidth, ph = photoBox.offsetHeight
-        const t = document.createElement('canvas')
-        t.width = pw * 2
-        t.height = ph * 2
-        const tc = t.getContext('2d')!
-        tc.drawImage(img, 0, 0, t.width, t.height)
-        const d = tc.getImageData(0, 0, t.width, t.height)
-        for (let i = 0; i < d.data.length; i += 4) {
-            d.data[i] = LUT[d.data[i]]
-            d.data[i + 1] = LUT[d.data[i + 1]]
-            d.data[i + 2] = LUT[d.data[i + 2]]
-        }
-        tc.putImageData(d, 0, 0)
-        ctx.save()
-        ctx.beginPath()
-        roundRect(ctx, px, py, pw, ph, 12)
-        ctx.clip()
-        ctx.drawImage(t, px, py, pw, ph)
-        const layer = boardLayer(board)
-        ctx.translate(px + board.offsetLeft + board.offsetWidth / 2, py + board.offsetTop + board.offsetHeight / 2)
-        ctx.rotate((-0.28 * Math.PI) / 180)
-        ctx.translate(-board.offsetWidth / 2, -board.offsetHeight / 2)
-        ctx.globalCompositeOperation = 'multiply'
-        ctx.drawImage(layer, 0, 0)
-        ctx.globalCompositeOperation = 'source-over'
-        sheen(ctx, board.offsetWidth, board.offsetHeight)
-        edgeShade(ctx, board.offsetWidth, board.offsetHeight, 50, 'rgba(40,48,60,0.10)')
-        ctx.restore()
-        texts.forEach((el) => drawText(ctx, el, 'center'))
-    } else {
-        const img = ab.querySelector('img')!
-        ctx.drawImage(img, img.offsetLeft, img.offsetTop, img.offsetWidth, img.offsetHeight)
-        const layer = boardLayer(board)
-        const q = board.dataset.quad?.split(',').map(Number)
-        if (q) {
-            if (board.dataset.board === 'night') {
-                ctx.save()
-                ctx.shadowColor = 'rgba(255,170,190,0.35)'
-                ctx.shadowBlur = 60
-                ctx.fillStyle = '#f2dcdd'
-                ctx.beginPath()
-                ctx.moveTo(q[0], q[1])
-                ctx.lineTo(q[2], q[3])
-                ctx.lineTo(q[4], q[5])
-                ctx.lineTo(q[6], q[7])
-                ctx.closePath()
-                ctx.fill()
-                ctx.restore()
-            }
-            warp(ctx, layer, q)
-        } else ctx.drawImage(layer, board.offsetLeft, board.offsetTop)
-        texts.forEach((el) => drawText(ctx, el, 'right'))
-    }
+    if (photoBox) drawPhotoArtboard(ctx, photoBox, board, texts)
+    else drawBillboardArtboard(ctx, ab, board, texts)
     return new Promise((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error('toBlob failed'))), 'image/png'))
 }
 
