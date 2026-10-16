@@ -185,6 +185,11 @@ h2 {
     font-weight: 700;
 }
 
+.steps .step strong {
+    display: block;
+    line-height: 30px; /* match .step-num so the number centers on the title */
+}
+
 .step p {
     margin: 4px 0 0;
     font-size: 14px;
@@ -1179,6 +1184,10 @@ h2 {
 
     .step {
         align-items: center;
+    }
+
+    .steps .step strong {
+        line-height: normal;
     }
 
     .step-num {
