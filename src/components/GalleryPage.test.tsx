@@ -57,6 +57,21 @@ describe('GalleryPage', () => {
     expect(screen.getByRole('button', { name: 'New' })).toHaveAttribute('aria-pressed', 'true')
   })
 
+  it('toggles plain italic rendering of the haiku lines', async () => {
+    vi.mocked(fetchGalleryPage).mockResolvedValue({ items: [entry('a', 5)], hasMore: false })
+    render(<GalleryPage allPhrases={allPhrases} count={1} />)
+    await waitFor(() => expect(screen.getByText('a-1')).toBeInTheDocument())
+    const toggle = screen.getByRole('button', { name: 'Toggle fonts' })
+    expect(toggle).toHaveAttribute('aria-pressed', 'false')
+
+    await userEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByText('a-1')).toHaveStyle({ fontStyle: 'italic' })
+
+    await userEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-pressed', 'false')
+  })
+
   it('shows an empty message when there are no haikus', async () => {
     vi.mocked(fetchGalleryPage).mockResolvedValue({ items: [], hasMore: false })
     render(<GalleryPage allPhrases={allPhrases} count={0} />)

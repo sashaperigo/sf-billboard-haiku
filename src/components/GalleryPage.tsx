@@ -28,6 +28,7 @@ export function GalleryPage({ allPhrases, count }: GalleryPageProps) {
   const { votedIds, toggleVote } = useVoting(setItems, setError)
   const [justSaved] = useState(getJustSaved)
   const [justSavedId, setJustSavedId] = useState(justSaved?.id ?? null)
+  const [plain, setPlain] = useState(false)
   const latest = useRef(0)
 
   const loadPage = async (offset: number, forSort: GallerySort) => {
@@ -89,6 +90,9 @@ export function GalleryPage({ allPhrases, count }: GalleryPageProps) {
             </button>
           ))}
         </div>
+        <button type="button" className="font-toggle" aria-pressed={plain} onClick={() => setPlain((p) => !p)}>
+          Toggle fonts
+        </button>
         {count !== null && <span className="gallery-total">{count} haikus</span>}
       </div>
 
@@ -109,6 +113,7 @@ export function GalleryPage({ allPhrases, count }: GalleryPageProps) {
               voted={votedIds.has(item.id)}
               yours={item.id === justSavedId}
               scale={isMobile ? 1 : 0.9}
+              plain={plain}
               onToggleVote={toggleVote}
             />
           ))}

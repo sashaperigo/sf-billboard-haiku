@@ -7,13 +7,14 @@ export interface GalleryCardProps {
   voted: boolean
   yours?: boolean
   scale?: number
+  plain?: boolean
   onToggleVote: (id: string) => void
 }
 
-export function GalleryCard({ item, voted, yours, scale, onToggleVote }: GalleryCardProps) {
+export function GalleryCard({ item, voted, yours, scale, plain, onToggleVote }: GalleryCardProps) {
   return (
     <div className="gallery-card">
-      <HaikuCard haiku={item.haiku} style={item.style} scale={scale} />
+      <HaikuCard haiku={item.haiku} style={item.style} scale={scale} plain={plain} />
       <div className="gallery-card-foot">
         <span className="creator">
           by {item.creator}

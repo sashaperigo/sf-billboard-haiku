@@ -6,17 +6,26 @@ export interface HaikuCardProps {
   style: Style
   /** Multiplier on the base type size (the gallery page uses a slightly smaller one). */
   scale?: number
+  /** Skip the fancy per-line styling and render in the base font, italic. */
+  plain?: boolean
 }
 
 const BASE_PX = [19, 17, 19]
 // Faces differ a lot in size, so a fixed line box (not em-relative) keeps line spacing even.
 const LINE_BOX = 1.4
 
-export function HaikuCard({ haiku, style, scale = 1 }: HaikuCardProps) {
+export function HaikuCard({ haiku, style, scale = 1, plain = false }: HaikuCardProps) {
   return (
     <div className="haiku-lines">
       {haiku.map((phrase, i) => (
-        <p key={i} style={{ ...plainCss(style, i, BASE_PX[i] * scale), lineHeight: `${BASE_PX[i] * scale * LINE_BOX}px` }}>
+        <p
+          key={i}
+          style={
+            plain
+              ? { fontStyle: 'italic', fontSize: `${BASE_PX[i] * scale}px`, lineHeight: `${BASE_PX[i] * scale * LINE_BOX}px` }
+              : { ...plainCss(style, i, BASE_PX[i] * scale), lineHeight: `${BASE_PX[i] * scale * LINE_BOX}px` }
+          }
+        >
           {phrase.text}
         </p>
       ))}
