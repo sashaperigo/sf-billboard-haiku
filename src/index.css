@@ -163,12 +163,12 @@ h2 {
 
 .step-num {
     flex: none;
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     background: #14140f;
     color: #fff;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
@@ -187,7 +187,8 @@ h2 {
 
 .steps .step strong {
     display: block;
-    line-height: 22px; /* match .step-num so the number spans exactly the title line */
+    font-size: 19px;
+    line-height: 26px; /* match .step-num so the number spans exactly the title line */
 }
 
 .step p {
