@@ -225,7 +225,7 @@ describe('App', () => {
     await userEvent.type(screen.getByLabelText('Nickname'), 'Sasha')
     await userEvent.click(screen.getByRole('button', { name: 'Save' }))
     await screen.findByText('Saved to gallery')
-    expect(sessionStorage.getItem('justSavedHaikuId')).toBe('abc')
+    expect(getJustSaved()?.id).toBe('abc')
     await waitFor(() => expect(fetchGalleryPage).toHaveBeenCalledTimes(2))
     expect(countHaikus).toHaveBeenCalledTimes(2)
   })
