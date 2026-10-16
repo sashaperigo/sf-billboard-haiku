@@ -2,14 +2,17 @@ import { computeLayout } from './layout'
 
 const measureCtx = document.createElement('canvas').getContext('2d')!
 
-/** Where a line's visible glyphs sit inside its line box, measured from the canvas font metrics. */
+/**
+ * Where a line's glyphs sit inside its line box, measured from the canvas font metrics.
+ * Spans cap height to baseline (not the text's full ink), so descenders and tall ascenders
+ * don't make the gap look bigger or smaller depending on which letters a line happens to have.
+ */
 function inkBox(el: HTMLElement, lineH: number) {
     const st = getComputedStyle(el)
     measureCtx.font = `${st.fontStyle} ${st.fontWeight} ${st.fontSize} ${st.fontFamily}`
-    const raw = el.textContent ?? ''
-    const m = measureCtx.measureText(st.textTransform === 'uppercase' ? raw.toUpperCase() : raw)
+    const m = measureCtx.measureText('H')
     const base = (lineH - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2 + m.fontBoundingBoxAscent
-    return { top: base - m.actualBoundingBoxAscent, bottom: base + m.actualBoundingBoxDescent }
+    return { top: base - m.actualBoundingBoxAscent, bottom: base }
 }
 
 /**
