@@ -134,12 +134,12 @@ h2 {
 .hero {
     width: 100%;
     max-width: var(--content-max);
-    padding: 56px 40px 36px;
+    padding: 56px 40px 48px;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 18px;
+    gap: 28px;
 }
 
 .hero h1 {
@@ -163,7 +163,7 @@ h2 {
     margin: 0;
     width: 100%;
     max-width: var(--content-max);
-    padding: 0 40px 40px;
+    padding: 0 40px 56px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
