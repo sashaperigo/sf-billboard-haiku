@@ -603,6 +603,7 @@ h2 {
 }
 
 .yours-tag {
+    margin-left: 8px;
     font-size: 12px;
     font-weight: 700;
     color: #b5730a;

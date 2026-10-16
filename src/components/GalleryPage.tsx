@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Phrase } from '../lib/haiku'
 import { type GalleryHaiku, type GallerySort, fetchGalleryPage } from '../lib/gallery'
-import { getJustSavedId } from '../lib/justSaved'
+import { getJustSaved } from '../lib/justSaved'
 import { Link } from '../lib/route'
 import { useMediaQuery } from '../lib/useMediaQuery'
 import { useVoting } from '../lib/useVoting'
@@ -26,7 +26,8 @@ export function GalleryPage({ allPhrases, count }: GalleryPageProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const { votedIds, toggleVote } = useVoting(setItems, setError)
-  const justSavedId = getJustSavedId()
+  const [justSaved] = useState(getJustSaved)
+  const [justSavedId, setJustSavedId] = useState(justSaved?.id ?? null)
   const latest = useRef(0)
 
   const loadPage = async (offset: number, forSort: GallerySort) => {
@@ -45,6 +46,12 @@ export function GalleryPage({ allPhrases, count }: GalleryPageProps) {
       if (request === latest.current) setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (!justSaved) return
+    const timer = setTimeout(() => setJustSavedId(null), justSaved.remaining)
+    return () => clearTimeout(timer)
+  }, [justSaved])
 
   useEffect(() => {
     setItems([])

@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import type { Phrase } from '../lib/haiku'
 import type { GalleryHaiku } from '../lib/gallery'
 import { fetchGalleryPage, removeUpvote, upvoteHaiku } from '../lib/gallery'
+import { setJustSavedId } from '../lib/justSaved'
 import { GalleryPage } from './GalleryPage'
 
 vi.mock('../lib/gallery', () => ({
@@ -132,11 +133,19 @@ describe('GalleryPage', () => {
   })
 
   it('tags the haiku saved this session', async () => {
-    sessionStorage.setItem('justSavedHaikuId', 'b')
+    setJustSavedId('b')
     vi.mocked(fetchGalleryPage).mockResolvedValue({ items: [entry('a', 5), entry('b', 0)], hasMore: false })
     render(<GalleryPage allPhrases={allPhrases} count={2} />)
     await waitFor(() => expect(screen.getByText('b-1')).toBeInTheDocument())
     expect(screen.getAllByText('Yours · just saved')).toHaveLength(1)
+  })
+
+  it('stops tagging a saved haiku once the time cap passes', async () => {
+    sessionStorage.setItem('justSavedHaikuId', JSON.stringify({ id: 'b', at: Date.now() - 61_000 }))
+    vi.mocked(fetchGalleryPage).mockResolvedValue({ items: [entry('b', 0)], hasMore: false })
+    render(<GalleryPage allPhrases={allPhrases} count={1} />)
+    await waitFor(() => expect(screen.getByText('b-1')).toBeInTheDocument())
+    expect(screen.queryByText('Yours · just saved')).not.toBeInTheDocument()
   })
 
   it('loads more items and appends them without clearing existing ones', async () => {

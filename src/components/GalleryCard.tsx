@@ -13,10 +13,12 @@ export interface GalleryCardProps {
 export function GalleryCard({ item, voted, yours, scale, onToggleVote }: GalleryCardProps) {
   return (
     <div className="gallery-card">
-      {yours && <span className="yours-tag">Yours · just saved</span>}
       <HaikuCard haiku={item.haiku} style={item.style} scale={scale} />
       <div className="gallery-card-foot">
-        <span className="creator">by {item.creator}</span>
+        <span className="creator">
+          by {item.creator}
+          {yours && <span className="yours-tag">Yours · just saved</span>}
+        </span>
       <button
         type="button"
         className="upvote"
