@@ -87,8 +87,8 @@ export function Artboards({ haiku, style }: { haiku: Haiku; style: Style }) {
             {box}
         </div>
     )
-    const caption = (
-        <div data-k="caption" style={captionStyle}>
+    const caption = (dark = false) => (
+        <div data-k="caption" style={dark ? { ...captionStyle, color: '#000', textShadow: 'none' } : captionStyle}>
             Make yours at haiku.guru
         </div>
     )
@@ -130,19 +130,19 @@ export function Artboards({ haiku, style }: { haiku: Haiku; style: Style }) {
                 <div data-board="sutro" style={{ position: 'absolute', left: 66, top: 620, width: 948, height: 317, fontSize: 44 }}>
                     {box}
                 </div>
-                {caption}
+                {caption(true)}
             </div>
 
             <div data-artboard="1c" style={artboardStyle('#c3d3e6')}>
                 <img src={dayBillboard} alt="" style={photoStyle(-111, 1512, 1080)} />
                 {paper('day')}
-                {caption}
+                {caption()}
             </div>
 
             <div data-artboard="1d" style={artboardStyle('#0b0606')}>
                 <img src={nightBillboard} alt="" style={photoStyle(-45, 1440, 1080)} />
                 {paper('night')}
-                {caption}
+                {caption()}
             </div>
         </div>
     )

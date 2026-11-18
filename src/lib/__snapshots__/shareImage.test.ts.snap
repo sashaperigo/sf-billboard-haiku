@@ -167,7 +167,7 @@ exports[`renderArtboard > draws artboard 1b exactly as before 1`] = `
     "toBlob": 1,
     "translate": 3,
   },
-  "sha1": "25c7a877b84058957a111552ce5b36c6065b83fe",
+  "sha1": "12d170b58694cca57a73d15de025a3c365351244",
   "tail": [
     "gradient#5 stop 0 rgba(40,48,60,0.12)",
     "gradient#5 stop 1 rgba(0,0,0,0)",
@@ -176,7 +176,7 @@ exports[`renderArtboard > draws artboard 1b exactly as before 1`] = `
     "0.drawImage(canvas#1(948x317), 66, 620)",
     "0.save()",
     "0.font = "italic 400 36px \\"Open Sans\\", sans-serif"",
-    "0.fillStyle = "rgb(255, 255, 255)"",
+    "0.fillStyle = "rgb(0, 0, 0)"",
     "0.textBaseline = "middle"",
     "0.textAlign = "right"",
     "0.shadowColor = "rgba(0,0,0,0.6)"",
