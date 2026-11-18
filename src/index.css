@@ -1645,6 +1645,7 @@ h2 {
 }
 
 .about-page .about-credits strong {
+    font-style: normal;
     font-weight: 600;
 }
 
