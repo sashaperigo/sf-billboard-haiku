@@ -1640,7 +1640,13 @@ h2 {
     margin-top: 40px;
     font-size: 13px;
     line-height: 1.6;
+    font-style: italic;
     color: rgba(20, 19, 14, 0.55);
+}
+
+.about-page .about-credits a {
+    font-weight: inherit;
+    color: inherit;
 }
 
 @media (max-width: 700px) {
