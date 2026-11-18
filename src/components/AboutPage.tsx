@@ -19,6 +19,10 @@ export function AboutPage() {
         </a>{' '}
         in San Francisco. You can reach me at sasha dot perigo at gmail dot com.
       </p>
+      <p className="about-credits">
+        <strong>Photo credits:</strong> Classic and Twin Peaks, Gustavo Hernandez/KQED. Rooftop, Ian C. Bates/The New
+        York Times. Night, Mike Isaac/The New York Times.
+      </p>
     </main>
   )
 }
