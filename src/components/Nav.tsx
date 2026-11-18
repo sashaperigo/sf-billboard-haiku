@@ -17,6 +17,7 @@ export interface NavProps {
 export function Nav({ active, count, onHelp, helpOpen = false, showWordmark = true }: NavProps) {
   const isMobile = useMediaQuery('(max-width: 700px)')
   const onGallery = active === 'gallery'
+  const onHome = active === 'home'
   const wordmark = (
     <Link
       to="/"
@@ -36,10 +37,16 @@ export function Nav({ active, count, onHelp, helpOpen = false, showWordmark = tr
     </Link>
   )
 
+  const about = (
+    <Link to="/about" className="nav-link" aria-current={active === 'about' ? 'page' : undefined}>
+      About
+    </Link>
+  )
+
   if (isMobile) {
     return (
       <nav className="nav" aria-label="Main">
-        {onGallery ? (
+        {!onHome ? (
           <>
             <Link to="/" className="nav-link">
               ← Make a haiku
@@ -51,6 +58,7 @@ export function Nav({ active, count, onHelp, helpOpen = false, showWordmark = tr
             {wordmark}
             <div className="nav-links">
               {gallery}
+              {about}
               {onHelp && (
                 <button
                   type="button"
@@ -74,7 +82,7 @@ export function Nav({ active, count, onHelp, helpOpen = false, showWordmark = tr
     <nav className="nav" aria-label="Main">
       {wordmark}
       <div className="nav-links">
-        {onGallery ? (
+        {!onHome ? (
           <Link to="/" className="nav-link nav-muted">
             Make a haiku
           </Link>
@@ -84,6 +92,7 @@ export function Nav({ active, count, onHelp, helpOpen = false, showWordmark = tr
           </a>
         )}
         {gallery}
+        {about}
       </div>
     </nav>
   )

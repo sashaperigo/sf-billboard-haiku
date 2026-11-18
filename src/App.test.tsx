@@ -200,6 +200,17 @@ describe('App', () => {
     expect(await screen.findByRole('link', { name: 'Gallery 312' })).toHaveAttribute('aria-current', 'page')
   })
 
+  it('renders the About page from the /about URL with the credits and links', async () => {
+    window.history.pushState({}, '', '/about')
+    render(<App />)
+    expect(screen.getByRole('heading', { name: 'About' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: '101ads.org' })).toHaveAttribute('href', 'https://101ads.org/')
+    expect(screen.getByRole('link', { name: 'Sasha Perigo' })).toHaveAttribute(
+      'href',
+      'https://www.linkedin.com/in/sashaperigo/',
+    )
+  })
+
   it('shows the explainer steps and the gallery preview with the total count', async () => {
     vi.mocked(fetchGalleryPage).mockResolvedValue({ items: [], hasMore: false })
     render(<App />)

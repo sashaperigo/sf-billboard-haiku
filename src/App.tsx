@@ -24,10 +24,11 @@ import { rememberVote } from './lib/useVoting'
 import type { ShareId } from './lib/shareImage'
 import { useMediaQuery } from './lib/useMediaQuery'
 import { useShareRenders } from './lib/useShareRenders'
-import { useRoute } from './lib/route'
+import { Link, useRoute } from './lib/route'
 import { useHeroVisible } from './lib/title'
 import { PostcardCard } from './components/PostcardCard'
 import { EditorPanel } from './components/EditorPanel'
+import { AboutPage } from './components/AboutPage'
 import { GalleryPage } from './components/GalleryPage'
 import { GalleryPreview } from './components/GalleryPreview'
 import { HelpCard, HelpSheet } from './components/HelpPanel'
@@ -78,9 +79,9 @@ export default function App() {
     const isMobile = useMediaQuery('(max-width: 700px)')
     const closeShare = useCallback(() => setShareOpen(false), [])
     const closeHelp = useCallback(() => setHelpOpen(false), [])
-    const heroVisible = useHeroVisible(heroRef, isMobile ? 64 : 76, route !== 'gallery')
+    const heroVisible = useHeroVisible(heroRef, isMobile ? 64 : 76, route === 'home')
     const artboardsRef = useRef<HTMLDivElement>(null)
-    const artboardsOn = route !== 'gallery' && (rendersIdle || shareOpen)
+    const artboardsOn = route === 'home' && (rendersIdle || shareOpen)
     const renders = useShareRenders(artboardsRef, haiku, style, artboardsOn)
     const openShare = (id?: ShareId) => {
         setShareInitial(id)
@@ -227,10 +228,12 @@ export default function App() {
                 count={count}
                 onHelp={openHelp}
                 helpOpen={helpOpen}
-                showWordmark={route === 'gallery' || !heroVisible}
+                showWordmark={route !== 'home' || !heroVisible}
             />
             {route === 'gallery' ? (
                 <GalleryPage allPhrases={all} count={count} />
+            ) : route === 'about' ? (
+                <AboutPage />
             ) : (
                 <>
                     <section ref={heroRef} className="hero">
@@ -328,6 +331,8 @@ export default function App() {
                 <span>Made with ❤️ in San Francisco</span>
                 <span aria-hidden="true">·</span>
                 <span>Created by Sasha Perigo</span>
+                <span aria-hidden="true">·</span>
+                <Link to="/about">About</Link>
             </footer>
         </div>
     )

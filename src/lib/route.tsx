@@ -1,9 +1,12 @@
 import { type AnchorHTMLAttributes, type MouseEvent, useSyncExternalStore } from 'react'
 
-export type Route = 'home' | 'gallery'
+export type Route = 'home' | 'gallery' | 'about'
 
 export function routeFromPath(path: string): Route {
-    return path.replace(/\/+$/, '') === '/gallery' ? 'gallery' : 'home'
+    const clean = path.replace(/\/+$/, '')
+    if (clean === '/gallery') return 'gallery'
+    if (clean === '/about') return 'about'
+    return 'home'
 }
 
 const NAV_EVENT = 'app:navigate'

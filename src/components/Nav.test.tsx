@@ -23,6 +23,16 @@ describe('Nav', () => {
     expect(hidden).toHaveAttribute('data-hidden')
   })
 
+  it('links to the About page and marks it current there', () => {
+    const { unmount } = render(<Nav active="home" count={1} />)
+    expect(screen.getByRole('link', { name: 'About' })).toHaveAttribute('href', '/about')
+    expect(screen.getByRole('link', { name: 'About' })).not.toHaveAttribute('aria-current')
+    unmount()
+    render(<Nav active="about" count={1} />)
+    expect(screen.getByRole('link', { name: 'About' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('link', { name: 'Make a haiku' })).toHaveAttribute('href', '/')
+  })
+
   it('omits the count while it is unknown', () => {
     render(<Nav active="home" count={null} />)
     expect(screen.getByRole('link', { name: /^Gallery/ })).toHaveTextContent(/^Gallery$/)

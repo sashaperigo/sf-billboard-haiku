@@ -9,6 +9,8 @@ describe('routeFromPath', () => {
         expect(routeFromPath('/')).toBe('home')
         expect(routeFromPath('/gallery')).toBe('gallery')
         expect(routeFromPath('/gallery/')).toBe('gallery')
+        expect(routeFromPath('/about')).toBe('about')
+        expect(routeFromPath('/about/')).toBe('about')
         expect(routeFromPath('/anything-else')).toBe('home')
     })
 })
