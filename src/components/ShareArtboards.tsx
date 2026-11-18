@@ -37,7 +37,7 @@ const captionStyle: React.CSSProperties = {
     fontFamily: "'Open Sans', sans-serif",
     fontStyle: 'italic',
     fontWeight: 400,
-    fontSize: 36,
+    fontSize: 44,
     color: '#fff',
     textShadow: '0 0 5px rgba(0,0,0,0.6)',
 }
