@@ -24,7 +24,7 @@ import { rememberVote } from './lib/useVoting'
 import type { ShareId } from './lib/shareImage'
 import { useMediaQuery } from './lib/useMediaQuery'
 import { useShareRenders } from './lib/useShareRenders'
-import { Link, useRoute } from './lib/route'
+import { useRoute } from './lib/route'
 import { useHeroVisible } from './lib/title'
 import { PostcardCard } from './components/PostcardCard'
 import { EditorPanel } from './components/EditorPanel'
@@ -330,9 +330,12 @@ export default function App() {
             <footer className="footer">
                 <span>Made with ❤️ in San Francisco</span>
                 <span aria-hidden="true">·</span>
-                <span>Created by Sasha Perigo</span>
-                <span aria-hidden="true">·</span>
-                <Link to="/about">About</Link>
+                <span>
+                    Created by{' '}
+                    <a href="https://www.linkedin.com/in/sashaperigo/" target="_blank" rel="noreferrer">
+                        Sasha Perigo
+                    </a>
+                </span>
             </footer>
         </div>
     )

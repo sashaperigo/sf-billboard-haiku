@@ -17,9 +17,8 @@ export function AboutPage() {
         <a href="https://www.linkedin.com/in/sashaperigo/" target="_blank" rel="noreferrer">
           Sasha Perigo
         </a>{' '}
-        in San Francisco.
+        in San Francisco. You can reach me at sasha dot perigo at gmail dot com.
       </p>
-      <p>To submit a billboard or send me feedback, you can reach me at sasha dot perigo at gmail dot com.</p>
     </main>
   )
 }
