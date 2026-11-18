@@ -1644,6 +1644,10 @@ h2 {
     color: rgba(20, 19, 14, 0.55);
 }
 
+.about-page .about-credits strong {
+    font-weight: 600;
+}
+
 .about-page .about-credits a {
     font-weight: inherit;
     color: inherit;
