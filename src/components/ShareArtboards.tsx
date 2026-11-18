@@ -30,8 +30,6 @@ const boxStyle: React.CSSProperties = {
     textAlign: 'center',
 }
 
-const CAPTION_LINE = 46
-
 const captionStyle: React.CSSProperties = {
     position: 'absolute',
     right: 30,
@@ -90,14 +88,9 @@ export function Artboards({ haiku, style }: { haiku: Haiku; style: Style }) {
         </div>
     )
     const caption = (
-        <>
-            <div data-k="caption" style={{ ...captionStyle, bottom: 26 + CAPTION_LINE }}>
-                Make yours at haiku.guru
-            </div>
-            <div data-k="caption" style={captionStyle}>
-                @sashainsf
-            </div>
-        </>
+        <div data-k="caption" style={captionStyle}>
+            Make yours at haiku.guru
+        </div>
     )
     return (
         <div aria-hidden="true" style={{ position: 'fixed', left: -99999, top: 0 }}>
