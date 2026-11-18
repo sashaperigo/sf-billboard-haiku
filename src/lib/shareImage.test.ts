@@ -44,7 +44,8 @@ function gradient() {
 function recordingContext(id: number) {
     const state: Record<string, unknown> = {}
     const results: Record<string, (...a: unknown[]) => unknown> = {
-        measureText: () => ({
+        measureText: (t) => ({
+            width: String(t).length * 10,
             fontBoundingBoxAscent: 10,
             fontBoundingBoxDescent: 4,
             actualBoundingBoxAscent: 8,

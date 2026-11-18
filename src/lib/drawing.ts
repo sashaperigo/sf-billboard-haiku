@@ -92,13 +92,25 @@ function boardLayer(board: HTMLElement): HTMLCanvasElement {
     return c
 }
 
+/** Styled runs of text in el: its own text plus any inline children (e.g. a differently coloured span). */
+function textRuns(el: HTMLElement) {
+    return [...el.childNodes].flatMap((n) => {
+        const text = n.textContent ?? ''
+        if (n.nodeType === Node.TEXT_NODE) return [{ text, st: getComputedStyle(el) }]
+        return n instanceof HTMLElement ? [{ text, st: getComputedStyle(n) }] : []
+    })
+}
+
 function drawText(ctx: CanvasRenderingContext2D, el: HTMLElement, align: CanvasTextAlign) {
     const st = getComputedStyle(el)
+    const plain = !el.children.length
     ctx.save()
-    ctx.font = `${st.fontStyle} ${st.fontWeight} ${st.fontSize} ${st.fontFamily}`
-    ctx.fillStyle = st.color
+    if (plain) {
+        ctx.font = `${st.fontStyle} ${st.fontWeight} ${st.fontSize} ${st.fontFamily}`
+        ctx.fillStyle = st.color
+    }
     ctx.textBaseline = 'middle'
-    ctx.textAlign = align
+    if (plain) ctx.textAlign = align
     if (st.textShadow !== 'none') {
         const [, color = 'rgba(0,0,0,0.6)'] = st.textShadow.match(/(rgba?\([^)]*\))/) ?? []
         const blur = st.textShadow.replace(/rgba?\([^)]*\)/, '').match(/-?[\d.]+/g)?.[2]
@@ -106,7 +118,27 @@ function drawText(ctx: CanvasRenderingContext2D, el: HTMLElement, align: CanvasT
         ctx.shadowBlur = blur === undefined ? 5 : Number(blur)
     }
     const x = el.offsetLeft + (align === 'right' ? el.offsetWidth : el.offsetWidth / 2)
-    ctx.fillText((el.textContent ?? '').trim(), x, el.offsetTop + el.offsetHeight / 2)
+    const y = el.offsetTop + el.offsetHeight / 2
+    if (plain) {
+        ctx.fillText((el.textContent ?? '').trim(), x, y)
+    } else {
+        const runs = textRuns(el).map((r) => ({ ...r, font: `${r.st.fontStyle} ${r.st.fontWeight} ${r.st.fontSize} ${r.st.fontFamily}` }))
+        runs[0].text = runs[0].text.trimStart()
+        runs[runs.length - 1].text = runs[runs.length - 1].text.trimEnd()
+        const widths = runs.map((r) => {
+            ctx.font = r.font
+            return ctx.measureText(r.text).width
+        })
+        const total = widths.reduce((a, b) => a + b, 0)
+        let cx = align === 'right' ? x - total : align === 'center' ? x - total / 2 : x
+        ctx.textAlign = 'left'
+        runs.forEach((r, i) => {
+            ctx.font = r.font
+            ctx.fillStyle = r.st.color
+            ctx.fillText(r.text, cx, y)
+            cx += widths[i]
+        })
+    }
     ctx.restore()
 }
 
