@@ -123,7 +123,7 @@ export function Artboards({ haiku, style }: { haiku: Haiku; style: Style }) {
                     </div>
                     <div data-k="text" style={{ fontFamily: "'Open Sans', sans-serif", fontSize: 30, color: 'rgba(20,19,14,0.6)' }}>
                         Write your own at{' '}
-                        <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600, color: '#b5730a' }}>haiku.guru</span>
+                        <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600, color: '#b5730a' }}>https://haiku.guru</span>
                     </div>
                 </div>
                 <div
