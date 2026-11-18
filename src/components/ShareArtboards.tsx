@@ -37,7 +37,7 @@ const captionStyle: React.CSSProperties = {
     fontFamily: "'Open Sans', sans-serif",
     fontStyle: 'italic',
     fontWeight: 400,
-    fontSize: 30,
+    fontSize: 36,
     color: '#fff',
     textShadow: '0 0 5px rgba(0,0,0,0.6)',
 }
@@ -89,7 +89,7 @@ export function Artboards({ haiku, style }: { haiku: Haiku; style: Style }) {
     )
     const caption = (
         <div data-k="caption" style={captionStyle}>
-            haiku.guru
+            Make yours at haiku.guru
         </div>
     )
     return (
