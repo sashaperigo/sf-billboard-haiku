@@ -205,10 +205,10 @@ describe('App', () => {
     render(<App />)
     expect(screen.getByRole('heading', { name: 'About' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: '101ads.org' })).toHaveAttribute('href', 'https://101ads.org/')
-    expect(screen.getByRole('link', { name: 'Sasha Perigo' })).toHaveAttribute(
-      'href',
-      'https://www.linkedin.com/in/sashaperigo/',
-    )
+    // once in the credit line, once in the footer
+    const names = screen.getAllByRole('link', { name: 'Sasha Perigo' })
+    expect(names).toHaveLength(2)
+    names.forEach((a) => expect(a).toHaveAttribute('href', 'https://www.linkedin.com/in/sashaperigo/'))
   })
 
   it('shows the explainer steps and the gallery preview with the total count', async () => {
