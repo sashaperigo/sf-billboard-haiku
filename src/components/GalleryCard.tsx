@@ -1,32 +1,25 @@
 import type { GalleryHaiku } from '../lib/gallery'
 import { HaikuCard } from './HaikuCard'
-import { DownloadIcon, UpvoteIcon } from './icons'
+import { UpvoteIcon } from './icons'
 
 export interface GalleryCardProps {
   item: GalleryHaiku
   voted: boolean
   yours?: boolean
   scale?: number
-  plain?: boolean
   onToggleVote: (id: string) => void
-  onShare?: (item: GalleryHaiku) => void
 }
 
-export function GalleryCard({ item, voted, yours, scale, plain, onToggleVote, onShare }: GalleryCardProps) {
+export function GalleryCard({ item, voted, yours, scale, onToggleVote }: GalleryCardProps) {
   return (
     <div className="gallery-card">
-      <HaikuCard haiku={item.haiku} style={item.style} scale={scale} plain={plain} />
+      <HaikuCard haiku={item.haiku} style={item.style} scale={scale} />
       <div className="gallery-card-foot">
         <span className="creator">
           by {item.creator}
           {yours && <span className="yours-tag">Yours · just saved</span>}
         </span>
       <div className="gallery-card-actions">
-        {onShare && (
-          <button type="button" className="upvote" aria-label="Download postcards" onClick={() => onShare(item)}>
-            <DownloadIcon />
-          </button>
-        )}
         <button
           type="button"
           className="upvote"
