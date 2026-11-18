@@ -176,4 +176,12 @@ describe('GalleryPage', () => {
     expect(screen.getByText('a-1')).toBeInTheDocument()
     expect(fetchGalleryPage).toHaveBeenLastCalledWith(allPhrases, 1, { sort: 'top' })
   })
+
+  it('opens the postcard share dialog for a haiku from its download button', async () => {
+    vi.mocked(fetchGalleryPage).mockResolvedValue({ items: [entry('a', 5)], hasMore: false })
+    render(<GalleryPage allPhrases={allPhrases} count={1} />)
+    await waitFor(() => expect(screen.getByText('a-1')).toBeInTheDocument())
+    await userEvent.click(screen.getByRole('button', { name: 'Download postcards' }))
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+  })
 })

@@ -1,6 +1,6 @@
 import type { GalleryHaiku } from '../lib/gallery'
 import { HaikuCard } from './HaikuCard'
-import { UpvoteIcon } from './icons'
+import { DownloadIcon, UpvoteIcon } from './icons'
 
 export interface GalleryCardProps {
   item: GalleryHaiku
@@ -9,9 +9,10 @@ export interface GalleryCardProps {
   scale?: number
   plain?: boolean
   onToggleVote: (id: string) => void
+  onShare?: (item: GalleryHaiku) => void
 }
 
-export function GalleryCard({ item, voted, yours, scale, plain, onToggleVote }: GalleryCardProps) {
+export function GalleryCard({ item, voted, yours, scale, plain, onToggleVote, onShare }: GalleryCardProps) {
   return (
     <div className="gallery-card">
       <HaikuCard haiku={item.haiku} style={item.style} scale={scale} plain={plain} />
@@ -20,16 +21,23 @@ export function GalleryCard({ item, voted, yours, scale, plain, onToggleVote }: 
           by {item.creator}
           {yours && <span className="yours-tag">Yours · just saved</span>}
         </span>
-      <button
-        type="button"
-        className="upvote"
-        aria-label={voted ? 'Remove your upvote' : 'Upvote this haiku'}
-        aria-pressed={voted}
-        onClick={() => onToggleVote(item.id)}
-      >
-        <UpvoteIcon />
-        <span className="upvote-count">{item.upvotes}</span>
-      </button>
+      <div className="gallery-card-actions">
+        {onShare && (
+          <button type="button" className="upvote" aria-label="Download postcards" onClick={() => onShare(item)}>
+            <DownloadIcon />
+          </button>
+        )}
+        <button
+          type="button"
+          className="upvote"
+          aria-label={voted ? 'Remove your upvote' : 'Upvote this haiku'}
+          aria-pressed={voted}
+          onClick={() => onToggleVote(item.id)}
+        >
+          <UpvoteIcon />
+          <span className="upvote-count">{item.upvotes}</span>
+        </button>
+      </div>
       </div>
     </div>
   )

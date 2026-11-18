@@ -6,6 +6,7 @@ import { Link } from '../lib/route'
 import { useMediaQuery } from '../lib/useMediaQuery'
 import { useVoting } from '../lib/useVoting'
 import { GalleryCard } from './GalleryCard'
+import { GallerySharePortal } from './GallerySharePortal'
 
 export interface GalleryPageProps {
   allPhrases: Phrase[]
@@ -29,6 +30,7 @@ export function GalleryPage({ allPhrases, count }: GalleryPageProps) {
   const [justSaved] = useState(getJustSaved)
   const [justSavedId, setJustSavedId] = useState(justSaved?.id ?? null)
   const [plain, setPlain] = useState(false)
+  const [sharing, setSharing] = useState<GalleryHaiku | null>(null)
   const latest = useRef(0)
 
   const loadPage = async (offset: number, forSort: GallerySort) => {
@@ -115,6 +117,7 @@ export function GalleryPage({ allPhrases, count }: GalleryPageProps) {
               scale={isMobile ? 1 : 0.9}
               plain={plain}
               onToggleVote={toggleVote}
+              onShare={setSharing}
             />
           ))}
         </div>
@@ -131,6 +134,7 @@ export function GalleryPage({ allPhrases, count }: GalleryPageProps) {
         )}
         {isMobile && makeYourOwn}
       </div>
+      {sharing && <GallerySharePortal item={sharing} onClose={() => setSharing(null)} />}
     </main>
   )
 }

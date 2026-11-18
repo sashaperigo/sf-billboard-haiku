@@ -1602,3 +1602,9 @@ h2 {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+.gallery-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
