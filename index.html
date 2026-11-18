@@ -21,7 +21,8 @@
         dataLayer.push(arguments);
       }
       gtag('js', new Date());
-      gtag('config', 'G-BWKK85NCE4');
+      // Page views are sent by the app, since routes change without a reload.
+      gtag('config', 'G-BWKK85NCE4', { send_page_view: false });
     </script>
   </head>
   <body>

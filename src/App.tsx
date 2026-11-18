@@ -25,6 +25,7 @@ import type { ShareId } from './lib/shareImage'
 import { useMediaQuery } from './lib/useMediaQuery'
 import { useShareRenders } from './lib/useShareRenders'
 import { useRoute } from './lib/route'
+import { track, trackPageView } from './lib/analytics'
 import { useHeroVisible } from './lib/title'
 import { PostcardCard } from './components/PostcardCard'
 import { EditorPanel } from './components/EditorPanel'
@@ -84,6 +85,7 @@ export default function App() {
     const artboardsOn = route === 'home' && (rendersIdle || shareOpen)
     const renders = useShareRenders(artboardsRef, haiku, style, artboardsOn)
     const openShare = (id?: ShareId) => {
+        track('share_open', { source: id ? 'postcard' : 'editor' })
         setShareInitial(id)
         setShareOpen(true)
     }
@@ -96,6 +98,7 @@ export default function App() {
         }
     }, [])
     const openHelp = () => {
+        track('help_open')
         dismissHelp()
         setHelpOpen(true)
     }
@@ -110,6 +113,8 @@ export default function App() {
         const t = setTimeout(() => setRendersIdle(true), 1000)
         return () => clearTimeout(t)
     }, [])
+
+    useEffect(() => trackPageView(window.location.pathname), [route])
 
     const refreshCount = useCallback(() => {
         countHaikus().then(setCount, () => undefined)
@@ -142,6 +147,7 @@ export default function App() {
     const reportSave = (ok: boolean) => setSaveResult((r) => ({ ok, n: (r?.n ?? 0) + 1 }))
     const save = async (creator: string) => {
         setSaveOpen(false)
+        track('save_submit')
         try {
             const id = await saveHaikuToGallery(haiku, style, creator)
             setJustSavedId(id)
@@ -152,16 +158,20 @@ export default function App() {
             } catch {
                 /* the save itself succeeded; the vote can be cast by hand */
             }
+            track('save_success')
             reportSave(true)
             refreshCount()
             setPreviewKey((k) => k + 1)
         } catch {
+            track('save_failure')
             reportSave(false)
         }
     }
 
-    const toggleLock = (i: number) =>
+    const toggleLock = (i: number) => {
+        track(locks[i] ? 'unlock_line' : 'lock_line', { line: i + 1 })
         setLocks((l) => l.map((v, j) => (j === i ? !v : v)) as unknown as Locks)
+    }
 
     const shareUrl = () => {
         const url = new URL(window.location.href)
@@ -183,17 +193,20 @@ export default function App() {
     const undo = () => {
         const prev = history[history.length - 1]
         if (!prev) return
+        track('undo')
         bump(LINES.filter((i) => prev.haiku[i].id !== haiku[i].id))
         setHaiku(prev.haiku)
         setStyle(prev.style)
         setHistory((h) => h.slice(0, -1))
     }
     const rerollFont = (i: number) => {
+        track('reroll_font', { line: i + 1 })
         setHistory((h) => [...h, { haiku, style }])
         bump([i])
         setStyle((s) => restyle(s.faces, s.inks, [i]))
     }
     const swapOuter = () => {
+        track('swap_lines')
         setHistory((h) => [...h, { haiku, style }])
         bump([0, 2])
         setHaiku((h) => [h[2], h[1], h[0]])
@@ -204,6 +217,7 @@ export default function App() {
         setLocks((l) => [l[2], l[1], l[0]])
     }
     const rerollEverything = () => {
+        track('roll', { locked_lines: locks.filter(Boolean).length })
         setHistory((h) => [...h, { haiku, style }])
         bump(LINES.filter((i) => !locks[i]))
         setHaiku((h) => rerollAll(all, h, locks, Math.random))
@@ -299,7 +313,10 @@ export default function App() {
                             onUndo={undo}
                             onSwap={swapOuter}
                             onShare={() => openShare()}
-                            onSave={() => setSaveOpen(true)}
+                            onSave={() => {
+                                track('save_open')
+                                setSaveOpen(true)
+                            }}
                         />
                         <PostcardCard
                             onShareImage={openShare}

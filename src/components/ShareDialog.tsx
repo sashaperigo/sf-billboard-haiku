@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { track } from '../lib/analytics'
 import { SHARE_OPTIONS, type ShareId, shareFileName } from '../lib/shareImage'
 import type { ShareRenders } from '../lib/useShareRenders'
 import { DownloadIcon, LinkIcon, MoreIcon } from './icons'
@@ -39,6 +40,7 @@ export function ShareDialog({ renders, initialSelected, shareUrl, onClose }: Sha
         if (!r) return flash('still rendering')
         const file = new File([r.blob], shareFileName(current), { type: 'image/png' })
         try {
+            track('share_native', { format: current })
             await navigator.share({ files: [file] })
         } catch {
             /* cancelled */
@@ -52,12 +54,14 @@ export function ShareDialog({ renders, initialSelected, shareUrl, onClose }: Sha
         a.href = r.url
         a.download = shareFileName(current)
         a.click()
+        track('share_download', { format: current })
         flash('downloaded')
     }
 
     const copyLink = async () => {
         try {
             await navigator.clipboard.writeText(shareUrl())
+            track('share_copy_link')
             flash('link copied')
         } catch {
             flash('copy failed')
@@ -99,7 +103,10 @@ export function ShareDialog({ renders, initialSelected, shareUrl, onClose }: Sha
                                 type="button"
                                 className="share-tile"
                                 aria-pressed={current === o.id}
-                                onClick={() => setSelected(o.id)}
+                                onClick={() => {
+                                    track('share_format_select', { format: o.id })
+                                    setSelected(o.id)
+                                }}
                             >
                                 <div className="share-thumb">
                                     {renders[o.id] && (

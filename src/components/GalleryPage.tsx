@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { track } from '../lib/analytics'
 import type { Phrase } from '../lib/haiku'
 import { type GalleryHaiku, type GallerySort, fetchGalleryPage } from '../lib/gallery'
 import { getJustSaved } from '../lib/justSaved'
@@ -84,7 +85,10 @@ export function GalleryPage({ allPhrases, count }: GalleryPageProps) {
       <div className="gallery-toolbar">
         <div className="segmented" role="group" aria-label="Sort haikus">
           {SORTS.map((s) => (
-            <button key={s.value} type="button" aria-pressed={sort === s.value} onClick={() => setSort(s.value)}>
+            <button key={s.value} type="button" aria-pressed={sort === s.value} onClick={() => {
+                track('gallery_sort', { sort: s.value })
+                setSort(s.value)
+              }}>
               {s.label}
             </button>
           ))}
@@ -119,7 +123,10 @@ export function GalleryPage({ allPhrases, count }: GalleryPageProps) {
             type="button"
             className="gallery-load-more"
             disabled={loading}
-            onClick={() => loadPage(items.length, sort)}
+            onClick={() => {
+              track('gallery_load_more')
+              loadPage(items.length, sort)
+            }}
           >
             Load more
           </button>
