@@ -141,13 +141,14 @@ describe('renderArtboard', () => {
         expect(summarize(await renderLog(id))).toMatchSnapshot()
     })
 
-    it('1a (photo): clips the photo, rotates the board over it, and centers the text below', async () => {
+    it('1a (photo): clips the photo, rotates the board over it, centers the text below and right-aligns the credit', async () => {
         const calls = (await renderLog('1a')).join('\n')
         expect(calls).toContain('clip()')
         expect(calls).toContain('rotate(-0.004887)')
         expect(calls).toContain('globalCompositeOperation = "multiply"')
         expect(calls).toContain('textAlign = "center"')
-        expect(calls).not.toContain('textAlign = "right"')
+        expect(calls.match(/textAlign = "right"/g)).toHaveLength(1)
+        expect(calls).toContain('Built by @sashainsf')
     })
 
     it('1b (sutro): draws the board flat on the photo with right-aligned caption', async () => {

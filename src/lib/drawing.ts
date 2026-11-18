@@ -184,7 +184,7 @@ export function drawPhotoArtboard(ctx: CanvasRenderingContext2D, photoBox: HTMLE
     sheen(ctx, board.offsetWidth, board.offsetHeight)
     edgeShade(ctx, board.offsetWidth, board.offsetHeight, 50, 'rgba(40,48,60,0.10)')
     ctx.restore()
-    texts.forEach((el) => drawText(ctx, el, 'center'))
+    texts.forEach((el) => drawText(ctx, el, (el.dataset.align as CanvasTextAlign | undefined) ?? 'center'))
 }
 
 /** Fill the quad with a soft pink glow, as if the night billboard were lit from within. */

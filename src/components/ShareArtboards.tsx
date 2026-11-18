@@ -118,16 +118,20 @@ export function Artboards({ haiku, style }: { haiku: Haiku; style: Style }) {
                     </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-                    <div data-k="text" style={{ fontFamily: "'Open Sans', sans-serif", fontSize: 24, color: 'rgba(20,19,14,0.6)' }}>
+                    <div data-k="text" style={{ fontFamily: "'Open Sans', sans-serif", fontSize: 30, color: 'rgba(20,19,14,0.6)' }}>
                         Words from real Bay Area AI billboards
                     </div>
-                    <div data-k="text" style={{ fontFamily: "'Open Sans', sans-serif", fontSize: 34, color: 'rgba(20,19,14,0.6)' }}>
+                    <div data-k="text" style={{ fontFamily: "'Open Sans', sans-serif", fontSize: 30, color: 'rgba(20,19,14,0.6)' }}>
                         Write your own at{' '}
                         <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600, color: '#b5730a' }}>haiku.guru</span>
                     </div>
-                    <div data-k="text" style={{ fontFamily: "'Open Sans', sans-serif", fontSize: 21, color: 'rgba(20,19,14,0.45)' }}>
-                        Built by @sashainsf
-                    </div>
+                </div>
+                <div
+                    data-k="text"
+                    data-align="right"
+                    style={{ position: 'absolute', right: 48, bottom: 32, fontFamily: "'Open Sans', sans-serif", fontSize: 24, color: 'rgba(20,19,14,0.45)' }}
+                >
+                    Built by @sashainsf
                 </div>
             </div>
 
