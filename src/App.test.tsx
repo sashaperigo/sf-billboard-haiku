@@ -205,7 +205,14 @@ describe('App', () => {
     render(<App />)
     expect(screen.getByRole('heading', { name: 'About' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: '101ads.org' })).toHaveAttribute('href', 'https://101ads.org/')
-    expect(screen.getByText(/Gustavo Hernandez\/KQED/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Gustavo Hernandez/KQED' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('kqed.org'),
+    )
+    expect(screen.getByRole('link', { name: 'Mike Isaac/The New York Times' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('nytimes.com'),
+    )
     // once in the credit line, once in the footer
     const names = screen.getAllByRole('link', { name: 'Sasha Perigo' })
     expect(names).toHaveLength(2)

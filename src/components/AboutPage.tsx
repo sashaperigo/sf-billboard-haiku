@@ -1,3 +1,5 @@
+const NYT = 'https://www.nytimes.com/2025/08/04/business/tech-billboards-are-all-over-san-francisco-can-you-decode-them.html'
+
 export function AboutPage() {
   return (
     <main className="about-page">
@@ -20,8 +22,22 @@ export function AboutPage() {
         in San Francisco. You can reach me at sasha dot perigo at gmail dot com.
       </p>
       <p className="about-credits">
-        <strong>Photo credits:</strong> Classic and Twin Peaks, Gustavo Hernandez/KQED. Rooftop, Ian C. Bates/The New
-        York Times. Night, Mike Isaac/The New York Times.
+        <strong>Photo credits:</strong>{' '}
+        <a
+          href="https://www.kqed.org/news/12076608/what-do-san-franciscos-ai-vs-humans-billboards-say-about-our-working-futures"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Gustavo Hernandez/KQED
+        </a>
+        ,{' '}
+        <a href={NYT} target="_blank" rel="noreferrer">
+          Ian C. Bates/The New York Times
+        </a>
+        ,{' '}
+        <a href={NYT} target="_blank" rel="noreferrer">
+          Mike Isaac/The New York Times
+        </a>
       </p>
     </main>
   )
