@@ -30,6 +30,8 @@ const boxStyle: React.CSSProperties = {
     textAlign: 'center',
 }
 
+const STRONG_SHADOW = '0 0 8px rgba(0,0,0,0.9)'
+
 const captionStyle: React.CSSProperties = {
     position: 'absolute',
     right: 30,
@@ -87,8 +89,8 @@ export function Artboards({ haiku, style }: { haiku: Haiku; style: Style }) {
             {box}
         </div>
     )
-    const caption = (dark = false) => (
-        <div data-k="caption" style={dark ? { ...captionStyle, color: '#000', textShadow: 'none' } : captionStyle}>
+    const caption = (textShadow?: string) => (
+        <div data-k="caption" style={textShadow ? { ...captionStyle, textShadow } : captionStyle}>
             Make yours at haiku.guru
         </div>
     )
@@ -130,7 +132,7 @@ export function Artboards({ haiku, style }: { haiku: Haiku; style: Style }) {
                 <div data-board="sutro" style={{ position: 'absolute', left: 66, top: 620, width: 948, height: 317, fontSize: 44 }}>
                     {box}
                 </div>
-                {caption(true)}
+                {caption(STRONG_SHADOW)}
             </div>
 
             <div data-artboard="1c" style={artboardStyle('#c3d3e6')}>

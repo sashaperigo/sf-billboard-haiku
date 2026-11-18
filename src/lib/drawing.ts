@@ -100,8 +100,10 @@ function drawText(ctx: CanvasRenderingContext2D, el: HTMLElement, align: CanvasT
     ctx.textBaseline = 'middle'
     ctx.textAlign = align
     if (st.textShadow !== 'none') {
-        ctx.shadowColor = 'rgba(0,0,0,0.6)'
-        ctx.shadowBlur = 5
+        const [, color = 'rgba(0,0,0,0.6)'] = st.textShadow.match(/(rgba?\([^)]*\))/) ?? []
+        const blur = st.textShadow.replace(/rgba?\([^)]*\)/, '').match(/-?[\d.]+/g)?.[2]
+        ctx.shadowColor = color
+        ctx.shadowBlur = blur === undefined ? 5 : Number(blur)
     }
     const x = el.offsetLeft + (align === 'right' ? el.offsetWidth : el.offsetWidth / 2)
     ctx.fillText((el.textContent ?? '').trim(), x, el.offsetTop + el.offsetHeight / 2)
