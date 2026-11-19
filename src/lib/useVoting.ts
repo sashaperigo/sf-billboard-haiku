@@ -1,4 +1,5 @@
 import { type Dispatch, type SetStateAction, useState } from 'react'
+import { track } from './analytics'
 import { type GalleryHaiku, removeUpvote, upvoteHaiku } from './gallery'
 
 const VOTED_KEY = 'votedHaikuIds'
@@ -30,6 +31,7 @@ export function rememberVote(id: string) {
 export function useVoting(
   setItems: Dispatch<SetStateAction<GalleryHaiku[]>>,
   onError: (message: string) => void,
+  source: 'gallery' | 'preview',
 ) {
   const [votedIds, setVotedIds] = useState<Set<string>>(() => loadVotedIds())
 
@@ -49,6 +51,7 @@ export function useVoting(
     setVoted(id, true)
     try {
       await upvoteHaiku(id)
+      track('upvote', { source })
     } catch {
       bump(id, -1)
       setVoted(id, false)
@@ -61,6 +64,7 @@ export function useVoting(
     setVoted(id, false)
     try {
       await removeUpvote(id)
+      track('remove_upvote', { source })
     } catch {
       bump(id, 1)
       setVoted(id, true)

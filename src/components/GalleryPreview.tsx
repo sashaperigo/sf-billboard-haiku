@@ -18,7 +18,7 @@ export function GalleryPreview({ allPhrases, count, refreshKey }: GalleryPreview
   const [items, setItems] = useState<GalleryHaiku[]>([])
   const [failed, setFailed] = useState(false)
   const [loaded, setLoaded] = useState(false)
-  const { votedIds, toggleVote } = useVoting(setItems, () => {})
+  const { votedIds, toggleVote } = useVoting(setItems, () => {}, 'preview')
 
   useEffect(() => {
     let live = true

@@ -26,7 +26,7 @@ export function GalleryPage({ allPhrases, count }: GalleryPageProps) {
   const [hasMore, setHasMore] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const { votedIds, toggleVote } = useVoting(setItems, setError)
+  const { votedIds, toggleVote } = useVoting(setItems, setError, 'gallery')
   const [justSaved] = useState(getJustSaved)
   const [justSavedId, setJustSavedId] = useState(justSaved?.id ?? null)
   const latest = useRef(0)
