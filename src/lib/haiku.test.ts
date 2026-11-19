@@ -46,6 +46,29 @@ describe('generateHaiku', () => {
   })
 })
 
+describe('conflicting phrases', () => {
+  const holiday = { id: 'p246', text: 'Holiday support', syllables: 5 as const }
+  const sweetens = { id: 'p269', text: 'Sweetens holiday support', syllables: 7 as const }
+  const pool = [holiday, ...mk(5, 3, 'f'), sweetens, ...mk(7, 2, 's')]
+  const hasBoth = (h: Haiku) => ids(h).includes('p246') && ids(h).includes('p269')
+
+  it('never generates both in one haiku', () => {
+    for (let seed = 1; seed <= 300; seed++) expect(hasBoth(generateHaiku(pool, rand(seed)))).toBe(false)
+  })
+
+  it('never rerolls into a conflict with a locked line', () => {
+    const byId = (id: string) => pool.find((p) => p.id === id)!
+    for (let seed = 1; seed <= 200; seed++) {
+      const a = rerollAll(pool, [holiday, byId('s1'), byId('f1')], [true, false, false], rand(seed))
+      expect(hasBoth(a)).toBe(false)
+      const b = rerollAll(pool, [byId('f1'), sweetens, byId('f2')], [false, true, false], rand(seed))
+      expect(hasBoth(b)).toBe(false)
+      const c = rerollAll(pool, [byId('f1'), byId('s1'), holiday], [false, false, true], rand(seed))
+      expect(hasBoth(c)).toBe(false)
+    }
+  })
+})
+
 describe('rerollAll', () => {
   const current = generateHaiku(minimal, seq(0, 0, 0)) // f1 s1 f2
   const none = [false, false, false] as const
